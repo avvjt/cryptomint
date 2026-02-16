@@ -23,7 +23,7 @@ export default function Ticker() {
   const [changes, setChanges] = useState({});
   const [glow, setGlow] = useState({});
 
-  const openPrice = useRef({}); // session open price
+  const openPrice = useRef({});
 
   useEffect(() => {
     const streams = COINS.map(
@@ -39,7 +39,6 @@ export default function Ticker() {
       const symbol = data.s;
       const price = parseFloat(data.p);
 
-      // set opening price ONCE
       if (!openPrice.current[symbol]) {
         openPrice.current[symbol] = price;
       }

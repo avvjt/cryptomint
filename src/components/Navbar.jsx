@@ -23,18 +23,18 @@ export default function Navbar() {
 
 
                         <div className="fixed left-0 right-0
-    bg-white rounded-b-xl
-    shadow-lg shadow-black/30
-    my-2
+                                        bg-white rounded-b-xl
+                                        shadow-lg shadow-black/30
+                                        my-2
 
-    opacity-0 translate-y-2
-    pointer-events-none
+                                        opacity-0 translate-y-2
+                                        pointer-events-none
 
-    transition-all duration-300 ease-out
+                                        transition-all duration-300 ease-out
 
-    group-hover:opacity-100
-    group-hover:translate-y-0
-    group-hover:pointer-events-auto">
+                                        group-hover:opacity-100
+                                        group-hover:translate-y-0
+                                        group-hover:pointer-events-auto">
                             <grid className="grid-cols-4 gap-10  px-10 py-10 flex justify-center">
                                 {/* 1st grid */}
                                 <div className=" ">

@@ -118,7 +118,7 @@
 .animate-marquee {
   display: flex;
   width: max-content;
-  animation: marquee 35s linear infinite;
+  animation: marquee 50s linear infinite;
 }
 
 .animate-marquee:hover {
@@ -166,3 +166,11 @@
 .glow-down {
   animation: glowDown 0.6s ease-out;
 }
+
+
+/* @font-face {
+  font-family: 'Trade';
+  src: url('/fonts/AlfaSlabOne-Regular.ttf') format('ttf');
+  font-weight: 900;
+  font-style: normal;
+} */
