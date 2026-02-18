@@ -3,6 +3,8 @@ import { useState } from "react";
 export default function Copyed() {
   const [expanded, setExpanded] = useState(false);
 
+
+  //commit check for git setup 18.02.2026
   return (
     <div className="bg-gray-50">
       {/* HEADER */}
