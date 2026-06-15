@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* body {
+  background: #000;
+} */
+
+html {
+  scroll-behavior: smooth;
+}
 
 @theme {
     /* Theme colors */
