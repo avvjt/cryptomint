@@ -181,3 +181,69 @@ html {
   font-weight: 900;
   font-style: normal;
 } */
+
+
+
+/* Events */
+
+.swiper-pagination {
+  bottom: 0 !important;
+}
+
+.swiper-pagination-bullet {
+  background: rgba(255,255,255,.4);
+}
+
+.swiper-pagination-bullet-active {
+  background: white;
+}
+
+
+/*Footer Design*/
+
+.footer-grid {
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0.05) 1px,
+      transparent 1px
+    );
+
+  background-size: 60px 60px;
+}
+
+.footer-noise {
+  background-image:
+    radial-gradient(
+      rgba(255,255,255,0.03) 1px,
+      transparent 1px
+    );
+
+  background-size: 4px 4px;
+  opacity: 0.4;
+}
+
+
+
+/*zero fees*/
+@keyframes tickerUp {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.scroll-up {
+  animation: tickerUp 40s linear infinite;
+}
+
+
+
+/*Login/signup button*/

@@ -1,72 +1,136 @@
 import {
-    Home,
-    CandlestickChart,
-    ArrowUpDown,
-    Wallet,
+  Home,
+  CandlestickChart,
+  ArrowUpDown,
+  Wallet,
 } from "lucide-react";
-import useScrollDirection from "../../hooks/useScrollDirection";
 
 import { NavLink } from "react-router-dom";
 
+import useScrollDirection from "../../hooks/useScrollDirection";
+
 export default function MobileBottomNav() {
-    const visible = useScrollDirection();
-    return (
-        <nav
-            className={`fixed
-      bottom-0
-      left-0
-      right-0
+  const visible = useScrollDirection();
+
+  const items = [
+    {
+      name: "Home",
+      path: "/",
+      icon: Home,
+    },
+    {
+      name: "Markets",
+      path: "/markets",
+      icon: CandlestickChart,
+    },
+    {
+      name: "Trade",
+      path: "/trade",
+      icon: ArrowUpDown,
+    },
+    {
+      name: "Futures",
+      path: "/futures",
+      icon: CandlestickChart,
+    },
+    {
+      name: "Assets",
+      path: "/assets",
+      icon: Wallet,
+    },
+  ];
+
+  return (
+    <div
+      className={`
+      fixed
+      bottom-4
+      left-4
+      right-4
+
       z-50
-      bg-black
-      border-t
-      border-zinc-800
+
       transition-transform
       duration-300
-      ${visible ? "translate-y-0" : "translate-y-full"}`}
-        >
-            <div className="grid grid-cols-5 py-2">
 
-                <NavLink
-                    to="/"
-                    className="flex flex-col items-center"
-                >
-                    <Home size={20} />
-                    <span className="text-xs">Home</span>
-                </NavLink>
+      ${
+        visible
+          ? "translate-y-0"
+          : "translate-y-32"
+      }
+      `}
+    >
+      <nav
+        className="
+        rounded-3xl
 
-                <NavLink
-                    to="/markets"
-                    className="flex flex-col items-center"
-                >
-                    <CandlestickChart size={20} />
-                    <span className="text-xs">Markets</span>
-                </NavLink>
+        border
+        border-[#1f2937]
 
-                <NavLink
-                    to="/trade"
-                    className="flex flex-col items-center"
-                >
-                    <ArrowUpDown size={20} />
-                    <span className="text-xs">Trade</span>
-                </NavLink>
+        bg-[#050A14]/95
 
-                <NavLink
-                    to="/futures"
-                    className="flex flex-col items-center"
-                >
-                    <CandlestickChart size={20} />
-                    <span className="text-xs">Futures</span>
-                </NavLink>
+        backdrop-blur-2xl
 
-                <NavLink
-                    to="/assets"
-                    className="flex flex-col items-center"
-                >
-                    <Wallet size={20} />
-                    <span className="text-xs">Assets</span>
-                </NavLink>
+        shadow-[0_0_40px_rgba(29,102,255,.15)]
+        "
+      >
+        <div className="grid grid-cols-5 py-2">
 
-            </div>
-        </nav>
-    );
+          {items.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <NavLink
+                key={item.path}
+                to={item.path}
+                className={({ isActive }) =>
+                  `
+                  flex
+                  flex-col
+                  items-center
+                  justify-center
+                  gap-1
+
+                  text-xs
+
+                  transition-all
+
+                  ${
+                    isActive
+                      ? "text-blue-500"
+                      : "text-zinc-400"
+                  }
+                  `
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <div
+                      className={`
+                      rounded-full
+                      p-2
+
+                      ${
+                        isActive
+                          ? "bg-blue-500/15"
+                          : ""
+                      }
+                      `}
+                    >
+                      <Icon size={20} />
+                    </div>
+
+                    <span>
+                      {item.name}
+                    </span>
+                  </>
+                )}
+              </NavLink>
+            );
+          })}
+
+        </div>
+      </nav>
+    </div>
+  );
 }

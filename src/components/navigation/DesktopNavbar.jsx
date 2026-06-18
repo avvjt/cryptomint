@@ -1,5 +1,8 @@
 import { NavLink } from "react-router-dom";
 import { Bell, Globe, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.png";
+import Ticker from "../../components/Ticker";
 
 export default function DesktopNavbar() {
   const navItems = [
@@ -10,18 +13,36 @@ export default function DesktopNavbar() {
     { name: "Assets", path: "/assets" },
   ];
 
+  const navigate = useNavigate();
+
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-black/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+    <header className="sticky top-0 z-50 bg-black/95 backdrop-blur-xl border-b border-[#111827]">
+      <Ticker />
+      <div className="mx-auto flex h-16 max-w-[1700px] items-center justify-between px-8">
 
         {/* Left */}
         <div className="flex items-center gap-10">
 
+
           <NavLink
             to="/"
-            className="text-2xl font-bold text-white"
+            className="flex items-center gap-2"
           >
-            MEXC
+            <img
+              src={logo}
+              alt="logo"
+              className="h-8"
+            />
+
+            <span
+              className="
+              text-3xl
+              font-bold
+              text-white
+              "
+            >
+              MEXC
+            </span>
           </NavLink>
 
           <nav className="flex items-center gap-8">
@@ -30,10 +51,9 @@ export default function DesktopNavbar() {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `transition ${
-                    isActive
-                      ? "text-white"
-                      : "text-zinc-400 hover:text-white"
+                  `transition ${isActive
+                    ? "text-white text-sm font-bold underline"
+                    : "text-zinc-400 hover:text-white hover:underline text-sm font-medium"
                   }`
                 }
               >
@@ -46,9 +66,38 @@ export default function DesktopNavbar() {
         {/* Right */}
         <div className="flex items-center gap-4">
 
-          <button className="rounded-full bg-zinc-900 p-2 hover:bg-zinc-800">
-            <Search size={18} />
-          </button>
+          <div
+            className="
+                    flex
+                    items-center
+                    gap-2
+
+                    w-[170px]
+                    h-10
+
+                    rounded-full
+
+                    bg-[#111827]
+
+                    px-4
+                    "
+          >
+            <Search
+              size={16}
+              className="text-zinc-500"
+            />
+
+            <input
+              placeholder="UNI"
+              className="
+                  w-full
+                  bg-transparent
+                  text-sm
+                  outline-none
+                  text-white
+                  "
+            />
+          </div>
 
           <button className="rounded-full bg-zinc-900 p-2 hover:bg-zinc-800">
             <Bell size={18} />
@@ -58,13 +107,23 @@ export default function DesktopNavbar() {
             <Globe size={18} />
           </button>
 
-          <button className="rounded-full border border-zinc-700 px-5 py-2 text-sm">
-            Login
+          <a href="#" className="hover:underline text-white text-sm">Academy</a>
+
+          <a href="#" className="hover:underline text-white text-sm">Help</a>
+
+          <button
+            onClick={() => navigate("/login")}
+            className="bg-white text-sm text-black px-4 py-1 rounded-full font-medium hover:bg-gray-200 transition">
+            Log in
           </button>
 
-          <button className="rounded-full bg-blue-600 px-5 py-2 text-sm hover:bg-blue-700">
+          <button
+            onClick={() => navigate("/signup")}
+            className="bg-blue-600 text-sm text-white px-4 py-1 rounded-full font-medium hover:bg-blue-700 transition">
             Sign Up
           </button>
+
+
 
         </div>
 
