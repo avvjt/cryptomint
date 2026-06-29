@@ -32,12 +32,12 @@ export default function MobileHeader() {
           <div className="flex items-center gap-2">
             <img
               src={logo}
-              alt="MEXC"
+              alt="CryproMintX"
               className="h-7"
             />
 
             <span className="font-bold text-lg text-white">
-              MEXC
+              CryproMintX
             </span>
           </div>
 

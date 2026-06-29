@@ -79,11 +79,11 @@ export default function FooterDesign() {
               font-semibold
               "
             >
-              <a href="/">Home</a>
-              <a href="/markets">Markets</a>
-              <a href="/trade">Trade</a>
-              <a href="/futures">Futures</a>
-              <a href="/assets">Assets</a>
+              <a className="hover:underline" href="/">Home</a>
+              <a className="hover:underline" href="/markets">Markets</a>
+              <a className="hover:underline" href="/trade">Trade</a>
+              <a className="hover:underline" href="/futures">Futures</a>
+              <a className="hover:underline" href="/assets">Assets</a>
             </div>
 
             {/* Newsletter */}
@@ -122,10 +122,10 @@ export default function FooterDesign() {
                   bg-transparent
                   px-6
                   py-5
-                  text-black
+                  text-white
                   font-semibold
                   outline-none
-                  placeholder:text-black
+                  placeholder:text-white
                   "
                 />
 
@@ -171,7 +171,7 @@ export default function FooterDesign() {
             select-none
             "
           >
-            MEXC
+            CryptoMintX
           </h1>
 
           <h1
@@ -218,7 +218,7 @@ export default function FooterDesign() {
               font-semibold
               "
             >
-              © 2025 MEXC Exchange
+              © 2026 CryptoMintX
               <br />
               All Rights Reserved
             </div>
@@ -233,9 +233,9 @@ export default function FooterDesign() {
               uppercase
               "
             >
-              <a href="#">Terms</a>
-              <a href="#">Privacy</a>
-              <a href="#">Disclaimer</a>
+              <a className="hover:underline" href="/terms">Terms</a>
+              <a className="hover:underline" href="/privacy">Privacy</a>
+              <a className="hover:underline" href="/disclaimer">Disclaimer</a>
             </div>
 
             <div
@@ -247,22 +247,22 @@ export default function FooterDesign() {
               "
             >
               <a
-                href="#"
-                className="text-[#1D66FF]"
+                href="https://t.me/avvjt"
+                className="text-[#1D66FF] hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Telegram
               </a>
 
-              <a
-                href="#"
-                className="text-[#1D66FF]"
-              >
-                X
-              </a>
+              
+              
 
               <a
-                href="#"
-                className="text-[#1D66FF]"
+                href="https://discord.com/invite/gsqpgarXuS"
+                className="text-[#1D66FF] hover:underline"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Discord
               </a>

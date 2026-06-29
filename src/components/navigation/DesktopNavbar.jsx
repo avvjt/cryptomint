@@ -31,17 +31,17 @@ export default function DesktopNavbar() {
             <img
               src={logo}
               alt="logo"
-              className="h-8"
+              className="h-12"
             />
 
             <span
               className="
-              text-3xl
+              text-2xl
               font-bold
               text-white
               "
             >
-              MEXC
+              CryptoMintX
             </span>
           </NavLink>
 
@@ -107,9 +107,9 @@ export default function DesktopNavbar() {
             <Globe size={18} />
           </button>
 
-          <a href="#" className="hover:underline text-white text-sm">Academy</a>
+          <a href="/academy" className="hover:underline text-white text-sm">Academy</a>
 
-          <a href="#" className="hover:underline text-white text-sm">Help</a>
+          <a href="/help" className="hover:underline text-white text-sm">Help</a>
 
           <button
             onClick={() => navigate("/login")}
@@ -117,11 +117,6 @@ export default function DesktopNavbar() {
             Log in
           </button>
 
-          <button
-            onClick={() => navigate("/signup")}
-            className="bg-blue-600 text-sm text-white px-4 py-1 rounded-full font-medium hover:bg-blue-700 transition">
-            Sign Up
-          </button>
 
 
 

@@ -5,6 +5,8 @@ export default function AuthInput({
   label,
   placeholder,
   type = "text",
+  value,
+  onChange
 }) {
   const [show, setShow] = useState(false);
 
@@ -35,6 +37,8 @@ export default function AuthInput({
               : type
           }
           placeholder={placeholder}
+          value={value}
+          onChange={onChange}
           className="
           w-full
 

@@ -3,6 +3,46 @@ import { FaApple } from "react-icons/fa";
 // import { SiTelegram, SiMetamask } from "react-icons/si";
 
 export default function SocialButtons() {
+
+  const handleGoogleSignup =
+          async (credentialResponse) => {
+              try {
+                  const res =
+                      await fetch(
+                          "http://localhost:3000/api/auth/google",
+                          {
+                              method: "POST",
+                              headers: {
+                                  "Content-Type":
+                                      "application/json",
+                              },
+                              body: JSON.stringify({
+                                  token:
+                                      credentialResponse.credential,
+                              }),
+                          }
+                      );
+  
+                  const data =
+                      await res.json();
+  
+                  if (res.ok) {
+                      localStorage.setItem(
+                          "token",
+                          data.token
+                      );
+  
+                      navigate(
+                          "/dashboard"
+                      );
+                  }
+              } catch (error) {
+                  console.log(
+                      error
+                  );
+              }
+          };
+  
   return (
     <div className="space-y-3">
 
@@ -23,6 +63,7 @@ export default function SocialButtons() {
         hover:border-blue-500
         transition
         "
+        onClick={handleGoogleSignup}
       >
         <FcGoogle size={22} />
         Continue with Google

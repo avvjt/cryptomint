@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroui/image": "^2.2.19",
     "@heroui/react": "^2.8.8",
+    "@react-oauth/google": "^0.13.5",
     "@tabler/icons-react": "^3.36.1",
     "@tailwindcss/vite": "^4.1.18",
     "axios": "^1.18.0",

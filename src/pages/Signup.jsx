@@ -2,9 +2,49 @@ import AuthCard from "../components/auth/AuthCard";
 import AuthInput from "../components/auth/AuthInput";
 import AuthDivider from "../components/auth/AuthDivider";
 import SocialButtons from "../components/auth/SocialButtons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Signup() {
+
+    const navigate = useNavigate();
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [referralCode, setReferralCode] = useState("");
+
+
+    const handleSingup = async (e) => {
+        e.preventDefault();
+
+        try {
+            // Your signup logic here
+            const res = await fetch("http://localhost:3000/api/auth/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, password, referralCode }),
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.setItem(
+                    "token",
+                    data.token
+                );
+
+                navigate("/dashboard");
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error("Error during signup:", error);
+        }
+    }
+
+
+    
     return (
         <div
             className="
@@ -36,17 +76,23 @@ export default function Signup() {
                     <AuthInput
                         label="Email"
                         placeholder="Enter email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
 
                     <AuthInput
                         label="Password"
                         type="password"
                         placeholder="Create password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
 
                     <AuthInput
                         label="Referral Code"
                         placeholder="Optional"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value)}
                     />
 
                     <button
@@ -58,6 +104,7 @@ export default function Signup() {
             font-medium
             text-white
             "
+                        onClick={handleSingup}
                     >
                         Sign Up
                     </button>
