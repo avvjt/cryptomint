@@ -1,73 +1,45 @@
-import { FcGoogle } from "react-icons/fc";
+import { GoogleLogin } from "@react-oauth/google";
 import { FaApple } from "react-icons/fa";
-// import { SiTelegram, SiMetamask } from "react-icons/si";
+import { useNavigate } from "react-router-dom";
 
 export default function SocialButtons() {
 
-  const handleGoogleSignup =
-          async (credentialResponse) => {
-              try {
-                  const res =
-                      await fetch(
-                          "http://localhost:3000/api/auth/google",
-                          {
-                              method: "POST",
-                              headers: {
-                                  "Content-Type":
-                                      "application/json",
-                              },
-                              body: JSON.stringify({
-                                  token:
-                                      credentialResponse.credential,
-                              }),
-                          }
-                      );
-  
-                  const data =
-                      await res.json();
-  
-                  if (res.ok) {
-                      localStorage.setItem(
-                          "token",
-                          data.token
-                      );
-  
-                      navigate(
-                          "/dashboard"
-                      );
-                  }
-              } catch (error) {
-                  console.log(
-                      error
-                  );
-              }
-          };
-  
+  const navigate = useNavigate();
+
+  const handleGoogleSignup = async (credentialResponse) => {
+    try {
+      const res = await fetch(
+        "http://localhost:3000/api/auth/google",
+        
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token: credentialResponse.credential,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem("token", data.token);
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <div className="space-y-3">
 
-      <button
-        className="
-        w-full
-        rounded-2xl
-        border
-        border-zinc-800
-        bg-[#111827]
-        py-4
-
-        flex
-        items-center
-        justify-center
-        gap-3
-
-        hover:border-blue-500
-        transition
-        "
-        onClick={handleGoogleSignup}
-      >
-        <FcGoogle size={22} />
-        Continue with Google
-      </button>
+      <GoogleLogin
+        onSuccess={handleGoogleSignup}
+        onError={() => console.log("Login Failed")}
+      />
 
       <div className="grid grid-cols-3 gap-3">
 
@@ -96,7 +68,6 @@ export default function SocialButtons() {
           justify-center
           "
         >
-          {/* <SiTelegram size={20} /> */}
         </button>
 
         <button
@@ -110,7 +81,6 @@ export default function SocialButtons() {
           justify-center
           "
         >
-          {/* <SiMetamask size={20} /> */}
         </button>
 
       </div>

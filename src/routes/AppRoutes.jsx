@@ -12,6 +12,8 @@ import Signup from "../pages/Signup";
 import Academy from "../pages/Academy";
 import Help from "../pages/Help";
 import Dashboard from "../pages/Dashboard";
+import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
 export default function AppRoutes() {
   return (
@@ -24,7 +26,9 @@ export default function AppRoutes() {
         <Route path="/signup" element={<Signup />} />
         {/* <Route path="/academy" element={<Academy />} />
         <Route path="/help" element={<Help />} /> */}
-        <Route path="/dashboard" element={<Dashboard />} /> 
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/forgot-password" element={<ForgotPassword/>}/> 
+        <Route path="/reset-password/:token" element={<ResetPassword/>}/>
       </Route>
 
       <Route element={<MainLayout />}>

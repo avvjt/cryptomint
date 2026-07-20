@@ -2,9 +2,49 @@ import AuthCard from "../components/auth/AuthCard";
 import AuthInput from "../components/auth/AuthInput";
 import SocialButtons from "../components/auth/SocialButtons";
 import AuthDivider from "../components/auth/AuthDivider";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function Login() {
+    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+
+    const handleSignin = async (e) => {
+        e.preventDefault();
+
+        try {
+            const res = await fetch("http://localhost:3000/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    email,
+                    password,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                localStorage.setItem("token", data.token);
+
+                alert("Login successful!");
+
+                navigate("/dashboard");
+            } else {
+                alert(data.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Something went wrong.");
+        }
+    };
+
+
+
     return (
         <div
             className="
@@ -36,26 +76,29 @@ export default function Login() {
                     <AuthInput
                         label="Email"
                         placeholder="Enter email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
 
                     <AuthInput
                         label="Password"
                         type="password"
                         placeholder="Enter password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
                     />
 
-                    <button
-                        className="
-            w-full
-            rounded-full
-            bg-[#1D66FF]
-            py-4
-            font-medium
-            text-white
-            "
-                    >
-                        Sign In
-                    </button>
+
+                    <form onSubmit={handleSignin}>
+                        {/* Inputs */}
+
+                        <button
+                            type="submit"
+                            className="w-full rounded-full bg-[#1D66FF] py-4 font-medium text-white"
+                        >
+                            Sign In
+                        </button>
+                    </form>
 
                     <AuthDivider />
 
@@ -71,6 +114,10 @@ export default function Login() {
                             className="text-blue-500 ml-2"
                         >
                             Sign Up
+                        </Link>
+                        <Link to="/forgot-password"
+                            className="text-blue-500 ml-2">
+                            Forgot Password?
                         </Link>
                     </div>
 
