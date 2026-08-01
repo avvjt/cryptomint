@@ -4,10 +4,10 @@ export default function BackgroundGlow() {
       <div
         className="
         absolute
-        left-[-200px]
-        top-[-100px]
-        h-[500px]
-        w-[500px]
+        -left-50
+        -top-25
+        h-125
+        w-125
         rounded-full
         bg-blue-600/20
         blur-[150px]
@@ -17,10 +17,10 @@ export default function BackgroundGlow() {
       <div
         className="
         absolute
-        right-[-200px]
-        bottom-[-100px]
-        h-[500px]
-        w-[500px]
+        -right-50
+        -bottom-25
+        h-125
+        w-125
         rounded-full
         bg-cyan-500/10
         blur-[150px]

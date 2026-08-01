@@ -53,8 +53,9 @@ export default function Dashboard() {
     );
   }
 
+  // full width black is showing but i want wrap
   return (
-    <div className="text-white">
+    <div className="text-white font-medium bg-black w-fit p-4 rounded-lg">
       <h1>
         Dashboard
       </h1>

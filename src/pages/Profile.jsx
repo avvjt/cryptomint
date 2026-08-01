@@ -1,4 +1,4 @@
-export default function Assets() {
+export default function Profile() {
   return (
     <div className="min-h-screen px-6 py-20">
       <div className="mx-auto max-w-7xl">

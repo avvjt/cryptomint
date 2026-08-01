@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 export default function AuthLayout() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black">
+    <div className="relative min-h-screen overflow-hidden bg-white flex justify-center items-center">
 
       {/* Glow 1 */}
       <div

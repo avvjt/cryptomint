@@ -1,0 +1,18 @@
+export const coinMap = {
+  BTC: "btc",
+  ETH: "eth",
+  SOL: "sol",
+  XRP: "xrp",
+  BNB: "bnb",
+  DOGE: "doge",
+  ADA: "ada",
+  TRX: "trx",
+  TON: "ton",
+  AVAX: "avax",
+  SHIB: "shib",
+  LTC: "ltc",
+  BCH: "bch",
+  LINK: "link",
+  DOT: "dot",
+  PEPE: "pepe",
+};

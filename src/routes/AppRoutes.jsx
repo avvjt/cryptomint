@@ -6,7 +6,7 @@ import Home from "../pages/Home";
 import Markets from "../pages/Markets";
 import Trade from "../pages/Trade";
 import Futures from "../pages/Futures";
-import Assets from "../pages/Assets";
+import Assets from "../pages/Profile";
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Academy from "../pages/Academy";
@@ -14,6 +14,7 @@ import Help from "../pages/Help";
 import Dashboard from "../pages/Dashboard";
 import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
+import MarketDetails from "../pages/MarketDetails";
 
 export default function AppRoutes() {
   return (
@@ -37,6 +38,8 @@ export default function AppRoutes() {
         <Route path="/trade" element={<Trade />} />
         <Route path="/futures" element={<Futures />} />
         <Route path="/assets" element={<Assets />} />
+        <Route path="/markets/:symbol" element={<MarketDetails />}
+/>
       </Route>
     </Routes>
   );

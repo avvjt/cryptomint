@@ -1,15 +1,24 @@
+import MarketCards from "../components/markets/MarketCards";
+import CategoryTabs from "../components/markets/CategoryTabs";
+import SearchBar from "../components/markets/SearchBar";
+import MarketTable from "../components/markets/MarketTable";
+
 export default function Markets() {
   return (
-    <div className="min-h-screen px-6 py-20">
-      <div className="mx-auto max-w-7xl">
-        <h1 className="text-4xl font-bold text-white">
-          Markets Page
-        </h1>
+    <div className="min-h-screen bg-black text-white">
 
-        <p className="mt-4 text-zinc-400">
-          Markets page is under development.
-        </p>
+      <div className="mx-auto max-w-7xl px-4 py-6">
+
+        <MarketCards />
+
+        <CategoryTabs />
+
+        <SearchBar />
+
+        <MarketTable />
+
       </div>
+
     </div>
   );
 }
