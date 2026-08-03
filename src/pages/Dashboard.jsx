@@ -1,81 +1,64 @@
-import {
-  useEffect,
-  useState,
-} from "react";
+import { useAuth } from "../context/AuthContext";
+import StatCard from "../components/dashboard/StatCard";
+import QuickActions from "../components/dashboard/QuickActions";
+import InvestmentProgress from "../components/dashboard/InvestmentProgress";
+import ReferralProgress from "../components/dashboard/ReferralProgress";
+import RecentActivity from "../components/dashboard/RecentActivity";
 
 export default function Dashboard() {
-  const [user, setUser] =
-    useState(null);
+  // const { user, loading } = useAuth();
 
-  useEffect(() => {
-    const getUser =
-      async () => {
-        try {
-          const token =
-            localStorage.getItem(
-              "token"
-            );
+  // if (loading) {
+  //   return (
+  //     <div className="flex h-screen items-center justify-center text-white">
+  //       Loading...
+  //     </div>
+  //   );
+  // }
 
-          const res =
-            await fetch(
-              "http://localhost:3000/api/auth/me",
-              {
-                headers: {
-                  Authorization:
-                    `Bearer ${token}`,
-                },
-              }
-            );
-
-          const data =
-            await res.json();
-
-          if (res.ok) {
-            setUser(
-              data.user
-            );
-          }
-        } catch (error) {
-          console.log(
-            error
-          );
-        }
-      };
-
-    getUser();
-  }, []);
-
-  if (!user) {
-    return (
-      <h1>
-        Loading...
-      </h1>
-    );
-  }
-
-  // full width black is showing but i want wrap
   return (
-    <div className="text-white font-medium bg-black w-fit p-4 rounded-lg">
-      <h1>
-        Dashboard
+    <div className="mx-auto max-w-7xl p-6">
+
+      <h1 className="text-4xl font-bold">
+        Welcome back 👋
       </h1>
 
-      <h2 className="text-white">
-        Welcome{" "}
-        {user.email}
-      </h2>
-
-      <p>
-        User ID:
-        {user._id}
+      <p className="mt-2 text-zinc-400">
+        {/* {user.email} */}
       </p>
 
-      <p>
-        Joined:
-        {new Date(
-          user.createdAt
-        ).toLocaleString()}
-      </p>
+      {/* Stats */}
+
+      <div className="mt-8 grid gap-6 lg:grid-cols-4">
+
+        <StatCard
+          title="Wallet Balance"
+          value="$0.00"
+        />
+
+        <StatCard
+          title="Today's Income"
+          value="$0.00"
+          color="text-green-500"
+        />
+
+        <StatCard
+          title="Team Income"
+          value="$0.00"
+          color="text-blue-500"
+        />
+
+        <StatCard
+          title="Current Package"
+          value="Starter"
+        />
+
+      </div>
+      <QuickActions />
+      <InvestmentProgress />
+      <ReferralProgress />
+      <RecentActivity />
+
     </div>
   );
 }

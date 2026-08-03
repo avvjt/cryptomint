@@ -1,50 +1,80 @@
+import { useState } from "react";
+
 const tabs = [
-
-    "Crypto",
-
-    "Stocks",
-
-    "TradFi",
-
-    "Crude Oil",
-
-    "Fiat"
-
+  "Favorites",
+  "Crypto",
+  "AI",
+  "Meme",
+  "Gaming",
+  "DeFi",
 ];
 
 export default function CategoryTabs() {
 
-    return (
+  const [active, setActive] = useState("Crypto");
 
-        <div
-            className="
-mt-10
-flex
-gap-8
-overflow-x-auto
-text-2xl
-font-semibold
-"
+  return (
+
+    <div
+      className="
+      flex
+      items-center
+      gap-8
+
+      overflow-x-auto
+
+      whitespace-nowrap
+      scrollbar-hide
+      "
+    >
+
+      {tabs.map((tab) => (
+
+        <button
+          key={tab}
+          onClick={() => setActive(tab)}
+          className="
+          relative
+          pb-3
+          text-xl
+          font-semibold
+          transition-all
+          duration-200
+          "
         >
 
-            {
-
-                tabs.map(tab => (
-
-                    <button
-                        key={tab}
-                    >
-
-                        {tab}
-
-                    </button>
-
-                ))
-
+          <span
+            className={
+              active === tab
+                ? "text-white"
+                : "text-zinc-500 hover:text-white"
             }
+          >
+            {tab}
+          </span>
 
-        </div>
+          {active === tab && (
 
-    )
+            <div
+              className="
+              absolute
+              bottom-0
+              left-0
+              h-[3px]
+              w-full
+              rounded-full
+              bg-white
+              "
+            />
+
+          )}
+
+        </button>
+
+      ))}
+
+    </div>
+
+  );
 
 }

@@ -34,8 +34,8 @@ export default function MobileBottomNav() {
       icon: CandlestickChart,
     },
     {
-      name: "Assets",
-      path: "/assets",
+      name: "Profile",
+      path: "/profile",
       icon: Wallet,
     },
   ];

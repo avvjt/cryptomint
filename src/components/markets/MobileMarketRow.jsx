@@ -1,44 +1,94 @@
+import { Star } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
 import CoinLogo from "./CoinLogo";
+import AnimatedPrice from "./AnimatedPrice";
 
 export default function MobileMarketRow({ coin }) {
-  const isPositive = Number(coin.priceChangePercent) >= 0;
+
+  const navigate = useNavigate();
+
+  const positive =
+    Number(coin.priceChangePercent) >= 0;
 
   return (
+
     <div
+      onClick={() =>
+        navigate(`/trade?symbol=${coin.symbol}`)
+      }
       className="
       flex
       items-center
       justify-between
+
       border-b
-      border-zinc-800
-      py-4
+      border-[#1A1A1A]
+
       px-3
+      py-3
+
+      active:bg-[#16181D]
       "
     >
-      {/* Left */}
 
-      <div className="flex items-center gap-3">
+      {/* LEFT */}
+
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+
+        <Star
+          size={15}
+          strokeWidth={1.8}
+          className="text-zinc-600 flex-shrink-0"
+        />
 
         <CoinLogo symbol={coin.symbol} />
 
-        <div>
+        <div className="min-w-0">
 
-          <h2 className="font-semibold">
-            {coin.symbol.replace("USDT", "/USDT")}
+          <h2
+            className="
+            truncate
+
+            text-[15px]
+            font-semibold
+            leading-none
+            "
+          >
+            {coin.symbol}
           </h2>
 
-          <div className="flex items-center gap-2 mt-1">
+          <div className="mt-1 flex items-center gap-1">
 
-            <span className="text-xs text-zinc-500">
+            <span className="text-[12px] text-zinc-500">
+
+              {Number(
+                coin.quoteVolume
+              ).toLocaleString(undefined, {
+                notation: "compact",
+                maximumFractionDigits: 1,
+              })}
+
+            </span>
+
+            <span className="text-[11px] text-zinc-500">
+
               Perpetual
+
             </span>
 
             <span
               className="
               rounded
-              bg-blue-600
-              px-1
-              text-xs
+
+              bg-[#2157FF]
+
+              px-1.5
+              py-[1px]
+
+              text-[10px]
+              font-medium
+              text-white
               "
             >
               50x
@@ -50,41 +100,68 @@ export default function MobileMarketRow({ coin }) {
 
       </div>
 
-      {/* Right */}
+      {/* PRICE */}
 
-      <div className="text-right">
+      <div className="mr-4 text-right">
 
-        <p className="text-lg font-semibold">
-          ${Number(coin.lastPrice).toLocaleString()}
-        </p>
+        <AnimatedPrice
+          price={coin.lastPrice}
+          className="
+          text-[16px]
+          font-semibold
+          leading-none
+          "
+        />
 
-        <p className="text-sm text-zinc-500">
-          ${Number(coin.closePrice).toLocaleString()}
+        <p className="mt-1 text-[12px] text-zinc-500">
+
+          $
+          {Number(
+            coin.lastPrice
+          ).toLocaleString()}
+
         </p>
 
       </div>
 
-      {/* Change */}
+      {/* CHANGE */}
 
-      <div
-        className={`
+      <div>
+
+        <div
+          className={`
+          min-w-[82px]
+
           rounded-lg
-          px-3
+
           py-2
-          text-sm
+
+          text-center
+
+          text-[15px]
           font-semibold
-          text-white
 
           ${
-            isPositive
-              ? "bg-green-500"
-              : "bg-red-500"
+            positive
+              ? "bg-[#00C076] text-white"
+              : "bg-[#FF4D67] text-white"
           }
-        `}
-      >
-        {Number(coin.priceChangePercent).toFixed(2)}%
+          `}
+        >
+
+          {positive ? "+" : ""}
+
+          {Number(
+            coin.priceChangePercent
+          ).toFixed(2)}
+          %
+
+        </div>
+
       </div>
 
     </div>
+
   );
+
 }

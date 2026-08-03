@@ -4,11 +4,13 @@ import SocialButtons from "../components/auth/SocialButtons";
 import AuthDivider from "../components/auth/AuthDivider";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
     const navigate = useNavigate();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const { fetchUser } = useAuth();
 
 
     const handleSignin = async (e) => {
@@ -29,11 +31,11 @@ export default function Login() {
             const data = await res.json();
 
             if (res.ok) {
-                localStorage.setItem("token", data.token);
+               localStorage.setItem("token", data.token);
 
-                alert("Login successful!");
+await fetchUser();
 
-                navigate("/dashboard");
+navigate("/dashboard");
             } else {
                 alert(data.message);
             }

@@ -1,48 +1,67 @@
 import { Search } from "lucide-react";
 
-export default function SearchBar(){
+export default function SearchBar() {
 
-return(
+  return (
 
-<div
-className="
-my-8
-flex
-justify-end
-"
->
+    <div
+      className="
+      w-full
 
-<div
-className="
-flex
-items-center
-rounded-xl
-bg-zinc-900
-px-4
-py-3
-"
->
+      lg:w-[320px]
+      "
+    >
 
-<Search
-size={18}
-/>
+      <div
+        className="
+        flex
+        items-center
 
-<input
+        rounded-2xl
 
-placeholder="Search"
+        border
+        border-[#1F2937]
 
-className="
-ml-3
-bg-transparent
-outline-none
-"
+        bg-[#111318]
 
-/>
+        px-4
+        py-3
 
-</div>
+        transition-all
 
-</div>
+        focus-within:border-blue-500
+        "
+      >
 
-)
+        <Search
+          size={18}
+          className="text-zinc-500"
+        />
+
+        <input
+
+          placeholder="Search Crypto / Futures"
+
+          className="
+          ml-3
+
+          w-full
+
+          bg-transparent
+
+          text-white
+
+          placeholder:text-zinc-500
+
+          outline-none
+          "
+
+        />
+
+      </div>
+
+    </div>
+
+  );
 
 }

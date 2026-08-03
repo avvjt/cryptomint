@@ -7,14 +7,31 @@ export default function Markets() {
   return (
     <div className="min-h-screen bg-black text-white">
 
-      <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="mx-auto max-w-[1700px] px-5 py-8">
 
+        {/* Highlights */}
         <MarketCards />
 
-        <CategoryTabs />
+        {/* Categories + Search */}
+        <div
+          className="
+          mt-12
 
-        <SearchBar />
+          flex
+          flex-col
+          gap-6
 
+          lg:flex-row
+          lg:items-center
+          lg:justify-between
+          "
+        >
+          <CategoryTabs />
+
+          <SearchBar />
+        </div>
+
+        {/* Table */}
         <MarketTable />
 
       </div>
