@@ -21,10 +21,7 @@ export default function MainLayout() {
         <Outlet />
       </main>
 
-      {/* Mobile Bottom Nav */}
-      <div className="lg:hidden">
-        <MobileBottomNav />
-      </div>
+      
 
     </div>
   );

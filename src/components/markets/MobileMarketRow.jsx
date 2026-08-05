@@ -39,7 +39,7 @@ export default function MobileMarketRow({ coin }) {
         <Star
           size={15}
           strokeWidth={1.8}
-          className="text-zinc-600 flex-shrink-0"
+          className="text-zinc-600 shrink-0"
         />
 
         <CoinLogo symbol={coin.symbol} />
@@ -84,7 +84,7 @@ export default function MobileMarketRow({ coin }) {
               bg-[#2157FF]
 
               px-1.5
-              py-[1px]
+              py-px
 
               text-[10px]
               font-medium
@@ -130,7 +130,7 @@ export default function MobileMarketRow({ coin }) {
 
         <div
           className={`
-          min-w-[82px]
+          min-w-20.5
 
           rounded-lg
 

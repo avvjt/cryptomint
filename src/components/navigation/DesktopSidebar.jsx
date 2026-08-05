@@ -6,6 +6,7 @@ import {
   Users,
   User,
   LogOut,
+  ChevronRight,
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
@@ -13,7 +14,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 
 export default function DashboardSidebar() {
-
   const navigate = useNavigate();
 
   const items = [
@@ -50,106 +50,238 @@ export default function DashboardSidebar() {
   ];
 
   return (
-
     <aside
       className="
-      w-72
+      flex
+      h-screen
+      w-[280px]
+      flex-col
 
       border-r
+      border-white/5
 
-      border-zinc-800
-
-      bg-black
-
-      flex
-
-      flex-col
+      bg-[#0B0E11]
       "
     >
-
       {/* Logo */}
 
-      <div className="p-6">
+      <div
+        className="
+        border-b
+        border-white/5
 
+        px-6
+        py-7
+        "
+      >
         <div className="flex items-center gap-3">
-
           <img
             src={logo}
             alt=""
-            className="h-12"
+            className="h-11 w-11"
           />
 
-          <span className="text-2xl font-bold">
+          <div>
+            <h1
+              className="
+              text-xl
+              font-bold
+              tracking-wide
+              "
+            >
+              CryptoMintX
+            </h1>
 
-            CryptoMintX
+            <p
+              className="
+              mt-1
 
-          </span>
-
+              text-xs
+              text-zinc-500
+              "
+            >
+              Trade Smarter
+            </p>
+          </div>
         </div>
-
       </div>
 
-      {/* Menu */}
+      {/* Navigation */}
 
-      <nav className="flex-1 px-4">
+      <nav
+        className="
+        flex-1
+
+        px-4
+        py-6
+        "
+      >
+        <p
+          className="
+          mb-3
+
+          px-4
+
+          text-xs
+          font-semibold
+
+          uppercase
+          tracking-[0.18em]
+
+          text-zinc-600
+          "
+        >
+          Navigation
+        </p>
 
         {items.map((item) => {
-
           const Icon = item.icon;
 
           return (
-
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) => `
-                mb-2
-
-                flex
-
-                items-center
-
-                gap-4
-
-                rounded-xl
-
-                px-4
-
-                py-4
-
-                transition
-
-                ${
-                  isActive
-                    ? "bg-blue-600 text-white"
-                    : "text-zinc-400 hover:bg-zinc-900"
-                }
-              `}
             >
+              {({ isActive }) => (
+                <div
+                  className={`
+                  relative
 
-              <Icon size={20} />
+                  mb-2
 
-              {item.name}
+                  flex
+                  items-center
+                  justify-between
 
+                  rounded-2xl
+
+                  px-4
+                  py-3
+
+                  transition-all
+                  duration-200
+
+                  ${
+                    isActive
+                      ? "bg-[#151922] text-white"
+                      : "text-zinc-400 hover:bg-[#14181F] hover:text-white"
+                  }
+                  `}
+                >
+                  {isActive && (
+                    <span
+                      className="
+                      absolute
+
+                      left-0
+                      top-3
+                      bottom-3
+
+                      w-1
+
+                      rounded-r-full
+
+                      bg-[#1D66FF]
+                      "
+                    />
+                  )}
+
+                  <div className="flex items-center gap-4">
+                    <Icon size={21} />
+
+                    <span className="font-medium">
+                      {item.name}
+                    </span>
+                  </div>
+
+                  <ChevronRight
+                    size={16}
+                    className={
+                      isActive
+                        ? "text-white"
+                        : "text-zinc-600"
+                    }
+                  />
+                </div>
+              )}
             </NavLink>
-
           );
-
         })}
-
       </nav>
 
-      {/* Logout */}
+      {/* Bottom */}
 
-      <div className="border-t border-zinc-800 p-4">
+      <div
+        className="
+        border-t
+        border-white/5
+
+        p-5
+        "
+      >
+        {/* User */}
+
+        <div
+          className="
+          mb-5
+
+          flex
+          items-center
+          gap-3
+
+          rounded-2xl
+
+          bg-[#14181F]
+
+          p-4
+          "
+        >
+          <div
+            className="
+            flex
+
+            h-12
+            w-12
+
+            items-center
+            justify-center
+
+            rounded-full
+
+            bg-[#1D66FF]
+
+            text-lg
+            font-bold
+            "
+          >
+            A
+          </div>
+
+          <div className="flex-1">
+            <p className="font-medium">
+              Abhijit
+            </p>
+
+            <p
+              className="
+              mt-1
+
+              text-xs
+
+              text-zinc-500
+              "
+            >
+              Verified User
+            </p>
+          </div>
+        </div>
+
+        {/* Logout */}
 
         <button
           onClick={() => {
-
             localStorage.removeItem("token");
-
             navigate("/login");
-
           }}
           className="
           flex
@@ -157,30 +289,28 @@ export default function DashboardSidebar() {
           w-full
 
           items-center
+          justify-center
 
           gap-3
 
           rounded-xl
 
-          bg-red-600
-
-          px-4
+          bg-[#1D66FF]
 
           py-3
 
-          hover:bg-red-500
+          font-medium
+
+          transition
+
+          hover:bg-[#3478ff]
           "
         >
-
           <LogOut size={18} />
 
           Logout
-
         </button>
-
       </div>
-
     </aside>
-
   );
 }

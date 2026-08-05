@@ -5,79 +5,86 @@ import CoinLogo from "./CoinLogo";
 import AnimatedPrice from "./AnimatedPrice";
 
 export default function MarketRow({ coin }) {
-
   const navigate = useNavigate();
 
   const positive =
     Number(coin.priceChangePercent) >= 0;
 
   return (
-
     <div
       onClick={() =>
         navigate(`/trade?symbol=${coin.symbol}`)
       }
       className="
       grid
-      grid-cols-[3fr_1.2fr_1fr_1.2fr_120px]
+      grid-cols-[3.8fr_1.2fr_1fr_1fr_1fr_120px]
 
       items-center
 
       px-6
-      py-5
+      py-[15px]
 
       border-b
       border-[#1A1A1A]
 
-      transition-colors
-
-      hover:bg-[#14161B]
-
       cursor-pointer
+
+      transition-colors
+      duration-150
+
+      hover:bg-[#111318]
       "
     >
-
       {/* Pair */}
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
 
-        <Star
-          size={17}
-          strokeWidth={1.8}
+        <button
+          onClick={(e) => e.stopPropagation()}
           className="
           text-zinc-600
           hover:text-yellow-400
+          transition
           "
-        />
+        >
+          <Star size={16} />
+        </button>
 
         <CoinLogo symbol={coin.symbol} />
 
         <div>
 
-          <h2 className="font-medium text-[18px]">
-
+          <h2
+            className="
+            text-[15px]
+            font-medium
+            text-white
+            "
+          >
             {coin.symbol}
-
           </h2>
 
           <div className="mt-1 flex items-center gap-2">
 
-            <span className="text-sm text-zinc-500">
-
+            <span
+              className="
+              text-[12px]
+              text-zinc-500
+              "
+            >
               Perpetual
-
             </span>
 
             <span
               className="
-              rounded
+              rounded-sm
 
               bg-[#2157FF]
 
               px-1.5
 
-              text-[11px]
-
+              text-[10px]
+              font-medium
               text-white
               "
             >
@@ -97,19 +104,23 @@ export default function MarketRow({ coin }) {
         <AnimatedPrice
           price={coin.lastPrice}
           className="
-          text-lg
+          text-[15px]
           font-medium
           "
         />
 
-        <p className="mt-1 text-sm text-zinc-500">
+        <p
+          className="
+          mt-1
 
+          text-[12px]
+          text-zinc-500
+          "
+        >
           $
-
           {Number(
             coin.lastPrice
           ).toLocaleString()}
-
         </p>
 
       </div>
@@ -118,9 +129,9 @@ export default function MarketRow({ coin }) {
 
       <div>
 
-        <p
+        <span
           className={`
-          text-lg
+          text-[15px]
           font-medium
 
           ${
@@ -130,68 +141,81 @@ export default function MarketRow({ coin }) {
           }
           `}
         >
-
           {positive ? "+" : ""}
 
           {Number(
             coin.priceChangePercent
           ).toFixed(2)}
           %
-
-        </p>
+        </span>
 
       </div>
 
-      {/* Volume */}
+      {/* 24h High */}
 
       <div>
 
-        <p className="text-lg">
-
+        <span
+          className="
+          text-[15px]
+          text-white
+          "
+        >
+          $
           {Number(
-            coin.quoteVolume
-          ).toLocaleString(
-            undefined,
-            {
-              notation: "compact",
-              maximumFractionDigits: 2,
-            }
-          )}
-
-        </p>
+            coin.highPrice
+          ).toLocaleString()}
+        </span>
 
       </div>
 
-      {/* Trade */}
+      {/* 24h Low */}
+
+      <div>
+
+        <span
+          className="
+          text-[15px]
+          text-white
+          "
+        >
+          $
+          {Number(
+            coin.lowPrice
+          ).toLocaleString()}
+        </span>
+
+      </div>
+
+      {/* Action */}
 
       <div className="flex justify-end">
 
         <button
           onClick={(e) => {
-
             e.stopPropagation();
 
             navigate(
               `/trade?symbol=${coin.symbol}`
             );
-
           }}
           className="
+          h-8
+          w-20
+
           rounded-full
 
           border
-          border-[#2D3642]
+          border-[#2B3442]
 
-          px-6
-          py-2
+          text-[13px]
+          font-medium
 
-          text-sm
+          text-white
 
-          transition
+          transition-all
 
-          hover:border-[#1D66FF]
-
-          hover:text-white
+          hover:border-white
           "
         >
           Trade
@@ -200,7 +224,5 @@ export default function MarketRow({ coin }) {
       </div>
 
     </div>
-
   );
-
 }

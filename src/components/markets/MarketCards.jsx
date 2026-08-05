@@ -33,22 +33,25 @@ export default function MarketCards() {
 
   return (
 
-    <div className="grid gap-6 lg:grid-cols-3">
+    <div className="grid gap-4 lg:grid-cols-3">
 
       <Card
         title="Hot Tokens"
+        type="spot"
         coins={hotTokens}
         navigate={navigate}
       />
 
       <Card
         title="Hot Futures"
+        type="future"
         coins={hotFutures}
         navigate={navigate}
       />
 
       <Card
-        title="New Listings"
+        title="Newest"
+        type="new"
         coins={newest}
         navigate={navigate}
       />
@@ -63,36 +66,41 @@ function Card({
   title,
   coins,
   navigate,
+  type,
 }) {
 
   return (
 
     <div
       className="
-      rounded-3xl
+      rounded-2xl
 
       border
-      border-[#1F2937]
+      border-[#1D2026]
 
       bg-[#111318]
 
-      p-6
+      p-5
 
       transition-all
       duration-300
 
-      hover:border-blue-500/30
+      hover:border-[#2A3442]
       "
     >
 
       {/* Header */}
 
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-5 flex items-center justify-between">
 
-        <h2 className="text-xl font-semibold">
-
+        <h2
+          className="
+          text-[20px]
+          font-semibold
+          text-white
+          "
+        >
           {title}
-
         </h2>
 
         <button
@@ -101,7 +109,7 @@ function Card({
           items-center
           gap-1
 
-          text-sm
+          text-[14px]
           text-zinc-500
 
           transition
@@ -112,22 +120,22 @@ function Card({
 
           More
 
-          <ChevronRight size={16} />
+          <ChevronRight
+            size={16}
+          />
 
         </button>
 
       </div>
 
-      {/* Coins */}
-
-      <div className="space-y-5">
-
-        {coins.map((coin) => {
+      <div className="space-y-2">
+                {coins.map((coin) => {
 
           const positive =
-            Number(
-              coin.priceChangePercent
-            ) >= 0;
+            Number(coin.priceChangePercent) >= 0;
+
+          const isFuture =
+            type === "future";
 
           return (
 
@@ -140,27 +148,25 @@ function Card({
               }
               className="
               flex
-
               w-full
-
               items-center
-
               justify-between
 
-              rounded-2xl
+              rounded-xl
 
               px-2
-              py-2
+              py-2.5
 
               transition-all
+              duration-200
 
-              hover:bg-[#171B22]
+              hover:bg-[#181B21]
               "
             >
 
               {/* Left */}
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2.5">
 
                 <CoinLogo
                   symbol={coin.symbol}
@@ -168,20 +174,60 @@ function Card({
 
                 <div className="text-left">
 
-                  <p className="font-medium">
+                  <p
+                    className="
+                    text-[15px]
+                    font-medium
+                    text-white
+                    "
+                  >
 
-                    {coin.symbol.replace(
-                      "USDT",
-                      "/USDT"
-                    )}
+                    {
+                      isFuture
+                        ? coin.symbol
+                        : coin.symbol.replace(
+                            "USDT",
+                            "/USDT"
+                          )
+                    }
 
                   </p>
 
-                  <p className="text-xs text-zinc-500">
+                  {
+                    isFuture && (
 
-                    Perpetual
+                      <div className="mt-1 flex items-center gap-1">
 
-                  </p>
+                        <span
+                          className="
+                          text-[12px]
+                          leading-none
+                          text-zinc-500
+                          "
+                        >
+                          Perpetual
+                        </span>
+
+                        <span
+                          className="
+                          rounded-sm
+
+                          bg-[#2157FF]
+
+                          px-1
+
+                          text-[10px]
+                          leading-4
+                          text-white
+                          "
+                        >
+                          50x
+                        </span>
+
+                      </div>
+
+                    )
+                  }
 
                 </div>
 
@@ -193,16 +239,29 @@ function Card({
 
                 <AnimatedPrice
                   price={coin.lastPrice}
-                  className="text-base font-semibold"
+                  className="
+                  text-[15px]
+                  font-medium
+                  text-white
+                  "
                 />
 
                 <p
-                  className={`text-sm font-medium ${
+                  className={`
+                  mt-1
+
+                  text-[15px]
+                  font-medium
+
+                  ${
                     positive
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
+                      ? "text-[#00C076]"
+                      : "text-[#FF5B6A]"
+                  }
+                  `}
                 >
+
+                  {positive ? "+" : ""}
 
                   {Number(
                     coin.priceChangePercent

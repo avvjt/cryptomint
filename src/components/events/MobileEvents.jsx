@@ -47,23 +47,17 @@ export default function MobileEvents() {
       <div className="mt-8">
 
         <Swiper
-          modules={[
-            Pagination,
-            Autoplay,
-          ]}
-          slidesPerView={1.15}
-          centeredSlides
-          spaceBetween={16}
-          pagination={{
-            clickable: true,
-          }}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: false,
-          }}
-          loop
-          className="pb-12"
-        >
+  modules={[Pagination, Autoplay]}
+  slidesPerView={1.15}
+  centeredSlides
+  spaceBetween={16}
+  pagination={{ clickable: true }}
+  autoplay={{
+    delay: 3000,
+    disableOnInteraction: false,
+  }}
+  className="pb-12"
+>
           {events.map((event) => (
             <SwiperSlide key={event.id}>
               <div
@@ -73,14 +67,11 @@ export default function MobileEvents() {
                 "
               >
                 <img
-                  src={event.image}
-                  alt=""
-                  className="
-                  h-[380px]
-                  w-full
-                  object-cover
-                  "
-                />
+  src={event.image}
+  alt={`Event ${event.id}`}
+  loading="lazy"
+  className="h-95 w-full object-cover"
+/>
               </div>
             </SwiperSlide>
           ))}
@@ -115,7 +106,7 @@ export default function MobileEvents() {
           font-medium
           text-white
           transition
-          hover:bg-blue-700
+          hover:bg-[#3478ff]
           "
         >
           Explore Now

@@ -1,0 +1,113 @@
+@layer components {
+
+  /* ---------- Surfaces ---------- */
+
+  .surface {
+    @apply bg-[#0B0E11];
+  }
+
+  .surface-card {
+    @apply bg-[#12161C];
+  }
+
+  .surface-hover {
+    @apply hover:bg-[#1A1F28];
+  }
+
+  
+  /* ---------- Borders ---------- */
+
+  .border-soft {
+    @apply border border-white/5;
+  }
+
+  .divider-soft {
+    @apply border-b border-white/5;
+  }
+
+  /* ---------- Radius ---------- */
+
+  .radius-card {
+    @apply rounded-2xl;
+  }
+
+  .radius-btn {
+    @apply rounded-full;
+  }
+
+  /* ---------- Typography ---------- */
+
+  .heading-xl {
+    @apply text-[34px] font-semibold text-white;
+  }
+
+  .heading-lg {
+    @apply text-[22px] font-semibold text-white;
+  }
+
+  .heading-md {
+    @apply text-[18px] font-semibold text-white;
+  }
+
+  .text-primary {
+    @apply text-white;
+  }
+
+  .text-secondary {
+    @apply text-zinc-300;
+  }
+
+  .text-muted {
+    @apply text-zinc-500;
+  }
+
+  .text-success {
+    color: #00C076;
+  }
+
+  .text-danger {
+    color: #FF4D67;
+  }
+
+  /* ---------- Buttons ---------- */
+
+  .btn-outline {
+
+    @apply
+    h-8
+    px-6
+    rounded-full
+
+    border
+    border-white/10
+
+    text-sm
+    text-white
+
+    transition;
+
+  }
+
+  .btn-outline:hover {
+
+    border-color: white;
+
+  }
+
+  .btn-primary {
+
+    @apply
+    rounded-xl
+    bg-[#1D66FF]
+    text-white
+    transition;
+
+  }
+
+  .btn-primary:hover {
+
+    background: #3578ff;
+
+  }
+
+}

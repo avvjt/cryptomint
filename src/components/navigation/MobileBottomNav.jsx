@@ -10,7 +10,7 @@ import { NavLink } from "react-router-dom";
 import useScrollDirection from "../../hooks/useScrollDirection";
 
 export default function MobileBottomNav() {
-  const visible = useScrollDirection();
+  // const visible = useScrollDirection();
 
   const items = [
     {
@@ -40,40 +40,41 @@ export default function MobileBottomNav() {
     },
   ];
 
-  return (
-    <div
-      className={`
-      fixed
-      bottom-4
-      left-4
-      right-4
-
-      z-50
-
-      transition-transform
-      duration-300
-
-      ${
+  //root div visibality 
+  /*
+  ${
         visible
           ? "translate-y-0"
           : "translate-y-32"
       }
-      `}
-    >
+  */
+
+  return (
+    <div
+  className="
+  fixed
+  bottom-0
+  left-0
+  right-0
+
+  z-50
+
+  transition-transform
+  duration-300
+  "
+>
       <nav
-        className="
-        rounded-3xl
+  className="
+  w-full
 
-        border
-        border-[#1f2937]
+  border-t
+  border-white/5
 
-        bg-[#050A14]/95
+  bg-[#050A14]/95
 
-        backdrop-blur-2xl
-
-        shadow-[0_0_40px_rgba(29,102,255,.15)]
-        "
-      >
+  backdrop-blur-xl
+  "
+>
         <div className="grid grid-cols-5 py-2">
 
           {items.map((item) => {
