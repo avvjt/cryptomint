@@ -9,7 +9,7 @@ export default function SocialButtons() {
   const handleGoogleSignup = async (credentialResponse) => {
     try {
       const res = await fetch(
-        "http://localhost:3000/api/auth/google",
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/google`,
         
         {
           method: "POST",
