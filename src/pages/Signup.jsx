@@ -4,6 +4,7 @@ import AuthDivider from "../components/auth/AuthDivider";
 import SocialButtons from "../components/auth/SocialButtons";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { LoaderCircle } from "lucide-react";
 
 export default function Signup() {
 
@@ -12,10 +13,12 @@ export default function Signup() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [referralCode, setReferralCode] = useState("");
+    const [loading, setLoading] = useState(false);
 
 
     const handleSingup = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         try {
             // Your signup logic here
@@ -96,17 +99,43 @@ export default function Signup() {
                     />
 
                     <button
-                        className="
-            w-full
-            rounded-full
-            bg-[#1D66FF]
-            py-4
-            font-medium
-            text-white
-            "
+                        type="submit"
                         onClick={handleSingup}
+                        disabled={loading}
+                        className={`
+    flex
+    w-full
+    items-center
+    justify-center
+    gap-2
+
+    rounded-full
+
+    py-4
+
+    font-medium
+    text-white
+
+    transition-all
+    duration-200
+
+    ${loading
+                                ? "cursor-not-allowed bg-blue-400"
+                                : "bg-[#1D66FF] hover:bg-[#3478ff] active:scale-[0.98]"
+                            }
+  `}
                     >
-                        Sign Up
+                        {loading ? (
+                            <>
+                                <LoaderCircle
+                                    size={20}
+                                    className="animate-spin"
+                                />
+                                Creating Account...
+                            </>
+                        ) : (
+                            "Sign Up"
+                        )}
                     </button>
 
                     <AuthDivider />

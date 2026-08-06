@@ -11,10 +11,13 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const { fetchUser } = useAuth();
+    const [loading, setLoading] = useState(false);
 
 
     const handleSignin = async (e) => {
         e.preventDefault();
+
+        setLoading(true);
 
         try {
             const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
@@ -91,16 +94,45 @@ navigate("/dashboard");
                     />
 
 
-                    <form onSubmit={handleSignin}>
-                        {/* Inputs */}
+                    <button
+                        type="submit"
+                        onClick={handleSingup}
+                        disabled={loading}
+                        className={`
+    flex
+    w-full
+    items-center
+    justify-center
+    gap-2
 
-                        <button
-                            type="submit"
-                            className="w-full rounded-full bg-[#1D66FF] py-4 font-medium text-white"
-                        >
-                            Sign In
-                        </button>
-                    </form>
+    rounded-full
+
+    py-4
+
+    font-medium
+    text-white
+
+    transition-all
+    duration-200
+
+    ${loading
+                                ? "cursor-not-allowed bg-blue-400"
+                                : "bg-[#1D66FF] hover:bg-[#3478ff] active:scale-[0.98]"
+                            }
+  `}
+                    >
+                        {loading ? (
+                            <>
+                                <LoaderCircle
+                                    size={20}
+                                    className="animate-spin"
+                                />
+                                Signing In...
+                            </>
+                        ) : (
+                            "Sign In"
+                        )}
+                    </button>
 
                     <AuthDivider />
 
