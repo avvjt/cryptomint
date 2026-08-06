@@ -9,13 +9,14 @@ import { NavLink } from "react-router-dom";
 
 import useScrollDirection from "../../hooks/useScrollDirection";
 
+
 export default function MobileBottomNav() {
   // const visible = useScrollDirection();
 
   const items = [
     {
       name: "Home",
-      path: "/",
+      path: "/Dashboard",
       icon: Home,
     },
     {
@@ -27,11 +28,6 @@ export default function MobileBottomNav() {
       name: "Trade",
       path: "/trade",
       icon: ArrowUpDown,
-    },
-    {
-      name: "Futures",
-      path: "/futures",
-      icon: CandlestickChart,
     },
     {
       name: "Profile",

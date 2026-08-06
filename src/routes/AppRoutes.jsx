@@ -17,10 +17,12 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import Team from "../pages/Team";
 import Assets from "../pages/Assets";
+import GuestRoute from "../layouts/GuestRoute";
 
 export default function AppRoutes() {
   return (
     <Routes>
+      <Route element={<GuestRoute />}> 
       <Route element={<MainLayout />}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -29,6 +31,7 @@ export default function AppRoutes() {
         <Route path="/reset-password/:token" element={<ResetPassword />} />
         <Route path="/academy" element={<Academy />} />
         <Route path="/help" element={<Help />} />
+      </Route>
       </Route>
 
       <Route element={<ProtectedRoute />}>
