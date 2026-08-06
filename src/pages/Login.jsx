@@ -5,6 +5,7 @@ import AuthDivider from "../components/auth/AuthDivider";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { LoaderCircle } from "lucide-react";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -20,31 +21,36 @@ export default function Login() {
         setLoading(true);
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/auth/login`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    email,
-                    password,
-                }),
-            });
+            const res = await fetch(
+                `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        email,
+                        password,
+                    }),
+                }
+            );
 
             const data = await res.json();
 
             if (res.ok) {
-               localStorage.setItem("token", data.token);
+                localStorage.setItem("token", data.token);
 
-await fetchUser();
+                await fetchUser();
 
-navigate("/dashboard");
+                navigate("/dashboard");
             } else {
                 alert(data.message);
             }
         } catch (error) {
             console.error(error);
             alert("Something went wrong.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -78,61 +84,64 @@ navigate("/dashboard");
 
                 <div className="mt-8 space-y-5">
 
-                    <AuthInput
-                        label="Email"
-                        placeholder="Enter email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-
-                    <AuthInput
-                        label="Password"
-                        type="password"
-                        placeholder="Enter password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
-
-
-                    <button
-                        type="submit"
-                        onClick={handleSingup}
-                        disabled={loading}
-                        className={`
-    flex
-    w-full
-    items-center
-    justify-center
-    gap-2
-
-    rounded-full
-
-    py-4
-
-    font-medium
-    text-white
-
-    transition-all
-    duration-200
-
-    ${loading
-                                ? "cursor-not-allowed bg-blue-400"
-                                : "bg-[#1D66FF] hover:bg-[#3478ff] active:scale-[0.98]"
-                            }
-  `}
+                    <form
+                        onSubmit={handleSignin}
+                        className="mt-8 space-y-5"
                     >
-                        {loading ? (
-                            <>
-                                <LoaderCircle
-                                    size={20}
-                                    className="animate-spin"
-                                />
-                                Signing In...
-                            </>
-                        ) : (
-                            "Sign In"
-                        )}
-                    </button>
+                        <AuthInput
+                            label="Email"
+                            placeholder="Enter email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+
+                        <AuthInput
+                            label="Password"
+                            type="password"
+                            placeholder="Enter password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className={`
+      flex
+      w-full
+      items-center
+      justify-center
+      gap-2
+
+      rounded-full
+
+      py-4
+
+      font-medium
+      text-white
+
+      transition-all
+      duration-200
+
+      ${loading
+                                    ? "cursor-not-allowed bg-blue-400"
+                                    : "bg-[#1D66FF] hover:bg-[#3478ff] active:scale-[0.98]"
+                                }
+    `}
+                        >
+                            {loading ? (
+                                <>
+                                    <LoaderCircle
+                                        size={20}
+                                        className="animate-spin"
+                                    />
+                                    Signing In...
+                                </>
+                            ) : (
+                                "Sign In"
+                            )}
+                        </button>
+                    </form>
 
                     <AuthDivider />
 
