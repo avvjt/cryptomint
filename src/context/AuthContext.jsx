@@ -51,11 +51,13 @@ export function AuthProvider({ children }) {
 
     setLoading(false);
   }
-  
+
 
   function logout() {
     localStorage.removeItem("token");
     setUser(null);
+
+    window.location.href = "/";
   }
 
   return (

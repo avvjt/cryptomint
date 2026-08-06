@@ -9,10 +9,12 @@ import {
 
 import ProfileHeader from "../components/profile/ProfileHeader";
 import MenuItem from "../components/profile/MenuItem";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Profile() {
-  const navigate = useNavigate();
+
+  const { logout } = useAuth();
+
   return (
     <div className="mx-auto max-w-4xl p-6">
 
@@ -60,10 +62,7 @@ export default function Profile() {
         />
 
         <MenuItem
-         onClick={() => {
-            localStorage.removeItem("token");
-            navigate("/login");
-          }}
+          onClick={logout}
           icon={LogOut}
           title="Logout"
           subtitle="Sign out of your account"
