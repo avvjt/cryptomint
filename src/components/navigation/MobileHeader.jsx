@@ -7,10 +7,12 @@ import {
 import logo from "../../assets/logo.png";
 import Ticker from "../../components/Ticker";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 export default function MobileHeader() {
 
- const navigate = useNavigate();
+  const navigate = useNavigate();
+  const {user} = useAuth();
   return (
     <header
       className="
@@ -25,7 +27,7 @@ export default function MobileHeader() {
       border-[#111827]
       "
     >
-      <Ticker/>
+      <Ticker />
       <div className="px-4 py-3">
 
         {/* Top Row */}
@@ -59,11 +61,70 @@ export default function MobileHeader() {
                 className="text-zinc-300"
               />
             </button>
-            <button
-            onClick={() => navigate("/login")}
-            className="bg-white text-sm text-black px-4 py-1 rounded-full font-medium hover:bg-gray-200 transition">
-            Log in
-          </button>
+
+
+            {user ? (
+              <button
+                onClick={() => navigate("/profile")}
+                className="
+                          flex
+                          items-center
+                          gap-2
+
+                          rounded-full
+
+                          bg-[#111827]
+
+                          px-3
+                          py-1.5
+
+                          transition
+
+                          hover:bg-[#1B2432]
+                          "
+              >
+                <div
+                  className="
+                            flex
+                            h-8
+                            w-8
+                            items-center
+                            justify-center
+
+                            rounded-full
+
+                            bg-[#1D66FF]
+
+                            text-sm
+                            font-bold
+                            text-white
+                            "
+                >
+                  {user.email.charAt(0).toUpperCase()}
+                </div>
+
+                <span className="text-sm text-white">
+                  Profile
+                </span>
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate("/login")}
+                className="
+                        rounded-full
+                        bg-white
+                        px-4
+                        py-1.5
+                        text-sm
+                        font-medium
+                        text-black
+                        transition
+                        hover:bg-gray-200
+                        "
+              >
+                Log In
+              </button>
+            )}
 
           </div>
 
