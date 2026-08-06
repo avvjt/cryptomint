@@ -15,6 +15,8 @@ import MarketDetails from "../pages/MarketDetails";
 import Profile from "../pages/Profile";
 import DashboardLayout from "../layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import Team from "../pages/Team";
+import Assets from "../pages/Assets";
 
 export default function AppRoutes() {
   return (
@@ -34,6 +36,8 @@ export default function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/markets" element={<Markets />} />
           <Route path="/trade" element={<Trade />} />
+          <Route path="/team" element={<Team />} />
+          <Route path="/assets" element={<Assets />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/markets/:symbol" element={<MarketDetails />} />
         </Route>

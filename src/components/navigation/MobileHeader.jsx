@@ -6,8 +6,11 @@ import {
 
 import logo from "../../assets/logo.png";
 import Ticker from "../../components/Ticker";
+import { useNavigate } from "react-router-dom";
 
 export default function MobileHeader() {
+
+ const navigate = useNavigate();
   return (
     <header
       className="
@@ -56,6 +59,11 @@ export default function MobileHeader() {
                 className="text-zinc-300"
               />
             </button>
+            <button
+            onClick={() => navigate("/login")}
+            className="bg-white text-sm text-black px-4 py-1 rounded-full font-medium hover:bg-gray-200 transition">
+            Log in
+          </button>
 
           </div>
 
