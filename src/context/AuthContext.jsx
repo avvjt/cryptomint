@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    
+
     try {
       const res = await fetch(
         `${API_URL}/api/auth/me`,
@@ -44,11 +44,14 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("token");
       }
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      localStorage.removeItem("token");
+      setUser(null);
     }
 
     setLoading(false);
   }
+  
 
   function logout() {
     localStorage.removeItem("token");

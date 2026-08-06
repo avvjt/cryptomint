@@ -1,13 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SplashScreen from "../components/SplashScreen";
 
 export default function GuestRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050A14]" />
-    );
+    return <SplashScreen />;
   }
 
   if (user) {

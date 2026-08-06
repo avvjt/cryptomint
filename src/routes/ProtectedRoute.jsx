@@ -1,15 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import SplashScreen from "../components/SplashScreen";
 
 export default function ProtectedRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-black text-white">
-        Loading...
-      </div>
-    );
+    return <SplashScreen />;
   }
 
   if (!user) {
