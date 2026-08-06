@@ -281,7 +281,7 @@ export default function DashboardSidebar() {
         <button
           onClick={() => {
             localStorage.removeItem("token");
-            navigate("/login");
+            navigate("/");
           }}
           className="
           flex

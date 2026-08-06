@@ -3,6 +3,7 @@ import {
   CandlestickChart,
   ArrowUpDown,
   Wallet,
+  Users,
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
@@ -30,9 +31,14 @@ export default function MobileBottomNav() {
       icon: ArrowUpDown,
     },
     {
+      name: "Team",
+      path: "/team",
+      icon: Wallet,
+    },
+    {
       name: "Profile",
       path: "/profile",
-      icon: Wallet,
+      icon: Users,
     },
   ];
 
