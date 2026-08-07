@@ -1,43 +1,87 @@
-import { useState } from "react";
+import team from "../data/team";
 
-import TeamOverview from "../components/team/TeamOverview";
-import LevelProgress from "../components/team/LevelProgress";
+import TeamHeader from "../components/team/TeamHeader";
 import TeamStats from "../components/team/TeamStats";
-import TeamTabs from "../components/team/TeamTabs";
-import TeamMemberList from "../components/team/TeamMemberList";
+import ReferralLink from "../components/team/ReferralLink";
+import ReferralTree from "../components/team/ReferralTree";
+import LevelProgress from "../components/team/LevelProgress";
+import TeamIncome from "../components/team/TeamIncome";
+import CommissionTable from "../components/team/CommissionTable";
+import TeamMembers from "../components/team/TeamMembers";
 
 export default function Team() {
 
-  const [tab, setTab] = useState("A");
-
   return (
-    <div className="mx-auto max-w-7xl p-6">
 
-      <h1 className="mb-8 text-4xl font-bold">
-        Team
-      </h1>
+    <div
+      className="
+      mx-auto
 
-      <TeamOverview />
+      max-w-7xl
 
-      <div className="mt-6">
-        <LevelProgress />
-      </div>
+      space-y-6
 
-      <div className="mt-6">
-        <TeamStats />
-      </div>
+      px-4
+      py-6
 
-      <div className="mt-8">
-        <TeamTabs
-          active={tab}
-          setActive={setTab}
-        />
-      </div>
+      lg:px-8
+      "
+    >
 
-      <div className="mt-6">
-        <TeamMemberList />
-      </div>
+      <TeamHeader
+
+        level={team.level}
+
+        totalMembers={team.totalMembers}
+
+      />
+
+      <TeamStats
+
+        levelA={team.levelA}
+
+        levelB={team.levelB}
+
+        levelC={team.levelC}
+
+        todayIncome={team.todayIncome}
+
+        totalIncome={team.totalIncome}
+
+      />
+
+      <ReferralLink
+
+        code={team.referralCode}
+
+        link={team.referralLink}
+
+      />
+
+      <ReferralTree
+
+        levelA={team.levelA}
+
+        levelB={team.levelB}
+
+        levelC={team.levelC}
+
+      />
+
+      <LevelProgress />
+
+      <TeamIncome />
+
+      <CommissionTable />
+
+      <TeamMembers
+
+        members={team.members}
+
+      />
 
     </div>
+
   );
+
 }

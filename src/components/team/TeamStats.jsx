@@ -1,58 +1,212 @@
-const stats = [
+import {
+  Users,
+  UserRound,
+  TrendingUp,
+  DollarSign,
+} from "lucide-react";
 
-  {
-    title:"Level A",
-    value:3,
-  },
+export default function TeamStats({
 
-  {
-    title:"Level B",
-    value:12,
-  },
+  levelA = 0,
 
-  {
-    title:"Level C",
-    value:8,
-  },
+  levelB = 0,
 
-  {
-    title:"Today's Commission",
-    value:"25 USDT",
-  },
+  levelC = 0,
 
-];
+  todayIncome = 0,
 
-export default function TeamStats(){
+  totalIncome = 0,
 
-return(
+}) {
 
-<div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+  const cards = [
 
-{stats.map(stat=>(
+    {
+      title: "Level A",
+      value: levelA,
+      subtitle: "Direct Referrals",
+      icon: UserRound,
+      color: "#1D66FF",
+    },
 
-<div
-key={stat.title}
-className="rounded-2xl bg-zinc-900 p-6"
->
+    {
+      title: "Level B",
+      value: levelB,
+      subtitle: "Second Level",
+      icon: Users,
+      color: "#00C076",
+    },
 
-<p className="text-zinc-500">
+    {
+      title: "Level C",
+      value: levelC,
+      subtitle: "Third Level",
+      icon: Users,
+      color: "#F6C344",
+    },
 
-{stat.title}
+    {
+      title: "Today's Income",
+      value: `${todayIncome} USDT`,
+      subtitle: "Commission",
+      icon: TrendingUp,
+      color: "#A855F7",
+    },
 
-</p>
+    {
+      title: "Total Income",
+      value: `${totalIncome} USDT`,
+      subtitle: "Lifetime",
+      icon: DollarSign,
+      color: "#00C076",
+    },
 
-<h2 className="mt-3 text-3xl font-bold">
+  ];
 
-{stat.value}
+  return (
 
-</h2>
+    <section>
 
-</div>
+      <div
+        className="
+        grid
 
-))}
+        gap-5
 
-</div>
+        sm:grid-cols-2
 
-);
+        xl:grid-cols-5
+        "
+      >
+
+        {cards.map((card) => {
+
+          const Icon = card.icon;
+
+          return (
+
+            <div
+
+              key={card.title}
+
+              className="
+              group
+
+              rounded-[28px]
+
+              border
+              border-white/5
+
+              bg-gradient-to-br
+              from-[#111318]
+              to-[#0D1119]
+
+              p-5
+
+              transition-all
+              duration-300
+
+              hover:-translate-y-1
+
+              hover:border-[#1D66FF]/30
+
+              hover:shadow-[0_20px_50px_rgba(29,102,255,.15)]
+              "
+
+            >
+
+              <div
+                className="
+                flex
+
+                items-center
+
+                justify-between
+                "
+              >
+
+                <div>
+
+                  <p className="text-sm text-zinc-500">
+
+                    {card.title}
+
+                  </p>
+
+                  <h3
+                    className="
+                    mt-3
+
+                    text-3xl
+
+                    font-bold
+                    "
+                  >
+
+                    {card.value}
+
+                  </h3>
+
+                  <p
+                    className="
+                    mt-2
+
+                    text-xs
+
+                    text-zinc-500
+                    "
+                  >
+
+                    {card.subtitle}
+
+                  </p>
+
+                </div>
+
+                <div
+                  className="
+                  flex
+
+                  h-14
+                  w-14
+
+                  items-center
+                  justify-center
+
+                  rounded-2xl
+
+                  transition-transform
+
+                  duration-300
+
+                  group-hover:scale-110
+                  "
+                  style={{
+                    background: `${card.color}20`,
+                  }}
+                >
+
+                  <Icon
+                    size={26}
+                    style={{
+                      color: card.color,
+                    }}
+                  />
+
+                </div>
+
+              </div>
+
+            </div>
+
+          );
+
+        })}
+
+      </div>
+
+    </section>
+
+  );
 
 }
