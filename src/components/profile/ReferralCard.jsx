@@ -1,176 +1,483 @@
-import { Copy, Share2 } from "lucide-react";
+import {
+  Gift,
+  Copy,
+  Share2,
+  QrCode,
+  Users,
+  DollarSign,
+} from "lucide-react";
 
-export default function ReferralCard() {
+export default function ReferralCard({
 
-  const code = "ABHI2026";
+  code = "CMX8JH29",
 
-  const link =
-    `https://cryptomintx.com/signup?ref=${code}`;
+  link = "https://cryptomintx.com/signup?ref=CMX8JH29",
 
-  function copy(text) {
+  totalReferrals = 18,
+
+  referralIncome = 285.50,
+
+}) {
+
+  const copy = (text) => {
 
     navigator.clipboard.writeText(text);
 
-    alert("Copied!");
-
-  }
+  };
 
   return (
 
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+    <section
+      className="
+      relative
 
-      <h2 className="text-2xl font-bold">
+      overflow-hidden
 
-        Referral Center
+      rounded-[32px]
 
-      </h2>
+      border
+      border-white/5
 
-      {/* Code */}
+      bg-gradient-to-br
+      from-[#111318]
+      via-[#121826]
+      to-[#0D1119]
 
-      <div className="mt-6">
+      p-6
 
-        <p className="text-zinc-500">
+      lg:p-8
+      "
+    >
 
-          Referral Code
+      {/* Background Glow */}
 
-        </p>
-
-        <div className="mt-2 flex">
-
-          <input
-            readOnly
-            value={code}
-            className="flex-1 rounded-l-xl bg-black p-4 outline-none"
-          />
-
-          <button
-            onClick={() => copy(code)}
-            className="rounded-r-xl bg-blue-600 px-5"
-          >
-            <Copy size={18}/>
-          </button>
-
-        </div>
-
-      </div>
-
-      {/* Link */}
-
-      <div className="mt-6">
-
-        <p className="text-zinc-500">
-
-          Referral Link
-
-        </p>
-
-        <div className="mt-2 flex">
-
-          <input
-            readOnly
-            value={link}
-            className="flex-1 rounded-l-xl bg-black p-4 text-sm outline-none"
-          />
-
-          <button
-            onClick={() => copy(link)}
-            className="rounded-r-xl bg-blue-600 px-5"
-          >
-            <Copy size={18}/>
-          </button>
-
-        </div>
-
-      </div>
-
-      {/* Stats */}
-
-      <div className="mt-8 grid grid-cols-3 gap-4">
-
-        <Stat
-          title="Level A"
-          value="3"
-        />
-
-        <Stat
-          title="Level B"
-          value="12"
-        />
-
-        <Stat
-          title="Level C"
-          value="6"
-        />
-
-      </div>
-
-      {/* Earnings */}
-
-      <div className="mt-8 rounded-2xl bg-black p-5">
-
-        <p className="text-zinc-500">
-
-          Total Referral Earnings
-
-        </p>
-
-        <h2 className="mt-2 text-3xl font-bold text-green-500">
-
-          1250 USDT
-
-        </h2>
-
-      </div>
-
-      <button
+      <div
         className="
-        mt-6
+        absolute
 
-        flex
-        w-full
-        items-center
-        justify-center
-        gap-2
+        -right-16
+        -top-16
 
-        rounded-xl
+        h-64
+        w-64
 
-        bg-blue-600
+        rounded-full
 
-        py-4
+        bg-[#1D66FF]/10
 
-        font-semibold
+        blur-[120px]
         "
-      >
+      />
 
-        <Share2 size={20}/>
+      <div className="relative">
 
-        Share Referral
+        {/* Header */}
 
-      </button>
+        <div className="flex items-center gap-4">
 
-    </div>
+          <div
+            className="
+            flex
+
+            h-16
+            w-16
+
+            items-center
+            justify-center
+
+            rounded-2xl
+
+            bg-[#1D66FF]/10
+            "
+          >
+
+            <Gift
+              size={30}
+              className="text-[#1D66FF]"
+            />
+
+          </div>
+
+          <div>
+
+            <p
+              className="
+              uppercase
+
+              tracking-[0.25em]
+
+              text-xs
+
+              text-zinc-500
+              "
+            >
+
+              Referral Program
+
+            </p>
+
+            <h2
+              className="
+              mt-2
+
+              text-3xl
+
+              font-bold
+              "
+            >
+
+              Invite & Earn
+
+            </h2>
+
+          </div>
+
+        </div>
+
+        {/* Stats */}
+
+        <div
+          className="
+          mt-8
+
+          grid
+
+          gap-4
+
+          sm:grid-cols-2
+          "
+        >
+
+          <Stat
+
+            icon={Users}
+
+            title="Total Referrals"
+
+            value={totalReferrals}
+
+            color="#1D66FF"
+
+          />
+
+          <Stat
+
+            icon={DollarSign}
+
+            title="Referral Income"
+
+            value={`$${referralIncome.toFixed(2)}`}
+
+            color="#00C076"
+
+          />
+
+        </div>
+
+        {/* Referral Code */}
+
+        <div className="mt-8">
+
+          <p className="text-sm text-zinc-500">
+
+            Referral Code
+
+          </p>
+
+          <div
+            className="
+            mt-3
+
+            flex
+
+            items-center
+
+            justify-between
+
+            rounded-2xl
+
+            bg-[#171B22]
+
+            px-5
+
+            py-4
+            "
+          >
+
+            <h3
+              className="
+              text-xl
+
+              font-bold
+
+              tracking-widest
+              "
+            >
+
+              {code}
+
+            </h3>
+
+            <button
+
+              onClick={() => copy(code)}
+
+              className="
+              rounded-xl
+
+              bg-[#1D66FF]
+
+              p-3
+
+              transition
+
+              hover:bg-[#3A7BFF]
+              "
+
+            >
+
+              <Copy size={18}/>
+
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* Referral Link */}
+
+        <div className="mt-6">
+
+          <p className="text-sm text-zinc-500">
+
+            Referral Link
+
+          </p>
+
+          <div
+            className="
+            mt-3
+
+            rounded-2xl
+
+            bg-[#171B22]
+
+            p-4
+            "
+          >
+
+            <p
+              className="
+              break-all
+
+              text-sm
+
+              text-zinc-400
+              "
+            >
+
+              {link}
+
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* Buttons */}
+
+        <div
+          className="
+          mt-8
+
+          grid
+
+          grid-cols-3
+
+          gap-3
+          "
+        >
+
+          <button
+
+            onClick={() => copy(link)}
+
+            className="
+            flex
+
+            items-center
+
+            justify-center
+
+            gap-2
+
+            rounded-2xl
+
+            bg-[#1D66FF]
+
+            py-3
+
+            font-medium
+
+            transition
+
+            hover:bg-[#3A7BFF]
+            "
+
+          >
+
+            <Copy size={18}/>
+
+            Copy
+
+          </button>
+
+          <button
+            className="
+            flex
+
+            items-center
+
+            justify-center
+
+            gap-2
+
+            rounded-2xl
+
+            bg-[#171B22]
+
+            py-3
+
+            transition
+
+            hover:bg-[#202633]
+            "
+          >
+
+            <Share2 size={18}/>
+
+            Share
+
+          </button>
+
+          <button
+            className="
+            flex
+
+            items-center
+
+            justify-center
+
+            gap-2
+
+            rounded-2xl
+
+            bg-[#171B22]
+
+            py-3
+
+            transition
+
+            hover:bg-[#202633]
+            "
+          >
+
+            <QrCode size={18}/>
+
+            QR
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
 
   );
 
 }
 
-function Stat({ title, value }) {
+function Stat({
+
+  icon: Icon,
+
+  title,
+
+  value,
+
+  color,
+
+}) {
 
   return (
 
-    <div className="rounded-xl bg-black p-4 text-center">
+    <div
+      className="
+      rounded-2xl
 
-      <p className="text-zinc-500">
+      border
+      border-white/5
+
+      bg-[#171B22]
+
+      p-5
+      "
+    >
+
+      <div
+        className="
+        flex
+
+        h-12
+        w-12
+
+        items-center
+        justify-center
+
+        rounded-xl
+        "
+        style={{
+          background: `${color}20`,
+        }}
+      >
+
+        <Icon
+          size={22}
+          style={{
+            color,
+          }}
+        />
+
+      </div>
+
+      <p
+        className="
+        mt-4
+
+        text-sm
+
+        text-zinc-500
+        "
+      >
 
         {title}
 
       </p>
 
-      <h2 className="mt-2 text-2xl font-bold">
+      <h3
+        className="
+        mt-2
+
+        text-2xl
+
+        font-bold
+        "
+      >
 
         {value}
 
-      </h2>
+      </h3>
 
     </div>
 

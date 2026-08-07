@@ -1,75 +1,178 @@
-import {
-  Shield,
-  Users,
-  Wallet,
-  History,
-  Settings,
-  LogOut,
-} from "lucide-react";
-
-import ProfileHeader from "../components/profile/ProfileHeader";
-import MenuItem from "../components/profile/MenuItem";
 import { useAuth } from "../context/AuthContext";
+
+import ProfileHero from "../components/profile/ProfileHero";
+import ProfileStats from "../components/profile/ProfileStats";
+import AccountInformation from "../components/profile/AccountInformation";
+import SecurityCenter from "../components/profile/SecurityCenter";
+import WalletAddresses from "../components/profile/WalletAddresses";
+import ReferralCard from "../components/profile/ReferralCard";
+import VerificationCard from "../components/profile/VerificationCard";
+import PreferencesCard from "../components/profile/PreferencesCard";
+import LoginDevices from "../components/profile/LoginDevices";
 
 export default function Profile() {
 
-  const { logout } = useAuth();
+  const { user, loading } = useAuth();
 
-  return (
-    <div className="mx-auto max-w-4xl p-6">
+  if (loading) {
 
-      <h1 className="mb-6 text-4xl font-bold">
-        Profile
-      </h1>
+    return (
 
-      <ProfileHeader
-        name="Abhi"
-        email="abhi@gmail.com"
-        level={2}
-        joined="Jul 2026"
-      />
+      <div className="flex h-screen items-center justify-center">
 
-      <div className="mt-8 space-y-4">
+        <div
+          className="
+          h-12
+          w-12
 
-        <MenuItem
-          icon={Shield}
-          title="Security"
-          subtitle="Password & account protection"
-        />
+          animate-spin
 
-        <MenuItem
-          icon={Wallet}
-          title="Wallet"
-          subtitle="Deposit & withdrawal addresses"
-        />
+          rounded-full
 
-        <MenuItem
-          icon={Users}
-          title="Referral"
-          subtitle="Referral code & invite friends"
-        />
+          border-4
 
-        <MenuItem
-          icon={History}
-          title="History"
-          subtitle="Rewards & transactions"
-        />
+          border-[#1D66FF]
 
-        <MenuItem
-          icon={Settings}
-          title="Settings"
-          subtitle="Theme & notifications"
-        />
-
-        <MenuItem
-          onClick={logout}
-          icon={LogOut}
-          title="Logout"
-          subtitle="Sign out of your account"
+          border-t-transparent
+          "
         />
 
       </div>
 
+    );
+
+  }
+
+  return (
+
+    <div
+      className="
+      mx-auto
+
+      max-w-7xl
+
+      space-y-6
+
+      px-4
+
+      py-6
+
+      lg:px-8
+      "
+    >
+
+      {/* Hero */}
+
+      <ProfileHero
+
+        avatar={user?.avatar}
+
+        username={user?.username || "User"}
+
+        email={user?.email}
+
+        uid={user?._id?.slice(-8).toUpperCase()}
+
+        level={user?.level || 1}
+
+        joined="August 2026"
+
+        verified={true}
+
+      />
+
+      {/* Stats */}
+
+      <ProfileStats
+
+        wallet={1520.5}
+
+        deposit={5000}
+
+        withdraw={1800}
+
+        earnings={920}
+
+        referral={285}
+
+        team={18}
+
+      />
+
+      {/* Two Column */}
+
+      <div
+        className="
+        grid
+
+        gap-6
+
+        xl:grid-cols-2
+        "
+      >
+
+        <AccountInformation
+
+          username={user?.username || "User"}
+
+          email={user?.email}
+
+          phone="+91 9876543210"
+
+          country="India"
+
+          joined="August 2026"
+
+          verified
+
+        />
+
+        <SecurityCenter />
+
+      </div>
+
+      {/* Two Column */}
+
+      <div
+        className="
+        grid
+
+        gap-6
+
+        xl:grid-cols-2
+        "
+      >
+
+        <WalletAddresses />
+
+        <VerificationCard />
+
+      </div>
+
+      {/* Referral */}
+
+      <ReferralCard
+
+        code="CMX82JKP"
+
+        link={`https://cryptomintx.com/signup?ref=${user?._id}`}
+
+        totalReferrals={18}
+
+        referralIncome={285.5}
+
+      />
+
+      {/* Preferences */}
+
+      <PreferencesCard />
+
+      {/* Devices */}
+
+      <LoginDevices />
+
     </div>
+
   );
+
 }
