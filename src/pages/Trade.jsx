@@ -1,67 +1,96 @@
-import { useSearchParams } from "react-router-dom";
-
-import useMarket from "../hooks/useMarket";
-
-import TradingHeader from "../components/markets/TradingHeader";
-import MarketStats from "../components/markets/MarketStats";
-import TradingChart from "../components/markets/TradingChart";
-import RightSidebar from "../components/markets/RightSidebar";
-import InvestmentCard from "../components/trade/InvestmentCard";
-import InvestmentPanel from "../components/trade/InvestmentPanel";
+import TradeHeader from "../components/trade/TradeHeader";
+import TradingPair from "../components/trade/TradingPair";
+import TradingChart from "../components/trade/TradingChart";
+import BuySellPanel from "../components/trade/BuySellPanel";
+import OrderBook from "../components/trade/OrderBook";
+import RecentTrades from "../components/trade/RecentTrades";
+import OpenOrders from "../components/trade/OpenOrders";
+import OrderHistory from "../components/trade/OrderHistory";
+import CoinInformation from "../components/trade/CoinInformation";
+import MarketStats from "../components/trade/MarketStats";
 
 export default function Trade() {
 
-  const [searchParams] = useSearchParams();
-
-  const symbol =
-    searchParams.get("symbol") || "BTCUSDT";
-
-  const market = useMarket(symbol);
-
-  if (!market) {
-    return (
-      <div className="min-h-screen flex items-center justify-center text-white">
-        Loading...
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-black text-white">
 
-      <div className="mx-auto max-w-[1700px] p-5">
+    <div
+      className="
+      mx-auto
+      max-w-[1800px]
+      space-y-6
+      px-4
+      py-6
+      lg:px-8
+      "
+    >
 
-        <TradingHeader market={market} />
+      <TradeHeader />
 
-        <MarketStats market={market} />
+      <TradingPair />
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-12">
+      {/* Desktop */}
 
-          <div className="lg:col-span-8 space-y-6">
+      <div
+        className="
+        hidden
+        xl:grid
+        xl:grid-cols-[1fr_380px]
+        gap-6
+        "
+      >
 
-            <TradingChart
-              symbol={market.symbol}
-            />
+        <div className="space-y-6">
 
-            <InvestmentCard />
+          <TradingChart />
 
-          </div>
+          <OpenOrders />
 
-          <div className="lg:col-span-4">
+          <OrderHistory />
 
-            <InvestmentPanel />
+        </div>
 
-            <RightSidebar
-              symbol={market.symbol}
-              currentPrice={market.lastPrice}
-            />
+        <div className="space-y-6">
 
-          </div>
+          <MarketStats />
+
+          <BuySellPanel />
+
+          <OrderBook />
+
+          <RecentTrades />
+
+          <CoinInformation />
 
         </div>
 
       </div>
 
+      {/* Mobile */}
+
+      <div className="xl:hidden space-y-6">
+
+        <TradingPair />
+
+        <TradingChart />
+
+        <MarketStats />
+
+        <BuySellPanel />
+
+        <OrderBook />
+
+        <RecentTrades />
+
+        <OpenOrders />
+
+        <OrderHistory />
+
+        <CoinInformation />
+
+      </div>
+
     </div>
+
   );
+
 }
