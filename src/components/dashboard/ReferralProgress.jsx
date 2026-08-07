@@ -57,7 +57,7 @@ export default function ReferralProgress({
         <div className="h-3 rounded-full overflow-hidden bg-zinc-800">
 
           <div
-            className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
+            className="h-full bg-linear-to-r from-blue-500 to-cyan-400"
             style={{
               width: `${totalProgress}%`,
             }}

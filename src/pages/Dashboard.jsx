@@ -1,64 +1,202 @@
+import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "../context/AuthContext";
-import StatCard from "../components/dashboard/StatCard";
-import QuickActions from "../components/dashboard/QuickActions";
-import InvestmentProgress from "../components/dashboard/InvestmentProgress";
-import ReferralProgress from "../components/dashboard/ReferralProgress";
+
+import dashboard from "../data/dashboard";
+
+import DashboardHeader from "../components/dashboard/DashboardHeader";
+import PortfolioCard from "../components/dashboard/PortfolioCard";
+import PackageCard from "../components/dashboard/PackageCard";
+import TeamOverview from "../components/dashboard/TeamOverview";
+import EarningsCard from "../components/dashboard/EarningsCard";
+import ReferralTree from "../components/dashboard/ReferralTree";
 import RecentActivity from "../components/dashboard/RecentActivity";
+import PromotionBanner from "../components/dashboard/PromotionBanner";
 
 export default function Dashboard() {
-  // const { user, loading } = useAuth();
 
-  // if (loading) {
-  //   return (
-  //     <div className="flex h-screen items-center justify-center text-white">
-  //       Loading...
-  //     </div>
-  //   );
-  // }
+  const navigate = useNavigate();
+
+  const {
+    user,
+    loading,
+  } = useAuth();
+
+  if (loading) {
+    return (
+      <div
+        className="
+        flex
+        min-h-screen
+        items-center
+        justify-center
+        text-zinc-400
+        "
+      >
+        Loading...
+      </div>
+    );
+  }
 
   return (
-    <div className="mx-auto max-w-7xl p-6">
 
-      <h1 className="text-4xl font-bold">
-        Welcome back 👋
-      </h1>
+    <div
+      className="
+      mx-auto
 
-      <p className="mt-2 text-zinc-400">
-        {/* {user.email} */}
-      </p>
+      max-w-7xl
 
-      {/* Stats */}
+      space-y-6
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-4">
+      px-4
+      py-6
 
-        <StatCard
-          title="Wallet Balance"
-          value="$0.00"
+      lg:px-8
+      "
+    >
+
+      {/* Header */}
+
+      <DashboardHeader
+
+        name={
+          user?.username ||
+          user?.email?.split("@")[0] ||
+          "Investor"
+        }
+
+        email={user?.email}
+
+        level={dashboard.team.level}
+
+      />
+
+      {/* Portfolio */}
+
+      <PortfolioCard
+
+        balance={dashboard.balance}
+
+        todayIncome={dashboard.todayIncome}
+
+        dailyRate={dashboard.dailyRate}
+
+        packageName={dashboard.package}
+
+        onDeposit={() => navigate("/assets")}
+
+        onWithdraw={() => navigate("/assets")}
+
+        onTeam={() => navigate("/team")}
+
+        onHistory={() => navigate("/assets")}
+
+      />
+
+      {/* Dashboard Grid */}
+
+      <div
+        className="
+        grid
+
+        gap-6
+
+        lg:grid-cols-2
+        "
+      >
+
+        <PackageCard
+
+          packageName={dashboard.package}
+
+          investment={dashboard.balance}
+
+          dailyRate={dashboard.dailyRate}
+
+          dailyIncome={dashboard.todayIncome}
+
+          nextReward={dashboard.nextReward}
+
+          onUpgrade={() =>
+            console.log("Upgrade")
+          }
+
         />
 
-        <StatCard
-          title="Today's Income"
-          value="$0.00"
-          color="text-green-500"
+        <TeamOverview
+
+          userLevel={dashboard.team.level}
+
+          levelA={dashboard.team.a}
+
+          levelB={dashboard.team.b}
+
+          levelC={dashboard.team.c}
+
+          commissionToday={dashboard.team.commissionToday}
+
+          totalTeam={
+            dashboard.team.a +
+            dashboard.team.b +
+            dashboard.team.c
+          }
+
+          nextLevelA={dashboard.team.nextLevelA}
+
+          nextLevelBC={dashboard.team.nextLevelBC}
+
+          onViewTeam={() =>
+            navigate("/team")
+          }
+
         />
 
-        <StatCard
-          title="Team Income"
-          value="$0.00"
-          color="text-blue-500"
+        <EarningsCard
+
+          investmentIncome={
+            dashboard.earnings.investment
+          }
+
+          referralIncome={
+            dashboard.earnings.referral
+          }
+
+          teamIncome={
+            dashboard.earnings.team
+          }
+
         />
 
-        <StatCard
-          title="Current Package"
-          value="Starter"
+        <ReferralTree
+
+          level={dashboard.team.level}
+
+          levelA={dashboard.team.a}
+
+          levelB={dashboard.team.b}
+
+          levelC={dashboard.team.c}
+
+          onViewTeam={() =>
+            navigate("/team")
+          }
+
         />
 
       </div>
-      <QuickActions />
-      <InvestmentProgress />
-      <ReferralProgress />
-      <RecentActivity />
+
+      {/* Recent Activity */}
+
+      <RecentActivity
+        activities={dashboard.activities}
+      />
+
+      {/* Promotion */}
+
+      <PromotionBanner />
 
     </div>
+
   );
+
 }

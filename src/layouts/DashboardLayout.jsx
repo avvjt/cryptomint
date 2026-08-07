@@ -1,6 +1,4 @@
 import { Outlet } from "react-router-dom";
-
-
 import MobileBottomNav from "../components/navigation/MobileBottomNav";
 import MobileHeader from "../components/navigation/MobileHeader";
 import DesktopSidebar from "../components/navigation/DesktopSidebar";

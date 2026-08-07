@@ -1,105 +1,97 @@
-import { useState } from "react";
+import assets from "../data/assets";
 
-import WalletOverview from "../components/assets/WalletOverview";
+import AssetsHeader from "../components/assets/AssetsHeader";
 import BalanceCard from "../components/assets/BalanceCard";
+import WalletOverview from "../components/assets/WalletOverview";
 import QuickActions from "../components/assets/QuickActions";
-import TransactionTabs from "../components/assets/TransactionTabs";
-import TransactionTable from "../components/assets/TransactionTable";
+import IncomeSummary from "../components/assets/IncomeSummary";
+import TransactionHistory from "../components/assets/TransactionHistory";
 
 export default function Assets() {
 
-  const [activeTab, setActiveTab] =
-    useState("All");
-
-  const transactions = [
-    {
-      id: 1,
-      type: "Deposit",
-      amount: "500 USDT",
-      status: "Completed",
-      date: "Today",
-    },
-    {
-      id: 2,
-      type: "Reward",
-      amount: "5 USDT",
-      status: "Completed",
-      date: "Yesterday",
-    },
-    {
-      id: 3,
-      type: "Withdrawal",
-      amount: "100 USDT",
-      status: "Pending",
-      date: "12 Jul",
-    },
-  ];
-
-  const filtered =
-    activeTab === "All"
-      ? transactions
-      : transactions.filter(
-          (tx) =>
-            tx.type.toLowerCase() ===
-            activeTab.slice(0, -1).toLowerCase()
-        );
-
   return (
-    <div className="mx-auto max-w-7xl p-6">
 
-      <h1 className="mb-8 text-4xl font-bold">
-        Assets
-      </h1>
+    <div
+      className="
+      mx-auto
 
-      <WalletOverview />
+      max-w-7xl
 
-      <div className="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      space-y-6
 
-        <BalanceCard
-          title="Available Balance"
-          value="250 USDT"
+      px-4
+      py-6
+
+      lg:px-8
+      "
+    >
+
+      {/* Header */}
+
+      <AssetsHeader />
+
+      {/* Hero Balance */}
+
+      <BalanceCard
+
+        availableBalance={assets.availableBalance}
+
+        todayIncome={assets.todayIncome}
+
+      />
+
+      {/* Quick Actions */}
+
+      <QuickActions />
+
+      {/* Wallet Grid */}
+
+      <div
+        className="
+        grid
+
+        gap-6
+
+        xl:grid-cols-2
+        "
+      >
+
+        <WalletOverview
+
+          investment={assets.investmentBalance}
+
+          profit={assets.profitBalance}
+
+          withdrawable={assets.withdrawableBalance}
+
+          pending={assets.pendingWithdrawal}
+
         />
 
-        <BalanceCard
-          title="Locked Investment"
-          value="1000 USDT"
-        />
+        <IncomeSummary
 
-        <BalanceCard
-          title="Today's Income"
-          value="15 USDT"
-        />
+          today={assets.todayIncome}
 
-        <BalanceCard
-          title="Total Income"
-          value="380 USDT"
+          total={assets.totalIncome}
+
+          referral={assets.referralIncome}
+
+          team={assets.teamIncome}
+
         />
 
       </div>
 
-      <div className="mt-6">
+      {/* Transactions */}
 
-        <QuickActions />
+      <TransactionHistory
 
-      </div>
+        transactions={assets.transactions}
 
-      <div className="mt-10">
-
-        <TransactionTabs
-          active={activeTab}
-          setActive={setActiveTab}
-        />
-
-      </div>
-
-      <div className="mt-6">
-
-        <TransactionTable
-          transactions={filtered}
-        />
-
-      </div>
+      />
 
     </div>
+
   );
+
 }
