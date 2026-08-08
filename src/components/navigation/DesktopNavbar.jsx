@@ -53,7 +53,7 @@ export default function DesktopNavbar() {
                 className={({ isActive }) =>
                   `transition ${isActive
                     ? "text-white text-sm font-bold underline"
-                    : "text-zinc-400 hover:text-white hover:underline text-sm font-medium"
+                    : "text-zinc-400 hover:text-white text-sm font-medium"
                   }`
                 }
               >

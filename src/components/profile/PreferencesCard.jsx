@@ -13,16 +13,12 @@ export default function PreferencesCard() {
     <section
       className="
       rounded-[32px]
-
       border
       border-white/5
-
       bg-gradient-to-br
       from-[#111318]
       to-[#0D1119]
-
       p-6
-
       lg:p-8
       "
     >
@@ -287,13 +283,12 @@ function ToggleRow({
 
         transition
 
-        ${
-          enabled
+        ${enabled
 
-          ? "bg-[#1D66FF]"
+            ? "bg-[#1D66FF]"
 
-          : "bg-zinc-600"
-        }
+            : "bg-zinc-600"
+          }
         `}
       >
 
@@ -312,13 +307,12 @@ function ToggleRow({
 
           transition-all
 
-          ${
-            enabled
+          ${enabled
 
-            ? "left-8"
+              ? "left-8"
 
-            : "left-1"
-          }
+              : "left-1"
+            }
           `}
         />
 

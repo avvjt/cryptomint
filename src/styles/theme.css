@@ -17,13 +17,7 @@
   
   /* ---------- Borders ---------- */
 
-  .border-soft {
-    @apply border border-white/5;
-  }
-
-  .divider-soft {
-    @apply border-b border-white/5;
-  }
+  
 
   /* ---------- Radius ---------- */
 
