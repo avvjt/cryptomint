@@ -1,27 +1,20 @@
-export default function AuthCard({
-    children,
-}) {
-    return (
-        <div
-            className="
-      w-full
-md:max-w-md
-w-full
-md:max-w-md
+export default function AuthCard({ children }) {
+  return (
+    <div
+      className="
+        w-full
+        rounded-[16px]
+        border
+        border-[#1D1D1D]
+        bg-[#121212]
+        p-6
+        sm:p-7
+        lg:p-8
 
-      border
-      border-zinc-800
-
-      bg-[#0B0F17]/80
-
-      backdrop-blur-xl
-
-      p-6 md:p-8
-
-      shadow-[0_0_60px_rgba(29,102,255,.15)]
+        shadow-[0_8px_40px_rgba(0,0,0,0.35)]
       "
-        >
-            {children}
-        </div>
-    );
+    >
+      {children}
+    </div>
+  );
 }

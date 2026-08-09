@@ -24,8 +24,6 @@ export default function MarketRow({ coin }) {
       px-6
       py-[15px]
 
-      border-b
-      border-[#1A1A1A]
 
       cursor-pointer
 

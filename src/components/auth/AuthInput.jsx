@@ -6,29 +6,35 @@ export default function AuthInput({
   placeholder,
   type = "text",
   value,
-  onChange
+  onChange,
+  name,
+  autoComplete,
 }) {
   const [show, setShow] = useState(false);
 
-  const isPassword =
-    type === "password";
+  const isPassword = type === "password";
 
   return (
-    <div>
-      <label
-        className="
-        block
-        mb-2
-        text-sm
-        text-zinc-400
-        "
-      >
-        {label}
-      </label>
+    <div className="w-full">
+      {label && (
+        <label
+          htmlFor={name}
+          className="
+            mb-2
+            block
+            text-[13px]
+            font-medium
+            text-[#8B929D]
+          "
+        >
+          {label}
+        </label>
+      )}
 
       <div className="relative">
-
         <input
+          id={name}
+          name={name}
           type={
             isPassword
               ? show
@@ -39,48 +45,79 @@ export default function AuthInput({
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          autoComplete={autoComplete}
           className="
-          w-full
+            h-[48px]
+            w-full
 
-          rounded-2xl
+            rounded-[8px]
 
-          bg-[#111827]
+            border
+            border-[#292C31]
 
-          border
-          border-zinc-800
+            bg-[#111214]
 
-          px-5
-          py-4
+            px-4
+            pr-12
 
-          text-white
+            text-[14px]
+            text-white
 
-          outline-none
+            placeholder:text-[#5F6671]
 
-          focus:border-blue-500
+            outline-none
+
+            transition-all
+            duration-150
+
+            hover:border-[#363A42]
+
+            focus:border-[#4A4F59]
+            focus:bg-[#131416]
+
+            disabled:cursor-not-allowed
+            disabled:opacity-50
           "
         />
 
         {isPassword && (
           <button
             type="button"
-            onClick={() =>
-              setShow(!show)
+            onClick={() => setShow((prev) => !prev)}
+            aria-label={
+              show
+                ? "Hide password"
+                : "Show password"
             }
             className="
-            absolute
-            right-4
-            top-1/2
-            -translate-y-1/2
+              absolute
+              right-3
+              top-1/2
+              -translate-y-1/2
+
+              flex
+              h-8
+              w-8
+              items-center
+              justify-center
+
+              rounded-md
+
+              text-[#707782]
+
+              transition
+
+              hover:bg-[#1A1C20]
+              hover:text-[#B8BEC8]
             "
           >
             {show ? (
-              <EyeOff size={18} />
+              <EyeOff size={17} strokeWidth={1.8} />
             ) : (
-              <Eye size={18} />
+              <Eye size={17} strokeWidth={1.8} />
             )}
           </button>
         )}
-
       </div>
     </div>
   );

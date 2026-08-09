@@ -3,14 +3,12 @@ import { FaApple } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 export default function SocialButtons() {
-
   const navigate = useNavigate();
 
   const handleGoogleSignup = async (credentialResponse) => {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/auth/google`,
-        
         {
           method: "POST",
           headers: {
@@ -27,63 +25,106 @@ export default function SocialButtons() {
       if (res.ok) {
         localStorage.setItem("token", data.token);
         navigate("/dashboard");
+      } else {
+        alert(data.message || "Google authentication failed");
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error("Google signup error:", error);
     }
   };
 
   return (
     <div className="space-y-3">
 
-      <GoogleLogin
-        onSuccess={handleGoogleSignup}
-        onError={() => console.log("Login Failed")}
-      />
+      {/* Google */}
 
-      <div className="grid grid-cols-3 gap-3">
-
-        <button
-          className="
-          rounded-2xl
-          bg-[#111827]
-          border
-          border-zinc-800
-          py-4
-          flex
-          justify-center
-          "
-        >
-          <FaApple size={20} />
-        </button>
-
-        <button
-          className="
-          rounded-2xl
-          bg-[#111827]
-          border
-          border-zinc-800
-          py-4
-          flex
-          justify-center
-          "
-        >
-        </button>
-
-        <button
-          className="
-          rounded-2xl
-          bg-[#111827]
-          border
-          border-zinc-800
-          py-4
-          flex
-          justify-center
-          "
-        >
-        </button>
-
+      <div
+        className="
+          relative
+          h-[46px]
+          w-full
+          overflow-hidden
+          rounded-full
+        "
+      >
+        <GoogleLogin
+          onSuccess={handleGoogleSignup}
+          onError={() =>
+            console.log("Google Login Failed")
+          }
+          theme="filled_black"
+          size="large"
+          shape="pill"
+          text="continue_with"
+          width="100%"
+        />
       </div>
+
+      {/* Apple */}
+
+      <button
+        type="button"
+        className="
+          flex
+          h-[46px]
+          w-full
+          items-center
+          justify-center
+          gap-3
+
+          rounded-full
+
+          bg-[#191B1E]
+
+          text-[14px]
+          font-medium
+          text-[#F1F3F5]
+
+          transition
+
+          hover:bg-[#22252A]
+
+          active:scale-[0.99]
+        "
+      >
+        <FaApple
+          size={18}
+          className="text-white"
+        />
+
+        <span>
+          Continue with Apple
+        </span>
+      </button>
+
+      {/* More Options */}
+
+      <button
+        type="button"
+        className="
+          flex
+          h-[46px]
+          w-full
+          items-center
+          justify-center
+
+          rounded-full
+
+          bg-[#191B1E]
+
+          text-[14px]
+          font-medium
+          text-[#F1F3F5]
+
+          transition
+
+          hover:bg-[#22252A]
+
+          active:scale-[0.99]
+        "
+      >
+        More Options
+      </button>
 
     </div>
   );

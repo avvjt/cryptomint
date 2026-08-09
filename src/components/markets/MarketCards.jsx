@@ -261,7 +261,7 @@ export default function MarketCards() {
       <div
         className="
         mb-6
-
+        mt-6
         flex
 
         items-center

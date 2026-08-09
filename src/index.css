@@ -1,125 +1,198 @@
 @import "tailwindcss";
 @import "./styles/theme.css";
 
-/* body {
-  background: #000; } */
+/* ========================================
+   Base
+======================================== */
 
 html {
   scroll-behavior: smooth;
 }
 
 @theme {
-    /* Theme colors */
-    --color-gray: #737373;
-    --color-black: #000000;
-    --color-white: #ffffff;
+  --color-gray: #737373;
+  --color-black: #000000;
+  --color-white: #ffffff;
 }
+
+/* ========================================
+   Custom Utilities
+======================================== */
 
 @layer utilities {
-    .animate-in {
-        animation-fill-mode: both;
-    }
-    .slide-in-from-top {
-        animation-name: slideInFromTop;
-    }
-    .duration-300 {
-        animation-duration: 300ms;
-    }
+  .animate-in {
+    animation-fill-mode: both;
+  }
+
+  .slide-in-from-top {
+    animation-name: slideInFromTop;
+  }
+
+  .duration-300 {
+    animation-duration: 300ms;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-@keyframes slideInFromTop{
-    from{
-        opacity: 0;
-        transform: translateY(-1rem);
-    }
-    to{
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* ========================================
+   Animations
+======================================== */
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-1rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-/* Smooth transitions */
-* {
-    transition-property: color, background-color, border-color, transform, opacity;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* For the dropdown animations */
 @keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 
-/* Custom animations */
-.animate-slide-down {
-    animation: slideDown 0.3s ease-out;
-}
-
-.animate-slide-up {
-    animation: slideUp 0.3s ease-out;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes spin-in {
-    from {
-        transform: rotate(-90deg);
-        opacity: 0;
-    }
-    to {
-        transform: rotate(0deg);
-        opacity: 1;
-    }
+  from {
+    transform: rotate(-90deg);
+    opacity: 0;
+  }
+
+  to {
+    transform: rotate(0deg);
+    opacity: 1;
+  }
 }
 
 @keyframes slide-up {
-    from {
-        transform: translateY(10px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.animate-spin-in {
-    animation: spin-in 0.3s ease-out;
-}
-
-.animate-slide-up {
-    animation: slide-up 0.3s ease-out;
-}
-
-* {
-    transition-duration: 200ms;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-
-/* Ticker */
 @keyframes marquee {
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
+}
+
+@keyframes tickerUp {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes loadingDot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.7);
+  }
+
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes glowUp {
+  0% {
+    text-shadow: 0 0 0 transparent;
+  }
+
+  50% {
+    text-shadow: 0 0 10px #22c55e;
+  }
+
+  100% {
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+@keyframes glowDown {
+  0% {
+    text-shadow: 0 0 0 transparent;
+  }
+
+  50% {
+    text-shadow: 0 0 10px #ef4444;
+  }
+
+  100% {
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+/* ========================================
+   Animation Classes
+======================================== */
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+.animate-spin-in {
+  animation: spin-in 0.3s ease-out;
 }
 
 .animate-marquee {
@@ -132,38 +205,12 @@ html {
   animation-play-state: paused;
 }
 
-/* colors */
-.price-up {
-  color: #22c55e;
+.scroll-up {
+  animation: tickerUp 40s linear infinite;
 }
 
-.price-down {
-  color: #ef4444;
-}
-
-/* glow flash */
-@keyframes glowUp {
-  0% {
-    text-shadow: 0 0 0px transparent;
-  }
-  50% {
-    text-shadow: 0 0 10px #22c55e;
-  }
-  100% {
-    text-shadow: 0 0 0px transparent;
-  }
-}
-
-@keyframes glowDown {
-  0% {
-    text-shadow: 0 0 0px transparent;
-  }
-  50% {
-    text-shadow: 0 0 10px #ef4444;
-  }
-  100% {
-    text-shadow: 0 0 0px transparent;
-  }
+.animate-float {
+  animation: float 2.5s ease-in-out infinite;
 }
 
 .glow-up {
@@ -174,42 +221,67 @@ html {
   animation: glowDown 0.6s ease-out;
 }
 
+/* ========================================
+   Loading Dots
+======================================== */
 
-/* @font-face {
-  font-family: 'Trade';
-  src: url('/fonts/AlfaSlabOne-Regular.ttf') format('ttf');
-  font-weight: 900;
-  font-style: normal;
-} */
+.loading-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #1d66ff;
+  animation: loadingDot 1.2s infinite;
+}
 
+.delay-200 {
+  animation-delay: 0.2s;
+}
 
+.delay-400 {
+  animation-delay: 0.4s;
+}
 
-/* Events */
+/* ========================================
+   Price Colors
+======================================== */
+
+.price-up {
+  color: #22c55e;
+}
+
+.price-down {
+  color: #ef4444;
+}
+
+/* ========================================
+   Swiper
+======================================== */
 
 .swiper-pagination {
   bottom: 0 !important;
 }
 
 .swiper-pagination-bullet {
-  background: rgba(255,255,255,.4);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .swiper-pagination-bullet-active {
   background: white;
 }
 
-
-/*Footer Design*/
+/* ========================================
+   Footer
+======================================== */
 
 .footer-grid {
   background-image:
     linear-gradient(
-      rgba(255,255,255,0.05) 1px,
+      rgba(255, 255, 255, 0.05) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(255,255,255,0.05) 1px,
+      rgba(255, 255, 255, 0.05) 1px,
       transparent 1px
     );
 
@@ -219,111 +291,10 @@ html {
 .footer-noise {
   background-image:
     radial-gradient(
-      rgba(255,255,255,0.03) 1px,
+      rgba(255, 255, 255, 0.03) 1px,
       transparent 1px
     );
 
   background-size: 4px 4px;
   opacity: 0.4;
-}
-
-
-
-/*zero fees*/
-@keyframes tickerUp {
-  from {
-    transform: translateY(0);
-  }
-
-  to {
-    transform: translateY(-50%);
-  }
-}
-
-.scroll-up {
-  animation: tickerUp 40s linear infinite;
-}
-
-
-
-
-/* Splash Screen progress bar animation */
-/* Floating Logo */
-@keyframes float {
-
-  0%,
-  100% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-8px);
-  }
-
-}
-
-.animate-float {
-  animation: float 2.5s ease-in-out infinite;
-}
-
-
-/* Loading Dots */
-
-@keyframes loadingDot {
-
-  0%,
-  80%,
-  100% {
-    opacity: .3;
-    transform: scale(.7);
-  }
-
-  40% {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-}
-
-.loading-dot {
-
-  width: 10px;
-
-  height: 10px;
-
-  border-radius: 9999px;
-
-  background: #1D66FF;
-
-  animation: loadingDot 1.2s infinite;
-
-}
-
-.delay-200 {
-
-  animation-delay: .2s;
-
-}
-
-.delay-400 {
-
-  animation-delay: .4s;
-
-}
-
-
-/* Hide Scrollbar */
-
-.scrollbar-hide {
-
-  -ms-overflow-style: none;
-
-  scrollbar-width: none;
-
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-
-  display: none;
-
 }
