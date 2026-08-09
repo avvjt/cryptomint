@@ -83,7 +83,7 @@ export default function Login() {
       } else {
         setError(
           data.message ||
-            "Invalid email or password."
+          "Invalid email or password."
         );
       }
     } catch (error) {
@@ -144,7 +144,7 @@ export default function Login() {
       } else {
         setError(
           data.message ||
-            "Google login failed."
+          "Google login failed."
         );
       }
     } catch (error) {
@@ -1105,11 +1105,10 @@ function LoginPanel({
 
           transition
 
-          ${
-            loading
+          ${loading
               ? "cursor-not-allowed bg-[#2858A6] text-white/70"
               : "bg-[#F4F5F7] text-black hover:bg-white active:scale-[.99]"
-          }
+            }
           `}
         >
 
@@ -1197,22 +1196,19 @@ function MobileLoginForm({
 
       <div
         className="
-        relative
-
-        h-[49px]
-
-        overflow-hidden
-
-        rounded-full
+          google-login-mobile
+          relative
+          flex
+          h-12.25
+          w-full
+          overflow-hidden
+          rounded-full
         "
       >
-
         <GoogleLogin
           onSuccess={handleGoogleLogin}
           onError={() =>
-            console.log(
-              "Google Login Failed"
-            )
+            console.log("Google Login Failed")
           }
           theme="filled_black"
           size="large"
@@ -1224,18 +1220,14 @@ function MobileLoginForm({
         {googleLoading && (
           <div
             className="
-            absolute
-
-            inset-0
-
-            flex
-
-            items-center
-
-            justify-center
-
-            bg-black/50
-            "
+        absolute
+        inset-0
+        z-10
+        flex
+        items-center
+        justify-center
+        bg-black/50
+      "
           >
             <LoaderCircle
               size={18}
@@ -1243,7 +1235,6 @@ function MobileLoginForm({
             />
           </div>
         )}
-
       </div>
 
       <div
@@ -1289,11 +1280,11 @@ function MobileLoginForm({
             setEmail(e.target.value)
           }
           className="
-          h-[49px]
+          h-12.25
 
           w-full
 
-          rounded-[8px]
+          rounded-lg
 
           border
           border-[#292C31]
@@ -1328,11 +1319,11 @@ function MobileLoginForm({
               setPassword(e.target.value)
             }
             className="
-            h-[49px]
+            h-12.25
 
             w-full
 
-            rounded-[8px]
+            rounded-lg
 
             border
             border-[#292C31]
@@ -1402,7 +1393,7 @@ function MobileLoginForm({
         {error && (
           <div
             className="
-            rounded-[8px]
+            rounded-lg
 
             border
             border-red-500/20
@@ -1428,7 +1419,7 @@ function MobileLoginForm({
           className={`
           flex
 
-          h-[49px]
+          h-12.25
 
           w-full
 
@@ -1446,11 +1437,10 @@ function MobileLoginForm({
 
           transition
 
-          ${
-            loading
+          ${loading
               ? "bg-[#2858A6] text-white/70"
               : "bg-[#F4F5F7] text-black hover:bg-white"
-          }
+            }
           `}
         >
 
@@ -1515,7 +1505,7 @@ function Terms() {
 
       text-[11px]
 
-      leading-[17px]
+      leading-4.25
 
       text-[#707782]
       "
@@ -1569,14 +1559,10 @@ function Logo() {
       <span
         className="
         block
-
-        h-[16px]
-        w-[7px]
-
+        h-4
+        w-1.75
         skew-x-[-25deg]
-
-        rounded-[2px]
-
+        rounded-xs
         bg-[#4D8DFF]
         "
       />
@@ -1584,14 +1570,10 @@ function Logo() {
       <span
         className="
         block
-
-        h-[16px]
-        w-[7px]
-
+        h-4
+        w-1.75
         skew-x-[-25deg]
-
-        rounded-[2px]
-
+        rounded-xs
         bg-[#72A9FF]
         "
       />

@@ -298,3 +298,12 @@ html {
   background-size: 4px 4px;
   opacity: 0.4;
 }
+
+/* ========================================
+   google login button
+======================================== */
+
+.google-login-mobile iframe {
+  width: 100% !important;
+  min-width: 100% !important;
+}

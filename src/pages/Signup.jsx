@@ -768,7 +768,17 @@ function SignupPanel({
 
         {/* Google */}
 
-        <div className="relative h-[46px] overflow-hidden rounded-full">
+        <div
+          className="
+            google-login-mobile
+            relative
+            flex
+            h-12.25
+            w-full
+            overflow-hidden
+            rounded-full
+          "
+>
 
           <GoogleLogin
             onSuccess={handleGoogleSignup}
