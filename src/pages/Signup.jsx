@@ -1169,52 +1169,58 @@ function MobileSocialFlow({
       {/* Google */}
 
       <div
-        className="
-        relative
+  className="
+    google-login-mobile
+    relative
 
-        h-[49px]
+    flex
+    h-[46px]
+    w-full
 
-        overflow-hidden
+    items-center
+
+    overflow-hidden
+
+    rounded-full
+  "
+>
+  <div className="w-full">
+    <GoogleLogin
+      onSuccess={handleGoogleSignup}
+      onError={() =>
+        console.log("Google Signup Failed")
+      }
+      theme="filled_black"
+      size="large"
+      shape="pill"
+      text="continue_with"
+      width="100%"
+    />
+  </div>
+
+  {googleLoading && (
+    <div
+      className="
+        absolute
+        inset-0
+        z-10
+
+        flex
+        items-center
+        justify-center
 
         rounded-full
-        "
-      >
 
-        <GoogleLogin
-          onSuccess={handleGoogleSignup}
-          onError={() =>
-            console.log(
-              "Google Login Failed"
-            )
-          }
-          theme="filled_black"
-          size="large"
-          shape="pill"
-          text="continue_with"
-          width="100%"
-        />
-
-        {googleLoading && (
-          <div
-            className="
-            absolute
-            inset-0
-
-            flex
-            items-center
-            justify-center
-
-            bg-black/50
-            "
-          >
-            <LoaderCircle
-              size={18}
-              className="animate-spin"
-            />
-          </div>
-        )}
-
-      </div>
+        bg-black/60
+      "
+    >
+      <LoaderCircle
+        size={18}
+        className="animate-spin"
+      />
+    </div>
+  )}
+</div>
 
       {/* OR */}
 

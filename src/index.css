@@ -303,7 +303,16 @@ html {
    google login button
 ======================================== */
 
+.google-login-mobile {
+  width: 100% !important;
+}
+
+.google-login-mobile > div {
+  width: 100% !important;
+}
+
 .google-login-mobile iframe {
   width: 100% !important;
   min-width: 100% !important;
+  max-width: 100% !important;
 }

@@ -174,11 +174,8 @@ export default function Login() {
         h-[64px]
         items-center
         justify-between
-
         px-5
-
         sm:px-8
-
         lg:px-10
         "
       >
@@ -226,16 +223,11 @@ export default function Login() {
             w-9
             items-center
             justify-center
-
             rounded-full
-
             text-[#9BA2AD]
-
             transition
-
             hover:bg-[#17191D]
             hover:text-white
-
             sm:flex
             "
             aria-label="Support"
@@ -250,15 +242,10 @@ export default function Login() {
             h-9
             items-center
             gap-1.5
-
             rounded-full
-
             px-3
-
             text-[#9BA2AD]
-
             transition
-
             hover:bg-[#17191D]
             hover:text-white
             "
@@ -283,22 +270,14 @@ export default function Login() {
       <div
         className="
         mx-auto
-
         hidden
-
         min-h-[calc(100vh-64px)]
-
         max-w-[1320px]
-
         grid-cols-[minmax(0,1fr)_414px]
-
         items-center
-
         gap-16
-
         px-8
         pb-10
-
         lg:grid
         "
       >
@@ -332,12 +311,9 @@ export default function Login() {
       <div
         className="
         block
-
         min-h-[calc(100vh-64px)]
-
         px-6
         pb-10
-
         lg:hidden
         "
       >
@@ -345,13 +321,9 @@ export default function Login() {
         <div
           className="
           mx-auto
-
           flex
-
           min-h-[calc(100vh-74px)]
-
           max-w-[430px]
-
           flex-col
           "
         >
@@ -363,13 +335,9 @@ export default function Login() {
             <h1
               className="
               max-w-[320px]
-
               text-[29px]
-
               font-semibold
-
               leading-[1.15]
-
               tracking-[-0.035em]
               "
             >
@@ -381,11 +349,8 @@ export default function Login() {
             <p
               className="
               mt-5
-
               text-[16px]
-
               leading-6
-
               text-[#8EB8FF]
               "
             >
@@ -424,7 +389,6 @@ export default function Login() {
           <div
             className="
             mt-9
-
             text-center
             "
           >
@@ -432,7 +396,6 @@ export default function Login() {
             <span
               className="
               text-[14px]
-
               text-[#707782]
               "
             >
@@ -443,13 +406,9 @@ export default function Login() {
               to="/signup"
               className="
               ml-1.5
-
               text-[14px]
-
               font-medium
-
               text-[#73A7FF]
-
               hover:text-[#9BC0FF]
               "
             >
@@ -470,33 +429,21 @@ export default function Login() {
         type="button"
         className="
         fixed
-
         bottom-5
         right-5
-
         flex
-
         h-12
         w-12
-
         items-center
         justify-center
-
         rounded-full
-
         border
         border-[#41464F]
-
         bg-[#191D24]
-
         text-[#E2E6EC]
-
         shadow-[0_6px_25px_rgba(0,0,0,.45)]
-
         transition
-
         hover:bg-[#222730]
-
         lg:hidden
         "
       >
@@ -516,13 +463,9 @@ function PromoSection() {
     <section
       className="
       flex
-
       flex-col
-
       items-center
-
       justify-center
-
       text-center
       "
     >
@@ -530,19 +473,12 @@ function PromoSection() {
       <div
         className="
         relative
-
         flex
-
         h-[300px]
-
         w-full
-
         max-w-[620px]
-
         items-end
-
         justify-center
-
         overflow-hidden
         "
       >
@@ -552,19 +488,13 @@ function PromoSection() {
         <div
           className="
           absolute
-
           bottom-4
           left-1/2
-
           h-[120px]
           w-[500px]
-
           -translate-x-1/2
-
           rounded-[50%]
-
           bg-[#79BFFF]/20
-
           blur-[55px]
           "
         />
@@ -574,25 +504,16 @@ function PromoSection() {
         <div
           className="
           absolute
-
           bottom-[36px]
           left-1/2
-
           h-[60px]
           w-[500px]
-
           -translate-x-1/2
-
           rounded-[50%]
-
           border-t
-
           border-[#B8D9FF]/50
-
           bg-gradient-to-b
-
           from-[#29394D]/80
-
           to-transparent
           "
         />
@@ -602,23 +523,14 @@ function PromoSection() {
         <div
           className="
           relative
-
           z-10
-
           mb-[35px]
-
           select-none
-
           text-[250px]
-
           font-black
-
           leading-none
-
           tracking-[-0.15em]
-
           text-white
-
           drop-shadow-[0_0_22px_rgba(135,194,255,.9)]
           "
         >
@@ -630,19 +542,13 @@ function PromoSection() {
         <div
           className="
           absolute
-
           bottom-[34px]
           left-1/2
-
           z-20
-
           h-[52px]
           w-[15px]
-
           -translate-x-1/2
-
           rounded-t-full
-
           bg-black
           "
         />
@@ -652,11 +558,8 @@ function PromoSection() {
       <h2
         className="
         mt-2
-
         text-[30px]
-
         font-semibold
-
         tracking-[-0.035em]
         "
       >
@@ -668,13 +571,9 @@ function PromoSection() {
       <div
         className="
         mt-5
-
         flex
-
         items-center
-
         justify-center
-
         gap-1
         "
       >
@@ -685,12 +584,9 @@ function PromoSection() {
               className="
               h-8
               w-8
-
               rounded-full
-
               border
               border-[#60656D]
-
               bg-[#272D37]
               "
             />
@@ -703,19 +599,12 @@ function PromoSection() {
       <div
         className="
         mt-14
-
         flex
-
         w-full
-
         max-w-[470px]
-
         items-center
-
         gap-3
-
         text-[12px]
-
         text-[#68717E]
         "
       >
@@ -733,17 +622,11 @@ function PromoSection() {
       <div
         className="
         mt-4
-
         flex
-
         items-center
-
         justify-center
-
         gap-8
-
         text-[13px]
-
         text-[#9BA2AC]
         "
       >
@@ -778,9 +661,7 @@ function LoginPanel({
     <section
       className="
       w-full
-
       rounded-[16px]
-
       border
       border-[#1D1D1F]
 
@@ -823,59 +704,58 @@ function LoginPanel({
         {/* Google */}
 
         <div
-          className="
-          relative
+  className="
+    google-login-mobile
+    relative
 
-          h-[46px]
+    flex
+    h-[46px]
+    w-full
 
-          overflow-hidden
+    items-center
 
-          rounded-full
-          "
-        >
+    overflow-hidden
 
-          <GoogleLogin
-            onSuccess={
-              handleGoogleLogin
-            }
-            onError={() =>
-              console.log(
-                "Google Login Failed"
-              )
-            }
-            theme="filled_black"
-            size="large"
-            shape="pill"
-            text="continue_with"
-            width="100%"
-          />
+    rounded-full
+  "
+>
+  <div className="w-full">
+    <GoogleLogin
+      onSuccess={handleGoogleLogin}
+      onError={() =>
+        console.log("Google Login Failed")
+      }
+      theme="filled_black"
+      size="large"
+      shape="pill"
+      text="continue_with"
+      width="100%"
+    />
+  </div>
 
-          {googleLoading && (
-            <div
-              className="
-              absolute
+  {googleLoading && (
+    <div
+      className="
+        absolute
+        inset-0
+        z-10
 
-              inset-0
+        flex
+        items-center
+        justify-center
 
-              flex
+        rounded-full
 
-              items-center
-
-              justify-center
-
-              rounded-full
-
-              bg-black/60
-              "
-            >
-              <LoaderCircle
-                size={18}
-                className="animate-spin"
-              />
-            </div>
-          )}
-
-        </div>
+        bg-black/60
+      "
+    >
+      <LoaderCircle
+        size={18}
+        className="animate-spin"
+      />
+    </div>
+  )}
+</div>
 
         {/* Apple */}
 
