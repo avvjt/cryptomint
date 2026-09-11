@@ -11,7 +11,7 @@ const AccountStatusContext = createContext(null);
 const DEMO_MODE = true;
 
 const DEMO_DATA = {
-  status: "ACTIVE",
+  status: "PENDING",
   depositAddress:
     "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
   depositAmount: 0,

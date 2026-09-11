@@ -33,19 +33,15 @@ export default function DashboardSidebar() {
       path: "/trade",
       icon: ArrowUpDown,
     },
-    {
-      name: "Assets",
-      path: "/assets",
-      icon: Wallet,
-    },
+    
     {
       name: "Team",
       path: "/team",
       icon: Users,
     },
     {
-      name: "Profile",
-      path: "/profile",
+      name: "Wallet",
+      path: "/wallet",
       icon: User,
     },
   ];

@@ -3,16 +3,15 @@ import {
   CandlestickChart,
   ArrowUpDown,
   Wallet,
-  Users,
+  Team
 } from "lucide-react";
 
 import { NavLink } from "react-router-dom";
 
-import useScrollDirection from "../../hooks/useScrollDirection";
 
 
 export default function MobileBottomNav() {
-  // const visible = useScrollDirection();
+  
 
   const items = [
     {
@@ -33,12 +32,12 @@ export default function MobileBottomNav() {
     {
       name: "Team",
       path: "/team",
-      icon: Wallet,
+      icon: Team,
     },
     {
-      name: "Profile",
-      path: "/profile",
-      icon: Users,
+      name: "Wallet",
+      path: "/wallet",
+      icon: Wallet,
     },
   ];
 

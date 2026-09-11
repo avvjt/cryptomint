@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import {
   useTradeWalletContext,
@@ -31,10 +31,13 @@ export default function Wallet() {
   } = useAccountStatusContext();
 
 
-  const [
-    activeTab,
-    setActiveTab,
-  ] = useState("Deposit");
+  const [searchParams, setSearchParams] =
+    useSearchParams();
+
+  const activeTab =
+    searchParams.get("tab") === "withdraw"
+      ? "Withdraw"
+      : "Deposit";
 
 
   const [
@@ -53,9 +56,6 @@ export default function Wallet() {
     availableBalance + locked;
 
 
-  const handleWithdrawTab = () => {
-    setActiveTab("Withdraw");
-  };
 
 
   return (
@@ -163,10 +163,9 @@ export default function Wallet() {
                 text-[11px]
                 font-medium
 
-                ${
-                  isActive
-                    ? "border-[#08B77A]/30 bg-[#08B77A]/10 text-[#08B77A]"
-                    : "border-[#F6465D]/30 bg-[#F6465D]/10 text-[#F6465D]"
+                ${isActive
+                  ? "border-[#08B77A]/30 bg-[#08B77A]/10 text-[#08B77A]"
+                  : "border-[#F6465D]/30 bg-[#F6465D]/10 text-[#F6465D]"
                 }
               `}
             >
@@ -275,14 +274,18 @@ export default function Wallet() {
 
           <TabButton
             active={activeTab === "Deposit"}
-            onClick={() => setActiveTab("Deposit")}
+            onClick={() =>
+              setSearchParams({ tab: "deposit" })
+            }
           >
             Deposit
           </TabButton>
 
           <TabButton
             active={activeTab === "Withdraw"}
-            onClick={handleWithdrawTab}
+            onClick={() =>
+              setSearchParams({ tab: "withdraw" })
+            }
           >
             Withdraw
           </TabButton>
@@ -448,10 +451,9 @@ function TabButton({
         font-medium
         transition
 
-        ${
-          active
-            ? "bg-[#1A1E24] text-white"
-            : "text-[#737B89] hover:text-white"
+        ${active
+          ? "bg-[#1A1E24] text-white"
+          : "text-[#737B89] hover:text-white"
         }
       `}
     >

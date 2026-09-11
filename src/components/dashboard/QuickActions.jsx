@@ -4,27 +4,34 @@ import {
   Clock3,
   Repeat2,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const actions = [
   {
     label: "Deposit",
     icon: ArrowDownToLine,
+    path: "/wallet?tab=deposit",
   },
   {
     label: "Withdraw",
     icon: ArrowUpFromLine,
+    path: "/wallet?tab=withdraw",
   },
   {
     label: "Trade",
     icon: Repeat2,
+    path: "/trade",
   },
   {
     label: "History",
     icon: Clock3,
+    path: "/history",
   },
 ];
 
 export default function QuickActions() {
+  const navigate = useNavigate();
+
   return (
     <section className="grid grid-cols-4 gap-2">
       {actions.map((action) => {
@@ -34,6 +41,7 @@ export default function QuickActions() {
           <button
             key={action.label}
             type="button"
+            onClick={() => navigate(action.path)}
             className="
               flex
               min-w-0
