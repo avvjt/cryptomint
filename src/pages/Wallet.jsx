@@ -18,6 +18,8 @@ import { WALLET_CONFIG } from "../config/walletConfig";
 
 export default function Wallet() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] =
+    useSearchParams();
 
   const {
     balance,
@@ -30,21 +32,15 @@ export default function Wallet() {
     status,
   } = useAccountStatusContext();
 
-
-  const [searchParams, setSearchParams] =
-    useSearchParams();
-
   const activeTab =
     searchParams.get("tab") === "withdraw"
       ? "Withdraw"
       : "Deposit";
 
-
   const [
     showActivationModal,
     setShowActivationModal,
   ] = useState(false);
-
 
   const availableBalance =
     Number(balance || 0);
@@ -55,8 +51,14 @@ export default function Wallet() {
   const totalBalance =
     availableBalance + locked;
 
-
-
+  const handleTabChange = (tab) => {
+    setSearchParams({
+      tab:
+        tab === "Withdraw"
+          ? "withdraw"
+          : "deposit",
+    });
+  };
 
   return (
     <main
@@ -71,7 +73,6 @@ export default function Wallet() {
         lg:px-8
       "
     >
-
       <div
         className="
           mx-auto
@@ -85,13 +86,61 @@ export default function Wallet() {
 
         <header className="mb-5">
 
-          <h1 className="text-xl font-semibold">
-            Wallet
-          </h1>
+          <div
+            className="
+              flex
+              items-end
+              justify-between
+              gap-4
+            "
+          >
 
-          <p className="mt-1 text-sm text-[#737B89]">
-            Manage your USDT balance and withdrawals
-          </p>
+            <div>
+
+              <h1
+                className="
+                  text-xl
+                  font-semibold
+                  tracking-tight
+                "
+              >
+                Wallet
+              </h1>
+
+              <p
+                className="
+                  mt-1
+                  text-sm
+                  text-[#737B89]
+                "
+              >
+                Manage your USDT balance
+              </p>
+
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate("/history")}
+              className="
+                rounded-xl
+                border
+                border-[#1A1E24]
+                bg-[#0D1014]
+                px-3
+                py-2
+                text-xs
+                font-medium
+                text-[#AAB1BD]
+                transition
+                hover:bg-[#14181E]
+                hover:text-white
+              "
+            >
+              History
+            </button>
+
+          </div>
 
         </header>
 
@@ -102,6 +151,8 @@ export default function Wallet() {
 
         <section
           className="
+            relative
+            overflow-hidden
             rounded-2xl
             border
             border-[#1A1E24]
@@ -110,84 +161,217 @@ export default function Wallet() {
           "
         >
 
-          <div className="flex items-start justify-between gap-4">
+          {/* subtle background detail */}
 
-            <div>
+          <div
+            className="
+              pointer-events-none
+              absolute
+              -right-20
+              -top-20
+              h-48
+              w-48
+              rounded-full
+              bg-[#4D8DFF]/5
+              blur-3xl
+            "
+          />
 
-              <p
-                className="
-                  text-xs
-                  uppercase
-                  tracking-wider
-                  text-[#737B89]
-                "
-              >
-                Total Balance
-              </p>
+          <div className="relative">
 
-              <div className="mt-2 flex items-end gap-2">
+            <div
+              className="
+                flex
+                items-start
+                justify-between
+                gap-4
+              "
+            >
 
-                <span
+              <div>
+
+                <p
                   className="
-                    text-3xl
-                    font-semibold
-                    tracking-tight
-                  "
-                >
-                  {totalBalance.toFixed(2)}
-                </span>
-
-                <span
-                  className="
-                    pb-1
-                    text-sm
+                    text-[11px]
+                    font-medium
+                    uppercase
+                    tracking-[0.12em]
                     text-[#737B89]
                   "
                 >
-                  USDT
-                </span>
+                  Total balance
+                </p>
+
+                <div
+                  className="
+                    mt-2
+                    flex
+                    items-baseline
+                    gap-2
+                  "
+                >
+
+                  <span
+                    className="
+                      text-3xl
+                      font-semibold
+                      tracking-tight
+                      sm:text-4xl
+                    "
+                  >
+                    {totalBalance.toFixed(2)}
+                  </span>
+
+                  <span
+                    className="
+                      text-sm
+                      font-medium
+                      text-[#737B89]
+                    "
+                  >
+                    USDT
+                  </span>
+
+                </div>
 
               </div>
 
             </div>
 
 
-            {/* Account status */}
+            {/* Balance split */}
 
             <div
-              className={`
-                rounded-full
-                border
-                px-3
-                py-1
-                text-[11px]
-                font-medium
-
-                ${isActive
-                  ? "border-[#08B77A]/30 bg-[#08B77A]/10 text-[#08B77A]"
-                  : "border-[#F6465D]/30 bg-[#F6465D]/10 text-[#F6465D]"
-                }
-              `}
+              className="
+                mt-6
+                grid
+                grid-cols-2
+                gap-3
+              "
             >
-              {isActive ? "Active" : "Pending"}
+
+              <div
+                className="
+                  rounded-xl
+                  border
+                  border-[#1A1E24]
+                  bg-[#090B0E]
+                  p-4
+                "
+              >
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                  "
+                >
+
+                  <span
+                    className="
+                      h-1.5
+                      w-1.5
+                      rounded-full
+                      bg-[#08B77A]
+                    "
+                  />
+
+                  <p
+                    className="
+                      text-[11px]
+                      text-[#737B89]
+                    "
+                  >
+                    Available
+                  </p>
+
+                </div>
+
+                <p
+                  className="
+                    mt-2
+                    text-lg
+                    font-medium
+                  "
+                >
+                  {availableBalance.toFixed(2)}
+
+                  <span
+                    className="
+                      ml-1
+                      text-xs
+                      text-[#737B89]
+                    "
+                  >
+                    USDT
+                  </span>
+                </p>
+
+              </div>
+
+
+              <div
+                className="
+                  rounded-xl
+                  border
+                  border-[#1A1E24]
+                  bg-[#090B0E]
+                  p-4
+                "
+              >
+
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-2
+                  "
+                >
+
+                  <span
+                    className="
+                      h-1.5
+                      w-1.5
+                      rounded-full
+                      bg-[#F59E0B]
+                    "
+                  />
+
+                  <p
+                    className="
+                      text-[11px]
+                      text-[#737B89]
+                    "
+                  >
+                    Locked
+                  </p>
+
+                </div>
+
+                <p
+                  className="
+                    mt-2
+                    text-lg
+                    font-medium
+                  "
+                >
+                  {locked.toFixed(2)}
+
+                  <span
+                    className="
+                      ml-1
+                      text-xs
+                      text-[#737B89]
+                    "
+                  >
+                    USDT
+                  </span>
+                </p>
+
+              </div>
+
             </div>
-
-          </div>
-
-
-          {/* Balance split */}
-
-          <div className="mt-5 grid grid-cols-2 gap-3">
-
-            <BalanceBox
-              label="Available"
-              value={availableBalance}
-            />
-
-            <BalanceBox
-              label="Locked"
-              value={locked}
-            />
 
           </div>
 
@@ -195,57 +379,114 @@ export default function Wallet() {
 
 
         {/* =====================================================
-            ACCOUNT STATUS
+            ACCOUNT VERIFICATION
+            ONLY VISIBLE WHILE NOT ACTIVE
         ===================================================== */}
 
         {!isActive && (
           <section
             className="
               mt-4
+              overflow-hidden
               rounded-2xl
               border
               border-[#1A1E24]
               bg-[#0D1014]
-              p-5
             "
           >
 
-            <div className="flex gap-3">
+            <div className="p-4">
 
               <div
                 className="
-                  mt-0.5
-                  h-2
-                  w-2
-                  shrink-0
-                  rounded-full
-                  bg-[#F6465D]
+                  flex
+                  items-center
+                  justify-between
+                  gap-4
                 "
-              />
+              >
 
-              <div>
-
-                <p className="text-sm font-semibold">
-                  Account verification pending
-                </p>
-
-                <p
+                <div
                   className="
-                    mt-1
-                    text-sm
-                    leading-6
-                    text-[#737B89]
+                    flex
+                    min-w-0
+                    items-center
+                    gap-3
                   "
                 >
-                  Deposit at least{" "}
-                  <span className="font-medium text-white">
-                    {WALLET_CONFIG.minimumDeposit} USDT
-                  </span>{" "}
-                  using the BEP20 network. Your deposit will
-                  be automatically verified by the backend
-                  and your account will be activated after
-                  confirmation.
-                </p>
+
+                  <div
+                    className="
+                      flex
+                      h-9
+                      w-9
+                      shrink-0
+                      items-center
+                      justify-center
+                      rounded-xl
+                      bg-[#F59E0B]/10
+                    "
+                  >
+
+                    <span
+                      className="
+                        h-2
+                        w-2
+                        animate-pulse
+                        rounded-full
+                        bg-[#F59E0B]
+                      "
+                    />
+
+                  </div>
+
+                  <div className="min-w-0">
+
+                    <p
+                      className="
+                        text-sm
+                        font-medium
+                      "
+                    >
+                      Account verification
+                    </p>
+
+                    <p
+                      className="
+                        mt-0.5
+                        text-xs
+                        text-[#737B89]
+                      "
+                    >
+                      Deposit {WALLET_CONFIG.minimumDeposit} USDT
+                      to activate
+                    </p>
+
+                  </div>
+
+                </div>
+
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    handleTabChange("Deposit")
+                  }
+                  className="
+                    shrink-0
+                    rounded-lg
+                    bg-[#4D8DFF]
+                    px-3
+                    py-2
+                    text-[11px]
+                    font-semibold
+                    text-white
+                    transition
+                    hover:bg-[#3D7EF0]
+                  "
+                >
+                  Deposit
+                </button>
 
               </div>
 
@@ -256,7 +497,7 @@ export default function Wallet() {
 
 
         {/* =====================================================
-            TABS
+            DEPOSIT / WITHDRAW TABS
         ===================================================== */}
 
         <div
@@ -275,7 +516,7 @@ export default function Wallet() {
           <TabButton
             active={activeTab === "Deposit"}
             onClick={() =>
-              setSearchParams({ tab: "deposit" })
+              handleTabChange("Deposit")
             }
           >
             Deposit
@@ -284,7 +525,7 @@ export default function Wallet() {
           <TabButton
             active={activeTab === "Withdraw"}
             onClick={() =>
-              setSearchParams({ tab: "withdraw" })
+              handleTabChange("Withdraw")
             }
           >
             Withdraw
@@ -295,10 +536,11 @@ export default function Wallet() {
 
         {/* =====================================================
             DEPOSIT
+            ALWAYS AVAILABLE
         ===================================================== */}
 
         {activeTab === "Deposit" && (
-          <section className="mt-5">
+          <section className="mt-4">
 
             <DepositVerificationCard />
 
@@ -311,14 +553,14 @@ export default function Wallet() {
         ===================================================== */}
 
         {activeTab === "Withdraw" && (
-          <section className="mt-5">
+          <section className="mt-4">
 
             <WithdrawPanel
               isActive={isActive}
               availableBalance={availableBalance}
-              onActivate={() =>
-                setShowActivationModal(true)
-              }
+              onActivate={() => {
+                handleTabChange("Deposit");
+              }}
             />
 
           </section>
@@ -326,12 +568,13 @@ export default function Wallet() {
 
 
         {/* =====================================================
-            RECENT TRANSACTIONS
+            RECENT ACTIVITY
         ===================================================== */}
 
         <section
           className="
             mt-5
+            overflow-hidden
             rounded-2xl
             border
             border-[#1A1E24]
@@ -356,14 +599,32 @@ export default function Wallet() {
                 Recent activity
               </p>
 
-              <p className="mt-1 text-xs text-[#737B89]">
+              <p
+                className="
+                  mt-1
+                  text-xs
+                  text-[#737B89]
+                "
+              >
                 Your recent wallet activity
               </p>
 
             </div>
 
-          </div>
+            <button
+              type="button"
+              onClick={() => navigate("/history")}
+              className="
+                text-xs
+                font-medium
+                text-[#4D8DFF]
+                hover:text-[#6CA1FF]
+              "
+            >
+              View all
+            </button>
 
+          </div>
 
           <WalletActivity
             tradeHistory={tradeHistory}
@@ -384,51 +645,10 @@ export default function Wallet() {
         />
 
       </div>
-
     </main>
   );
 }
 
-
-/* =============================================================
-   BALANCE BOX
-============================================================= */
-
-function BalanceBox({
-  label,
-  value,
-}) {
-  return (
-    <div
-      className="
-        rounded-xl
-        bg-[#090B0E]
-        p-4
-      "
-    >
-
-      <p className="text-xs text-[#737B89]">
-        {label}
-      </p>
-
-      <p className="mt-1 text-lg font-medium">
-        {Number(value).toFixed(2)}
-
-        <span
-          className="
-            ml-1
-            text-xs
-            text-[#737B89]
-          "
-        >
-          USDT
-        </span>
-
-      </p>
-
-    </div>
-  );
-}
 
 
 /* =============================================================
@@ -540,19 +760,25 @@ function WithdrawPanel({
           type="button"
           onClick={onActivate}
           className="
-            mt-5
-            w-full
-            rounded-xl
-            bg-[#4D8DFF]
-            py-3
-            text-sm
-            font-semibold
-            text-white
-            transition
-            hover:bg-[#3D7EF0]
-          "
+          mt-5
+          w-full
+          rounded-xl
+          border
+          border-[#3B73D9]
+          bg-[#285DB5]
+          py-3
+          text-sm
+          font-semibold
+          text-white
+          shadow-[0_6px_20px_rgba(40,93,181,0.18)]
+          transition
+          duration-200
+          hover:border-[#4D8DFF]
+          hover:bg-[#326BC7]
+          active:scale-[0.99]
+        "
         >
-          Activate account
+          Deposit to activate
         </button>
 
       </div>
