@@ -15,39 +15,14 @@ import {
   useAuth,
 } from "../../context/AuthContext";
 
-import {
-  useState,
-} from "react";
 
 export default function MobileHeader() {
   const navigate = useNavigate();
 
   const { user } = useAuth();
 
-  const [
-    search,
-    setSearch,
-  ] = useState("");
 
 
-  /* =====================================================
-     SEARCH
-  ===================================================== */
-
-  const handleSearch = (event) => {
-    event.preventDefault();
-
-    const query = search.trim();
-
-    if (!query) {
-      navigate("/markets");
-      return;
-    }
-
-    navigate(
-      `/markets?search=${encodeURIComponent(query)}`
-    );
-  };
 
 
   return (
@@ -282,122 +257,6 @@ export default function MobileHeader() {
           </div>
 
         </div>
-
-
-        {/* =================================================
-            GLOBAL MARKET SEARCH
-        ================================================= */}
-
-        {/* <form
-          onSubmit={handleSearch}
-          className="mt-3"
-        >
-          <div
-            className="
-              group
-
-              flex
-              h-[46px]
-              w-full
-
-              items-center
-
-              rounded-xl
-
-              border
-              border-[#1D232B]
-
-              bg-[#0F1318]
-
-              px-3.5
-
-              transition-all
-              duration-200
-
-              focus-within:border-[#315FAE]
-
-              focus-within:bg-[#10161D]
-
-              focus-within:shadow-[0_0_0_3px_rgba(29,102,255,.06)]
-            "
-          >
-
-            <Search
-              size={18}
-              strokeWidth={1.8}
-              className="
-                shrink-0
-
-                text-[#626A75]
-
-                transition-colors
-
-                group-focus-within:text-[#78A7FF]
-              "
-            />
-
-            <input
-              type="search"
-              value={search}
-              onChange={(event) =>
-                setSearch(
-                  event.target.value
-                )
-              }
-              placeholder="Search coins"
-              autoComplete="off"
-              spellCheck="false"
-              className="
-                ml-3
-
-                min-w-0
-                flex-1
-
-                bg-transparent
-
-                text-[14px]
-                text-[#F5F7FA]
-
-                outline-none
-
-                placeholder:text-[#626A75]
-
-                [&::-webkit-search-cancel-button]:hidden
-              "
-            />
-
-            {search && (
-              <button
-                type="button"
-                onClick={() =>
-                  setSearch("")
-                }
-                className="
-                  mr-1
-
-                  flex
-                  h-7
-                  w-7
-
-                  items-center
-                  justify-center
-
-                  rounded-lg
-
-                  text-[#626A75]
-
-                  transition
-
-                  hover:bg-[#191F27]
-                  hover:text-white
-                "
-              >
-                ×
-              </button>
-            )}
-
-          </div>
-        </form> */}
 
       </div>
 
