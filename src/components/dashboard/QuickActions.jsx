@@ -1,97 +1,88 @@
-import { Wallet, ArrowDownToLine } from "lucide-react";
+import {
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  Clock3,
+  Repeat2,
+} from "lucide-react";
+
+const actions = [
+  {
+    label: "Deposit",
+    icon: ArrowDownToLine,
+  },
+  {
+    label: "Withdraw",
+    icon: ArrowUpFromLine,
+  },
+  {
+    label: "Trade",
+    icon: Repeat2,
+  },
+  {
+    label: "History",
+    icon: Clock3,
+  },
+];
 
 export default function QuickActions() {
   return (
-    <div className="mt-8 grid gap-6 md:grid-cols-2">
+    <section className="grid grid-cols-4 gap-2">
+      {actions.map((action) => {
+        const Icon = action.icon;
 
-      {/* Deposit */}
-
-      <button
-        className="
-        group
-        rounded-3xl
-        border
-        border-zinc-800
-        bg-zinc-900
-        p-6
-        text-left
-        transition
-        hover:border-blue-500
-        hover:bg-zinc-800
-        "
-      >
-        <div className="flex items-center justify-between">
-
-          <div>
-
-            <p className="text-zinc-400">
-              Add Funds
-            </p>
-
-            <h2 className="mt-2 text-2xl font-bold">
-              Deposit
-            </h2>
-
-          </div>
-
-          <div
+        return (
+          <button
+            key={action.label}
+            type="button"
             className="
-            rounded-2xl
-            bg-blue-500/20
-            p-4
-            text-blue-500
+              flex
+              min-w-0
+              flex-col
+              items-center
+              gap-2
+              rounded-2xl
+              border
+              border-white/[0.06]
+              bg-[#0D1117]
+              px-2
+              py-3
+              transition
+              hover:border-white/[0.1]
+              hover:bg-[#11161D]
+              active:scale-[0.97]
             "
           >
-            <Wallet size={28} />
-          </div>
+            <span
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-xl
+                bg-[#151B23]
+                text-[#8EA0B5]
+              "
+            >
+              <Icon
+                size={16}
+                strokeWidth={1.8}
+              />
+            </span>
 
-        </div>
-      </button>
-
-      {/* Withdraw */}
-
-      <button
-        className="
-        group
-        rounded-3xl
-        border
-        border-zinc-800
-        bg-zinc-900
-        p-6
-        text-left
-        transition
-        hover:border-red-500
-        hover:bg-zinc-800
-        "
-      >
-        <div className="flex items-center justify-between">
-
-          <div>
-
-            <p className="text-zinc-400">
-              Cash Out
-            </p>
-
-            <h2 className="mt-2 text-2xl font-bold">
-              Withdraw
-            </h2>
-
-          </div>
-
-          <div
-            className="
-            rounded-2xl
-            bg-red-500/20
-            p-4
-            text-red-500
-            "
-          >
-            <ArrowDownToLine size={28} />
-          </div>
-
-        </div>
-      </button>
-
-    </div>
+            <span
+              className="
+                truncate
+                text-[10px]
+                font-medium
+                text-[#A8B0BA]
+              "
+            >
+              {action.label}
+            </span>
+          </button>
+        );
+      })}
+    </section>
   );
 }

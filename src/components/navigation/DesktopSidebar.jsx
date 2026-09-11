@@ -7,6 +7,7 @@ import {
   User,
   LogOut,
   ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
@@ -49,44 +50,104 @@ export default function DashboardSidebar() {
     },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/");
+  };
+
   return (
     <aside
       className="
-      flex
-      h-screen
-      w-[280px]
-      flex-col
+        fixed
+        inset-y-0
+        left-0
+        z-50
 
-      border-r
-      border-white/5
+        hidden
+        w-[270px]
 
-      bg-[#0B0E11]
+        flex-col
+
+        border-r
+        border-[#1A1E24]
+
+        bg-[#090C10]
+
+        lg:flex
       "
     >
-      {/* Logo */}
+      {/* =====================================================
+          BRAND
+      ====================================================== */}
 
       <div
         className="
-        border-b
-        border-white/5
+          flex
+          h-[82px]
+          shrink-0
+          items-center
 
-        px-6
-        py-7
+          border-b
+          border-[#171B20]
+
+          px-6
         "
       >
-        <div className="flex items-center gap-3">
-          <img
-            src={logo}
-            alt=""
-            className="h-11 w-11"
-          />
+        <NavLink
+          to="/dashboard"
+          className="
+            flex
+            items-center
+            gap-3
+          "
+        >
+          <div
+            className="
+              relative
+              flex
+              h-10
+              w-10
+              items-center
+              justify-center
+            "
+          >
+            {/* subtle glow */}
 
-          <div>
+            <div
+              className="
+                absolute
+                inset-0
+
+                rounded-xl
+
+                bg-[#1D66FF]/10
+
+                blur-md
+              "
+            />
+
+            <img
+              src={logo}
+              alt="CryptoMintX"
+              className="
+                relative
+                h-9
+                w-9
+                object-contain
+              "
+            />
+          </div>
+
+          <div className="min-w-0">
             <h1
               className="
-              text-xl
-              font-bold
-              tracking-wide
+                truncate
+
+                text-[17px]
+                font-semibold
+                tracking-[-0.02em]
+
+                text-white
               "
             >
               CryptoMintX
@@ -94,222 +155,431 @@ export default function DashboardSidebar() {
 
             <p
               className="
-              mt-1
+                mt-0.5
 
-              text-xs
-              text-zinc-500
+                text-[10px]
+                font-medium
+
+                uppercase
+                tracking-[0.16em]
+
+                text-[#626A76]
               "
             >
               Trade Smarter
             </p>
           </div>
-        </div>
+        </NavLink>
       </div>
 
-      {/* Navigation */}
-
-      <nav
-        className="
-        flex-1
-
-        px-4
-        py-6
-        "
-      >
-        <p
-          className="
-          mb-3
-
-          px-4
-
-          text-xs
-          font-semibold
-
-          uppercase
-          tracking-[0.18em]
-
-          text-zinc-600
-          "
-        >
-          Navigation
-        </p>
-
-        {items.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <NavLink
-              key={item.path}
-              to={item.path}
-            >
-              {({ isActive }) => (
-                <div
-                  className={`
-                  relative
-
-                  mb-2
-
-                  flex
-                  items-center
-                  justify-between
-
-                  rounded-2xl
-
-                  px-4
-                  py-3
-
-                  transition-all
-                  duration-200
-
-                  ${
-                    isActive
-                      ? "bg-[#151922] text-white"
-                      : "text-zinc-400 hover:bg-[#14181F] hover:text-white"
-                  }
-                  `}
-                >
-                  {isActive && (
-                    <span
-                      className="
-                      absolute
-
-                      left-0
-                      top-3
-                      bottom-3
-
-                      w-1
-
-                      rounded-r-full
-
-                      bg-[#1D66FF]
-                      "
-                    />
-                  )}
-
-                  <div className="flex items-center gap-4">
-                    <Icon size={21} />
-
-                    <span className="font-medium">
-                      {item.name}
-                    </span>
-                  </div>
-
-                  <ChevronRight
-                    size={16}
-                    className={
-                      isActive
-                        ? "text-white"
-                        : "text-zinc-600"
-                    }
-                  />
-                </div>
-              )}
-            </NavLink>
-          );
-        })}
-      </nav>
-
-      {/* Bottom */}
+      {/* =====================================================
+          NAVIGATION
+      ====================================================== */}
 
       <div
         className="
-        border-t
-        border-white/5
-
-        p-5
+          flex
+          min-h-0
+          flex-1
+          flex-col
         "
       >
-        {/* User */}
+        <nav
+          className="
+            min-h-0
+            flex-1
+
+            overflow-y-auto
+
+            px-3
+            py-6
+
+            scrollbar-none
+          "
+        >
+          <p
+            className="
+              mb-3
+
+              px-3
+
+              text-[10px]
+              font-semibold
+
+              uppercase
+              tracking-[0.18em]
+
+              text-[#555D68]
+            "
+          >
+            Main Menu
+          </p>
+
+          <div className="space-y-1">
+            {items.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <NavLink
+                  key={item.path}
+                  to={item.path}
+                  className="group block"
+                >
+                  {({ isActive }) => (
+                    <div
+                      className={`
+                        relative
+
+                        flex
+                        h-[48px]
+
+                        items-center
+                        justify-between
+
+                        rounded-xl
+
+                        px-3
+
+                        transition-all
+                        duration-200
+
+                        ${
+                          isActive
+                            ? `
+                              bg-[#151B25]
+                              text-white
+
+                              shadow-[inset_0_0_0_1px_rgba(255,255,255,.035)]
+                            `
+                            : `
+                              text-[#7C8490]
+
+                              hover:bg-[#11151B]
+                              hover:text-[#DDE2E9]
+                            `
+                        }
+                      `}
+                    >
+                      {/* Active indicator */}
+
+                      {isActive && (
+                        <>
+                          <span
+                            className="
+                              absolute
+                              left-0
+
+                              h-6
+                              w-[3px]
+
+                              rounded-r-full
+
+                              bg-[#3B7CFF]
+
+                              shadow-[0_0_12px_rgba(59,124,255,.7)]
+                            "
+                          />
+
+                          <span
+                            className="
+                              pointer-events-none
+                              absolute
+                              inset-0
+
+                              rounded-xl
+
+                              bg-gradient-to-r
+                              from-[#1D66FF]/5
+                              to-transparent
+                            "
+                          />
+                        </>
+                      )}
+
+                      <div
+                        className="
+                          relative
+                          z-10
+
+                          flex
+                          min-w-0
+                          items-center
+                          gap-3
+                        "
+                      >
+                        <div
+                          className={`
+                            flex
+                            h-8
+                            w-8
+                            shrink-0
+
+                            items-center
+                            justify-center
+
+                            rounded-lg
+
+                            transition
+
+                            ${
+                              isActive
+                                ? "bg-[#1D66FF]/12 text-[#6D9EFF]"
+                                : "text-[#68717D] group-hover:text-[#AAB2BD]"
+                            }
+                          `}
+                        >
+                          <Icon
+                            size={18}
+                            strokeWidth={1.8}
+                          />
+                        </div>
+
+                        <span
+                          className="
+                            truncate
+
+                            text-[13px]
+                            font-medium
+                          "
+                        >
+                          {item.name}
+                        </span>
+                      </div>
+
+                      <ChevronRight
+                        size={15}
+                        strokeWidth={1.8}
+                        className={`
+                          relative
+                          z-10
+
+                          shrink-0
+
+                          transition-all
+                          duration-200
+
+                          ${
+                            isActive
+                              ? "translate-x-0 text-[#7588A7]"
+                              : "-translate-x-1 text-transparent group-hover:translate-x-0 group-hover:text-[#4D5560]"
+                          }
+                        `}
+                      />
+                    </div>
+                  )}
+                </NavLink>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* ===================================================
+            BOTTOM SECTION — ALWAYS PINNED
+        ==================================================== */}
 
         <div
           className="
-          mb-5
+            shrink-0
 
-          flex
-          items-center
-          gap-3
+            border-t
+            border-[#070708]
 
-          rounded-2xl
+            bg-[#090C10]
 
-          bg-[#14181F]
-
-          p-4
+            p-4
           "
         >
+          {/* User */}
+
           <div
             className="
-            flex
+              mb-3
 
-            h-12
-            w-12
+              flex
+              items-center
+              gap-3
 
-            items-center
-            justify-center
+              rounded-xl
 
-            rounded-full
+              border
+              border-[#1D2229]
 
-            bg-[#1D66FF]
+              bg-[#0F1318]
 
-            text-lg
-            font-bold
+              px-3
+              py-3
+
+              transition
+
+              hover:border-[#272E38]
             "
           >
-            A
-          </div>
+            {/* Avatar */}
 
-          <div className="flex-1">
-            <p className="font-medium">
-              Abhijit
-            </p>
-
-            <p
+            <div
               className="
-              mt-1
+                relative
 
-              text-xs
+                flex
+                h-10
+                w-10
+                shrink-0
 
-              text-zinc-500
+                items-center
+                justify-center
+
+                rounded-full
+
+                bg-gradient-to-br
+                from-[#2C75FF]
+                to-[#1745A8]
+
+                text-sm
+                font-semibold
+
+                text-white
+
+                shadow-[0_0_18px_rgba(29,102,255,.18)]
               "
             >
-              Verified User
-            </p>
+              A
+
+              {/* Online */}
+
+              <span
+                className="
+                  absolute
+                  bottom-0
+                  right-0
+
+                  h-2.5
+                  w-2.5
+
+                  rounded-full
+
+                  border-2
+                  border-[#0F1318]
+
+                  bg-[#20C77A]
+                "
+              />
+            </div>
+
+            {/* User info */}
+
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <p
+                  className="
+                    truncate
+
+                    text-[13px]
+                    font-semibold
+
+                    text-[#E9EDF2]
+                  "
+                >
+                  Abhijit
+                </p>
+
+                <ShieldCheck
+                  size={13}
+                  className="shrink-0 text-[#4E8AFF]"
+                />
+              </div>
+
+              <p
+                className="
+                  mt-0.5
+
+                  text-[10px]
+
+                  text-[#626A75]
+                "
+              >
+                Verified User
+              </p>
+            </div>
+
+            {/* Profile shortcut */}
+
+            <button
+              type="button"
+              onClick={() => navigate("/profile")}
+              className="
+                flex
+                h-7
+                w-7
+                shrink-0
+
+                items-center
+                justify-center
+
+                rounded-lg
+
+                text-[#626A75]
+
+                transition
+
+                hover:bg-[#191E25]
+                hover:text-white
+              "
+              aria-label="Open profile"
+            >
+              <ChevronRight size={15} />
+            </button>
           </div>
+
+          {/* Logout */}
+
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="
+              group
+
+              flex
+              h-10
+              w-full
+
+              items-center
+              justify-center
+              gap-2.5
+
+              rounded-xl
+
+              border
+              border-[#242A32]
+
+              bg-[#11151A]
+
+              text-[12px]
+              font-medium
+
+              text-[#9AA2AC]
+
+              transition-all
+              duration-200
+
+              hover:border-red-500/20
+              hover:bg-red-500/[0.06]
+              hover:text-red-400
+
+              active:scale-[0.99]
+            "
+          >
+            <LogOut
+              size={16}
+              strokeWidth={1.8}
+              className="
+                transition
+                group-hover:-translate-x-0.5
+              "
+            />
+
+            Sign out
+          </button>
         </div>
-
-        {/* Logout */}
-
-        <button
-          onClick={() => {
-            localStorage.removeItem("token");
-            navigate("/");
-          }}
-          className="
-          flex
-
-          w-full
-
-          items-center
-          justify-center
-
-          gap-3
-
-          rounded-xl
-
-          bg-[#1D66FF]
-
-          py-3
-
-          font-medium
-
-          transition
-
-          hover:bg-[#3478ff]
-          "
-        >
-          <LogOut size={18} />
-
-          Logout
-        </button>
       </div>
     </aside>
   );

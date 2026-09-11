@@ -1,25 +1,95 @@
 @import "tailwindcss";
 @import "./styles/theme.css";
 
-/* ========================================
-   Base
-======================================== */
+
+/* =========================================================
+   BASE
+========================================================= */
 
 html {
   scroll-behavior: smooth;
 }
 
-@theme {
-  --color-gray: #737373;
-  --color-black: #000000;
-  --color-white: #ffffff;
+html,
+body,
+#root {
+  min-height: 100%;
 }
 
-/* ========================================
-   Custom Utilities
-======================================== */
+body {
+  margin: 0;
+
+  background: #05080C;
+
+  color: #F5F7FA;
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* =========================================================
+   THEME
+========================================================= */
+
+@theme {
+
+  /* Base */
+
+  --color-gray: #737373;
+  --color-black: #000000;
+  --color-white: #FFFFFF;
+
+
+  /* Surfaces */
+
+  --color-surface: #05080C;
+  --color-surface-card: #0F1318;
+  --color-surface-hover: #141920;
+
+
+  /* Borders */
+
+  --color-border-subtle: #171C22;
+  --color-border: #1D232B;
+  --color-border-strong: #272E37;
+
+
+  /* Typography */
+
+  --color-text-primary: #F5F7FA;
+  --color-text-secondary: #A1A8B3;
+  --color-text-muted: #626A75;
+
+
+  /* Brand */
+
+  --color-brand: #1D66FF;
+  --color-brand-hover: #3578FF;
+
+
+  /* Trading */
+
+  --color-success: #00C076;
+  --color-danger: #FF4D67;
+}
+
+
+/* =========================================================
+   CUSTOM UTILITIES
+========================================================= */
 
 @layer utilities {
+
   .animate-in {
     animation-fill-mode: both;
   }
@@ -28,9 +98,10 @@ html {
     animation-name: slideInFromTop;
   }
 
-  .duration-300 {
-    animation-duration: 300ms;
-  }
+
+  /* -----------------------------------------
+     Scrollbars
+  ----------------------------------------- */
 
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -40,13 +111,24 @@ html {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-/* ========================================
-   Animations
-======================================== */
+
+/* =========================================================
+   ANIMATIONS
+========================================================= */
 
 @keyframes slideInFromTop {
+
   from {
     opacity: 0;
     transform: translateY(-1rem);
@@ -56,9 +138,12 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+
 }
 
+
 @keyframes slideDown {
+
   from {
     opacity: 0;
     transform: translateY(-10px);
@@ -68,9 +153,12 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+
 }
 
+
 @keyframes slideUp {
+
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -80,9 +168,12 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+
 }
 
+
 @keyframes spin-in {
+
   from {
     transform: rotate(-90deg);
     opacity: 0;
@@ -92,9 +183,12 @@ html {
     transform: rotate(0deg);
     opacity: 1;
   }
+
 }
 
+
 @keyframes slide-up {
+
   from {
     transform: translateY(10px);
     opacity: 0;
@@ -104,9 +198,12 @@ html {
     transform: translateY(0);
     opacity: 1;
   }
+
 }
 
+
 @keyframes marquee {
+
   0% {
     transform: translateX(0);
   }
@@ -114,9 +211,12 @@ html {
   100% {
     transform: translateX(-50%);
   }
+
 }
 
+
 @keyframes tickerUp {
+
   from {
     transform: translateY(0);
   }
@@ -124,20 +224,26 @@ html {
   to {
     transform: translateY(-50%);
   }
+
 }
 
+
 @keyframes float {
+
   0%,
   100% {
-    transform: translateY(0px);
+    transform: translateY(0);
   }
 
   50% {
     transform: translateY(-8px);
   }
+
 }
 
+
 @keyframes loadingDot {
+
   0%,
   80%,
   100% {
@@ -149,39 +255,47 @@ html {
     opacity: 1;
     transform: scale(1);
   }
+
 }
+
 
 @keyframes glowUp {
+
   0% {
     text-shadow: 0 0 0 transparent;
   }
 
   50% {
-    text-shadow: 0 0 10px #22c55e;
+    text-shadow: 0 0 10px #22C55E;
   }
 
   100% {
     text-shadow: 0 0 0 transparent;
   }
+
 }
+
 
 @keyframes glowDown {
+
   0% {
     text-shadow: 0 0 0 transparent;
   }
 
   50% {
-    text-shadow: 0 0 10px #ef4444;
+    text-shadow: 0 0 10px #EF4444;
   }
 
   100% {
     text-shadow: 0 0 0 transparent;
   }
+
 }
 
-/* ========================================
-   Animation Classes
-======================================== */
+
+/* =========================================================
+   ANIMATION CLASSES
+========================================================= */
 
 .animate-slide-down {
   animation: slideDown 0.3s ease-out;
@@ -198,6 +312,7 @@ html {
 .animate-marquee {
   display: flex;
   width: max-content;
+
   animation: marquee 50s linear infinite;
 }
 
@@ -221,15 +336,19 @@ html {
   animation: glowDown 0.6s ease-out;
 }
 
-/* ========================================
-   Loading Dots
-======================================== */
+
+/* =========================================================
+   LOADING DOTS
+========================================================= */
 
 .loading-dot {
   width: 10px;
   height: 10px;
+
   border-radius: 9999px;
-  background: #1d66ff;
+
+  background: #1D66FF;
+
   animation: loadingDot 1.2s infinite;
 }
 
@@ -241,21 +360,23 @@ html {
   animation-delay: 0.4s;
 }
 
-/* ========================================
-   Price Colors
-======================================== */
+
+/* =========================================================
+   PRICE COLORS
+========================================================= */
 
 .price-up {
-  color: #22c55e;
+  color: #22C55E;
 }
 
 .price-down {
-  color: #ef4444;
+  color: #EF4444;
 }
 
-/* ========================================
-   Swiper
-======================================== */
+
+/* =========================================================
+   SWIPER
+========================================================= */
 
 .swiper-pagination {
   bottom: 0 !important;
@@ -266,12 +387,13 @@ html {
 }
 
 .swiper-pagination-bullet-active {
-  background: white;
+  background: #FFFFFF;
 }
 
-/* ========================================
-   Footer
-======================================== */
+
+/* =========================================================
+   FOOTER
+========================================================= */
 
 .footer-grid {
   background-image:
@@ -296,12 +418,14 @@ html {
     );
 
   background-size: 4px 4px;
+
   opacity: 0.4;
 }
 
-/* ========================================
-   google login button
-======================================== */
+
+/* =========================================================
+   GOOGLE LOGIN
+========================================================= */
 
 .google-login-mobile {
   width: 100% !important;

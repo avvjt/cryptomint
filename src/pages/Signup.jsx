@@ -818,36 +818,6 @@ function SignupPanel({
 
         </div>
 
-        {/* Apple */}
-
-        <button
-          type="button"
-          className="
-          flex
-          h-[46px]
-          w-full
-          items-center
-          justify-center
-          gap-3
-
-          rounded-full
-
-          bg-[#191B1E]
-
-          text-[14px]
-          font-medium
-
-          transition
-
-          hover:bg-[#22252A]
-
-          active:scale-[.99]
-          "
-        >
-          <FaApple size={18} />
-
-          Continue with Apple
-        </button>
 
         {/* More options */}
 

@@ -1,317 +1,324 @@
-import { useState } from "react";
 import {
   Search,
   Star,
-  TrendingUp,
+  ChevronDown,
 } from "lucide-react";
 
-const pairs = [
+import {
+  useMemo,
+  useState,
+} from "react";
 
-  {
-    symbol: "BTC",
-    pair: "BTC/USDT",
-    price: "117,250.40",
-    change: 2.56,
-    favorite: true,
-  },
-
-  {
-    symbol: "ETH",
-    pair: "ETH/USDT",
-    price: "4,285.62",
-    change: -1.42,
-    favorite: false,
-  },
-
-  {
-    symbol: "SOL",
-    pair: "SOL/USDT",
-    price: "189.62",
-    change: 8.72,
-    favorite: true,
-  },
-
-  {
-    symbol: "BNB",
-    pair: "BNB/USDT",
-    price: "815.11",
-    change: 1.81,
-    favorite: false,
-  },
-
-  {
-    symbol: "XRP",
-    pair: "XRP/USDT",
-    price: "3.08",
-    change: -3.11,
-    favorite: false,
-  },
-
-];
+import useMarketData from "../../hooks/useMarketData";
 
 export default function TradingPair() {
+  const markets = useMarketData();
 
-  const [active, setActive] =
-    useState("BTC/USDT");
+  const [
+    search,
+    setSearch,
+  ] = useState("");
 
-  const [search, setSearch] =
-    useState("");
+  const [
+    active,
+    setActive,
+  ] = useState("BTCUSDT");
 
-  const filtered = pairs.filter((coin) =>
-    coin.pair
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+
+  const pairs = useMemo(() => {
+    const list = markets.length
+      ? markets
+      : [
+          {
+            symbol: "BTCUSDT",
+            lastPrice: 117250.4,
+            priceChangePercent: 4.71,
+          },
+          {
+            symbol: "ETHUSDT",
+            lastPrice: 4285.62,
+            priceChangePercent: -1.42,
+          },
+          {
+            symbol: "SOLUSDT",
+            lastPrice: 189.62,
+            priceChangePercent: 8.72,
+          },
+          {
+            symbol: "BNBUSDT",
+            lastPrice: 815.11,
+            priceChangePercent: 1.81,
+          },
+          {
+            symbol: "XRPUSDT",
+            lastPrice: 3.08,
+            priceChangePercent: -3.11,
+          },
+        ];
+
+    return list
+      .filter((coin) =>
+        coin.symbol
+          .toLowerCase()
+          .includes(
+            search
+              .toLowerCase()
+              .replace("/", "")
+          )
+      )
+      .slice(0, 12);
+
+  }, [markets, search]);
+
 
   return (
-
     <section
       className="
-      rounded-[32px]
+        border-b
+        border-[#1A1E24]
 
-      border
-      border-white/5
-
-      bg-gradient-to-br
-
-      from-[#111318]
-
-      to-[#0D1119]
-
-      p-6
+        bg-[#0B0E11]
       "
     >
 
-      {/* Search */}
+      {/* Desktop selector */}
 
       <div
         className="
-        flex
+          hidden
+          lg:flex
 
-        items-center
+          items-center
 
-        gap-3
+          gap-2
 
-        rounded-2xl
+          overflow-x-auto
+          scrollbar-hide
 
-        border
-        border-white/5
-
-        bg-[#171B22]
-
-        px-4
-
-        h-12
+          px-4
+          py-2
         "
       >
 
-        <Search
-          size={18}
-          className="text-zinc-500"
-        />
-
-        <input
-
-          value={search}
-
-          onChange={(e)=>
-            setSearch(e.target.value)
-          }
-
-          placeholder="Search Pair"
-
+        <div
           className="
-          w-full
+            flex
+            h-8
 
-          bg-transparent
+            w-[190px]
 
-          outline-none
+            shrink-0
+
+            items-center
+
+            rounded-md
+
+            border
+            border-[#20252C]
+
+            bg-[#11151A]
+
+            px-2
           "
+        >
 
-        />
+          <Search
+            size={14}
+            className="text-[#626B77]"
+          />
 
-      </div>
+          <input
+            value={search}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
+            placeholder="Search pair..."
+            className="
+              ml-2
 
-      {/* Pair List */}
+              min-w-0
+              flex-1
 
-      <div
-        className="
-        mt-6
+              bg-transparent
 
-        flex
+              text-[11px]
+              text-white
 
-        gap-4
+              outline-none
 
-        overflow-x-auto
+              placeholder:text-[#59626D]
+            "
+          />
 
-        pb-2
+        </div>
 
-        scrollbar-hide
-        "
-      >
 
-        {
+        {pairs.map((coin) => {
+          const isActive =
+            active === coin.symbol;
 
-          filtered.map((coin)=>(
+          const positive =
+            Number(
+              coin.priceChangePercent
+            ) >= 0;
 
+          const base =
+            coin.symbol.replace(
+              "USDT",
+              ""
+            );
+
+          return (
             <button
-
-              key={coin.pair}
-
-              onClick={()=>
-                setActive(coin.pair)
+              key={coin.symbol}
+              type="button"
+              onClick={() =>
+                setActive(
+                  coin.symbol
+                )
               }
-
               className={`
-              min-w-[240px]
+                flex
+                h-8
 
-              rounded-3xl
+                shrink-0
 
-              border
+                items-center
+                gap-2
 
-              p-5
+                rounded-md
 
-              text-left
+                px-3
 
-              transition-all
+                text-[11px]
 
-              duration-300
+                transition
 
-              ${
-                active===coin.pair
-
-                ? "border-[#1D66FF] bg-[#1D66FF]/10"
-
-                : "border-white/5 bg-[#171B22]"
-              }
+                ${
+                  isActive
+                    ? "bg-[#171C22] text-white"
+                    : "text-[#69727E] hover:bg-[#13171C] hover:text-[#DCE1E7]"
+                }
               `}
             >
 
-              <div
-                className="
-                flex
+              <span>
+                {base}/USDT
+              </span>
 
-                justify-between
-                "
+              <span
+                className={
+                  positive
+                    ? "text-[#00C076]"
+                    : "text-[#F6465D]"
+                }
               >
-
-                <div className="flex items-center gap-3">
-
-                  <img
-
-                    src={`https://cryptoicons.org/api/icon/${coin.symbol.toLowerCase()}/100`}
-
-                    alt={coin.symbol}
-
-                    className="h-12 w-12"
-
-                  />
-
-                  <div>
-
-                    <h3 className="font-semibold">
-
-                      {coin.symbol}
-
-                    </h3>
-
-                    <p
-                      className="
-                      text-sm
-
-                      text-zinc-500
-                      "
-                    >
-
-                      {coin.pair}
-
-                    </p>
-
-                  </div>
-
-                </div>
-
-                <Star
-
-                  size={18}
-
-                  className={
-                    coin.favorite
-
-                    ? "fill-yellow-400 text-yellow-400"
-
-                    : "text-zinc-600"
-                  }
-
-                />
-
-              </div>
-
-              <h2
-                className="
-                mt-6
-
-                text-2xl
-
-                font-bold
-                "
-              >
-
-                ${coin.price}
-
-              </h2>
-
-              <div
-                className="
-                mt-3
-
-                flex
-
-                items-center
-
-                gap-2
-                "
-              >
-
-                <TrendingUp
-                  size={16}
-                  className={
-                    coin.change >= 0
-
-                    ? "text-green-400"
-
-                    : "text-red-400"
-                  }
-                />
-
-                <span
-                  className={
-                    coin.change >= 0
-
-                    ? "font-semibold text-green-400"
-
-                    : "font-semibold text-red-400"
-                  }
-                >
-
-                  {coin.change >= 0 ? "+" : ""}
-
-                  {coin.change}%
-
-                </span>
-
-              </div>
+                {positive
+                  ? "+"
+                  : ""}
+                {Number(
+                  coin.priceChangePercent ||
+                    0
+                ).toFixed(2)}
+                %
+              </span>
 
             </button>
+          );
+        })}
 
-          ))
+      </div>
 
-        }
+
+      {/* Mobile compact pair */}
+
+      <div
+        className="
+          flex
+          items-center
+          justify-between
+
+          px-4
+          py-3
+
+          lg:hidden
+        "
+      >
+
+        <button
+          type="button"
+          className="
+            flex
+            items-center
+            gap-2
+          "
+        >
+
+          <div
+            className="
+              flex
+              h-8
+              w-8
+
+              items-center
+              justify-center
+
+              rounded-full
+
+              bg-[#F7931A]
+
+              text-xs
+              font-bold
+            "
+          >
+            ₿
+          </div>
+
+          <div className="text-left">
+
+            <div
+              className="
+                flex
+                items-center
+                gap-1
+
+                text-[15px]
+                font-semibold
+              "
+            >
+              BTC/USDT
+
+              <ChevronDown
+                size={13}
+                className="text-[#69727E]"
+              />
+            </div>
+
+            <p
+              className="
+                text-[10px]
+                text-[#68717D]
+              "
+            >
+              Bitcoin
+            </p>
+
+          </div>
+
+        </button>
+
+
+        <button
+          type="button"
+          className="
+            text-[#626B77]
+          "
+        >
+          <Star size={17} />
+        </button>
 
       </div>
 
     </section>
-
   );
-
 }

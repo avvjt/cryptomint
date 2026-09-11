@@ -1,202 +1,35 @@
-import { useNavigate } from "react-router-dom";
-
-import { useAuth } from "../context/AuthContext";
-
-import dashboard from "../data/dashboard";
-
 import DashboardHeader from "../components/dashboard/DashboardHeader";
+import DepositVerificationCard from "../components/account/DepositVerificationCard";
 import PortfolioCard from "../components/dashboard/PortfolioCard";
-import PackageCard from "../components/dashboard/PackageCard";
-import TeamOverview from "../components/dashboard/TeamOverview";
-import EarningsCard from "../components/dashboard/EarningsCard";
-import ReferralTree from "../components/dashboard/ReferralTree";
+import QuickActions from "../components/dashboard/QuickActions";
+import EarningsOverview from "../components/dashboard/EarningsOverview";
 import RecentActivity from "../components/dashboard/RecentActivity";
-import PromotionBanner from "../components/dashboard/PromotionBanner";
+import MarketSnapshot from "../components/dashboard/MarketSnapshot";
+import WalletBreakdown from "../components/dashboard/WalletBreakdown";
+import AutoTradeStatus from "../components/dashboard/AutoTradeStatus";
 
 export default function Dashboard() {
-
-  const navigate = useNavigate();
-
-  const {
-    user,
-    loading,
-  } = useAuth();
-
-  if (loading) {
-    return (
-      <div
-        className="
-        flex
-        min-h-screen
-        items-center
-        justify-center
-        text-zinc-400
-        "
-      >
-        Loading...
-      </div>
-    );
-  }
-
   return (
+    <main className="min-h-screen bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1700px]">
+        <DashboardHeader />
 
-    <div
-      className="
-      mx-auto
+        <DepositVerificationCard />
 
-      max-w-7xl
+        <PortfolioCard />
 
-      space-y-6
+        <QuickActions />
 
-      px-4
-      py-6
+        <EarningsOverview />
 
-      lg:px-8
-      "
-    >
+        <RecentActivity />
 
-      {/* Header */}
+        <MarketSnapshot />
 
-      <DashboardHeader
+        <WalletBreakdown />
 
-        name={
-          user?.username ||
-          user?.email?.split("@")[0] ||
-          "Investor"
-        }
-
-        email={user?.email}
-
-        level={dashboard.team.level}
-
-      />
-
-      {/* Portfolio */}
-
-      <PortfolioCard
-
-        balance={dashboard.balance}
-
-        todayIncome={dashboard.todayIncome}
-
-        dailyRate={dashboard.dailyRate}
-
-        packageName={dashboard.package}
-
-        onDeposit={() => navigate("/assets")}
-
-        onWithdraw={() => navigate("/assets")}
-
-        onTeam={() => navigate("/team")}
-
-        onHistory={() => navigate("/assets")}
-
-      />
-
-      {/* Dashboard Grid */}
-
-      <div
-        className="
-        grid
-
-        gap-6
-
-        lg:grid-cols-2
-        "
-      >
-
-        <PackageCard
-
-          packageName={dashboard.package}
-
-          investment={dashboard.balance}
-
-          dailyRate={dashboard.dailyRate}
-
-          dailyIncome={dashboard.todayIncome}
-
-          nextReward={dashboard.nextReward}
-
-          onUpgrade={() =>
-            console.log("Upgrade")
-          }
-
-        />
-
-        <TeamOverview
-
-          userLevel={dashboard.team.level}
-
-          levelA={dashboard.team.a}
-
-          levelB={dashboard.team.b}
-
-          levelC={dashboard.team.c}
-
-          commissionToday={dashboard.team.commissionToday}
-
-          totalTeam={
-            dashboard.team.a +
-            dashboard.team.b +
-            dashboard.team.c
-          }
-
-          nextLevelA={dashboard.team.nextLevelA}
-
-          nextLevelBC={dashboard.team.nextLevelBC}
-
-          onViewTeam={() =>
-            navigate("/team")
-          }
-
-        />
-
-        <EarningsCard
-
-          investmentIncome={
-            dashboard.earnings.investment
-          }
-
-          referralIncome={
-            dashboard.earnings.referral
-          }
-
-          teamIncome={
-            dashboard.earnings.team
-          }
-
-        />
-
-        <ReferralTree
-
-          level={dashboard.team.level}
-
-          levelA={dashboard.team.a}
-
-          levelB={dashboard.team.b}
-
-          levelC={dashboard.team.c}
-
-          onViewTeam={() =>
-            navigate("/team")
-          }
-
-        />
-
+        <AutoTradeStatus />
       </div>
-
-      {/* Recent Activity */}
-
-      <RecentActivity
-        activities={dashboard.activities}
-      />
-
-      {/* Promotion */}
-
-      <PromotionBanner />
-
-    </div>
-
+    </main>
   );
-
 }

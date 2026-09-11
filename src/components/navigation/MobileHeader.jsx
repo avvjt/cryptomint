@@ -1,126 +1,279 @@
 import {
-  Search,
   Globe,
   Headphones,
+  Search,
 } from "lucide-react";
 
 import logo from "../../assets/logo.png";
 import Ticker from "../../components/Ticker";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+
+import {
+  useNavigate,
+} from "react-router-dom";
+
+import {
+  useAuth,
+} from "../../context/AuthContext";
+
+import {
+  useState,
+} from "react";
 
 export default function MobileHeader() {
-
   const navigate = useNavigate();
-  const {user} = useAuth();
+
+  const { user } = useAuth();
+
+  const [
+    search,
+    setSearch,
+  ] = useState("");
+
+
+  /* =====================================================
+     SEARCH
+  ===================================================== */
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+
+    const query = search.trim();
+
+    if (!query) {
+      navigate("/markets");
+      return;
+    }
+
+    navigate(
+      `/markets?search=${encodeURIComponent(query)}`
+    );
+  };
+
+
   return (
     <header
       className="
-      sticky
-      top-0
-      z-50
+        sticky
+        top-0
+        z-50
 
-      bg-black/95
-      backdrop-blur-xl
+        border-b
+        border-[#171C22]
 
-      border-b
-      border-[#111827]
+        bg-[#05080C]/95
+
+        backdrop-blur-xl
       "
     >
+
       <Ticker />
+
       <div className="px-4 py-3">
 
-        {/* Top Row */}
-        <div className="flex items-center justify-between">
+        {/* =================================================
+            TOP ROW
+        ================================================= */}
+
+        <div
+          className="
+            flex
+            items-center
+            justify-between
+          "
+        >
 
           {/* Logo */}
-          <div className="flex items-center gap-2">
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/dashboard")
+            }
+            className="
+              flex
+              items-center
+              gap-2
+            "
+          >
             <img
               src={logo}
-              alt="CryproMintX"
-              className="h-7"
+              alt="CryptoMintX"
+              className="
+                h-7
+                w-auto
+              "
             />
 
-            <span className="font-bold text-lg text-white">
-              CryproMintX
+            <span
+              className="
+                text-lg
+                font-bold
+                tracking-tight
+                text-white
+              "
+            >
+              CryptoMintX
             </span>
-          </div>
+          </button>
 
-          <div className="flex items-center gap-4">
 
-            <button>
-              <Headphones
-                size={18}
-                className="text-zinc-300"
-              />
+          {/* Actions */}
+
+          <div
+            className="
+              flex
+              items-center
+              gap-3
+            "
+          >
+
+            {/* Support */}
+
+            <button
+              type="button"
+              aria-label="Support"
+              className="
+                flex
+                h-9
+                w-9
+
+                items-center
+                justify-center
+
+                rounded-full
+
+                text-[#A1A8B3]
+
+                transition
+
+                hover:bg-[#141920]
+                hover:text-white
+              "
+            >
+              <Headphones size={18} />
             </button>
 
-            <button>
-              <Globe
-                size={18}
-                className="text-zinc-300"
-              />
+
+            {/* Language */}
+
+            <button
+              type="button"
+              aria-label="Language"
+              className="
+                flex
+                h-9
+                w-9
+
+                items-center
+                justify-center
+
+                rounded-full
+
+                text-[#A1A8B3]
+
+                transition
+
+                hover:bg-[#141920]
+                hover:text-white
+              "
+            >
+              <Globe size={18} />
             </button>
 
+
+            {/* User */}
 
             {user ? (
               <button
-                onClick={() => navigate("/profile")}
+                type="button"
+                onClick={() =>
+                  navigate("/profile")
+                }
                 className="
-                          flex
-                          items-center
-                          gap-2
+                  flex
+                  items-center
+                  gap-2
 
-                          rounded-full
+                  rounded-full
 
-                          bg-[#111827]
+                  border
+                  border-[#1D232B]
 
-                          px-3
-                          py-1.5
+                  bg-[#0F1318]
 
-                          transition
+                  px-2
+                  py-1
 
-                          hover:bg-[#1B2432]
-                          "
+                  transition
+
+                  hover:border-[#272E37]
+                  hover:bg-[#141920]
+                "
               >
+
                 <div
                   className="
-                            flex
-                            h-8
-                            w-8
-                            items-center
-                            justify-center
+                    flex
+                    h-8
+                    w-8
 
-                            rounded-full
+                    shrink-0
 
-                            bg-[#1D66FF]
+                    items-center
+                    justify-center
 
-                            text-sm
-                            font-bold
-                            text-white
-                            "
+                    rounded-full
+
+                    bg-[#1D66FF]
+
+                    text-sm
+                    font-bold
+                    text-white
+                  "
                 >
-                  {user.email.charAt(0).toUpperCase()}
+                  {user?.email
+                    ?.charAt(0)
+                    ?.toUpperCase() || "A"}
                 </div>
 
-                <span className="text-sm text-white">
+                <span
+                  className="
+                    pr-1
+
+                    text-sm
+                    font-medium
+                    text-white
+                  "
+                >
                   Profile
                 </span>
+
               </button>
             ) : (
               <button
-                onClick={() => navigate("/login")}
+                type="button"
+                onClick={() =>
+                  navigate("/login")
+                }
                 className="
-                        rounded-full
-                        bg-white
-                        px-4
-                        py-1.5
-                        text-sm
-                        font-medium
-                        text-black
-                        transition
-                        hover:bg-gray-200
-                        "
+                  rounded-full
+
+                  bg-white
+
+                  px-4
+                  py-2
+
+                  text-sm
+                  font-medium
+
+                  text-black
+
+                  transition
+
+                  hover:bg-[#E5E7EB]
+
+                  active:scale-[0.98]
+                "
               >
                 Log In
               </button>
@@ -130,41 +283,124 @@ export default function MobileHeader() {
 
         </div>
 
-        {/* Search */}
-        <div
-          className="
-          mt-4
 
-          flex
-          items-center
-          gap-2
+        {/* =================================================
+            GLOBAL MARKET SEARCH
+        ================================================= */}
 
-          rounded-full
-
-          bg-[#111827]
-
-          px-4
-          py-3
-          "
+        {/* <form
+          onSubmit={handleSearch}
+          className="mt-3"
         >
-          <Search
-            size={16}
-            className="text-zinc-500"
-          />
-
-          <input
-            placeholder="Search coins"
+          <div
             className="
-            w-full
-            bg-transparent
-            text-sm
-            outline-none
-            text-white
+              group
+
+              flex
+              h-[46px]
+              w-full
+
+              items-center
+
+              rounded-xl
+
+              border
+              border-[#1D232B]
+
+              bg-[#0F1318]
+
+              px-3.5
+
+              transition-all
+              duration-200
+
+              focus-within:border-[#315FAE]
+
+              focus-within:bg-[#10161D]
+
+              focus-within:shadow-[0_0_0_3px_rgba(29,102,255,.06)]
             "
-          />
-        </div>
+          >
+
+            <Search
+              size={18}
+              strokeWidth={1.8}
+              className="
+                shrink-0
+
+                text-[#626A75]
+
+                transition-colors
+
+                group-focus-within:text-[#78A7FF]
+              "
+            />
+
+            <input
+              type="search"
+              value={search}
+              onChange={(event) =>
+                setSearch(
+                  event.target.value
+                )
+              }
+              placeholder="Search coins"
+              autoComplete="off"
+              spellCheck="false"
+              className="
+                ml-3
+
+                min-w-0
+                flex-1
+
+                bg-transparent
+
+                text-[14px]
+                text-[#F5F7FA]
+
+                outline-none
+
+                placeholder:text-[#626A75]
+
+                [&::-webkit-search-cancel-button]:hidden
+              "
+            />
+
+            {search && (
+              <button
+                type="button"
+                onClick={() =>
+                  setSearch("")
+                }
+                className="
+                  mr-1
+
+                  flex
+                  h-7
+                  w-7
+
+                  items-center
+                  justify-center
+
+                  rounded-lg
+
+                  text-[#626A75]
+
+                  transition
+
+                  hover:bg-[#191F27]
+                  hover:text-white
+                "
+              >
+                ×
+              </button>
+            )}
+
+          </div>
+        </form> */}
 
       </div>
+
     </header>
   );
 }

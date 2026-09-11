@@ -1,10 +1,15 @@
-import DashboardLayout from "./layouts/DashboardLayout";
 import AppRoutes from "./routes/AppRoutes";
+import { TradeWalletProvider } from "./context/TradeWalletContext";
+import { AccountStatusProvider } from "./context/AccountStatusContext";
 
 function App() {
-  return <AppRoutes />;
-  
+  return (
+    <TradeWalletProvider>
+      <AccountStatusProvider>
+        <AppRoutes />
+      </AccountStatusProvider>
+    </TradeWalletProvider>
+  );
 }
 
-export default App
-
+export default App;

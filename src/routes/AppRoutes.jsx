@@ -18,6 +18,8 @@ import ProtectedRoute from "./ProtectedRoute";
 import Team from "../pages/Team";
 import Assets from "../pages/Assets";
 import GuestRoute from "../layouts/GuestRoute";
+import Wallet from "../pages/Wallet";
+import History from "../pages/History";
 
 export default function AppRoutes() {
   return (
@@ -43,6 +45,8 @@ export default function AppRoutes() {
           <Route path="/assets" element={<Assets />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/markets/:symbol" element={<MarketDetails />} />
+          <Route path="/wallet" element={<Wallet />} />
+          <Route path="/history" element={<History />} />
         </Route>
       </Route>
     </Routes>

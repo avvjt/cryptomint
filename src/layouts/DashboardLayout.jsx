@@ -2,35 +2,45 @@ import { Outlet } from "react-router-dom";
 import MobileBottomNav from "../components/navigation/MobileBottomNav";
 import MobileHeader from "../components/navigation/MobileHeader";
 import DesktopSidebar from "../components/navigation/DesktopSidebar";
+import Ticker from "../components/Ticker";
 
 export default function DashboardLayout() {
   return (
-    <div className="min-h-screen bg-[#050A14] text-white">
+    <div className="min-h-screen bg-[#05080C] text-white">
 
-      {/* Desktop */}
+      {/* =====================================================
+          DESKTOP
+      ====================================================== */}
 
-      <div className="hidden lg:flex">
-
+      <div className="hidden lg:block">
+        <Ticker />
         <DesktopSidebar />
 
-        <main className="flex-1 overflow-auto">
+        <main
+          className="
+            min-h-screen
+            pl-[270px]
+            bg-[#05080C]
+          "
+        >
 
-          <Outlet />
-
+          <div className="min-h-screen">
+            <Outlet />
+          </div>
         </main>
 
       </div>
 
-      {/* Mobile */}
+      {/* =====================================================
+          MOBILE
+      ====================================================== */}
 
       <div className="lg:hidden">
 
         <MobileHeader />
 
         <main className="pb-24">
-
           <Outlet />
-
         </main>
 
         <MobileBottomNav />

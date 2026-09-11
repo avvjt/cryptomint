@@ -1,268 +1,104 @@
 import {
   Bell,
-  ChevronDown,
+  Settings2,
 } from "lucide-react";
 
-export default function DashboardHeader({
-
-  name = "Investor",
-
-  email = "",
-
-  level = 1,
-
-}) {
-
-  const hour = new Date().getHours();
-
-  let greeting = "Good Evening";
-
-  if (hour < 12) greeting = "Good Morning";
-
-  else if (hour < 18) greeting = "Good Afternoon";
-
-  const today = new Date().toLocaleDateString(
-    undefined,
-    {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    }
-  );
-
+export default function DashboardHeader() {
   return (
-
-    <header
-      className="
-      flex
-
-      flex-col
-
-      gap-6
-
-      lg:flex-row
-
-      lg:items-center
-
-      lg:justify-between
-      "
-    >
-
-      {/* Left */}
-
-      <div className="flex items-center gap-4">
-
-        <div
+    <header className="flex items-center justify-between">
+      <div>
+        <p
           className="
-          flex
-
-          h-16
-          w-16
-
-          items-center
-          justify-center
-
-          rounded-3xl
-
-          bg-gradient-to-br
-
-          from-[#1D66FF]
-
-          to-[#4E8EFF]
-
-          text-2xl
-
-          font-bold
-
-          text-white
-
-          shadow-[0_15px_35px_rgba(29,102,255,.35)]
+            text-[10px]
+            font-medium
+            uppercase
+            tracking-[0.18em]
+            text-[#606975]
           "
         >
+          Account
+        </p>
 
-          {name.charAt(0).toUpperCase()}
-
-        </div>
-
-        <div>
-
-          <p className="text-sm text-zinc-500">
-
-            {greeting} 👋
-
-          </p>
-
-          <h1
-            className="
+        <h1
+          className="
             mt-1
-
-            text-3xl
-
-            font-bold
-
-            lg:text-4xl
-            "
-          >
-
-            {name}
-
-          </h1>
-
-          <div
-            className="
-            mt-2
-
-            flex
-
-            flex-wrap
-
-            items-center
-
-            gap-3
-
-            text-sm
-
-            text-zinc-400
-            "
-          >
-
-            <span>
-
-              {email}
-
-            </span>
-
-            <span className="h-1 w-1 rounded-full bg-zinc-600"/>
-
-            <span>
-
-              {today}
-
-            </span>
-
-          </div>
-
-        </div>
-
+            text-[22px]
+            font-semibold
+            tracking-[-0.025em]
+            text-white
+          "
+        >
+          Dashboard
+        </h1>
       </div>
 
-      {/* Right */}
-
-      <div
-        className="
-        flex
-
-        items-center
-
-        gap-4
-        "
-      >
-
-        {/* Level */}
-
-        <div
-          className="
-          rounded-2xl
-
-          border
-
-          border-[#1F2937]
-
-          bg-[#111318]
-
-          px-5
-          py-3
-          "
-        >
-
-          <p className="text-xs text-zinc-500">
-
-            Current Level
-
-          </p>
-
-          <div className="mt-2 flex items-center gap-2">
-
-            <span
-              className="
-              rounded-full
-
-              bg-[#1D66FF]/15
-
-              px-3
-              py-1
-
-              text-sm
-
-              font-semibold
-
-              text-[#6FA6FF]
-              "
-            >
-
-              LV {level}
-
-            </span>
-
-            <ChevronDown size={16}/>
-
-          </div>
-
-        </div>
-
-        {/* Notification */}
-
+      <div className="flex items-center gap-2">
         <button
+          type="button"
           className="
-          relative
-
-          flex
-
-          h-14
-          w-14
-
-          items-center
-
-          justify-center
-
-          rounded-2xl
-
-          border
-
-          border-[#1F2937]
-
-          bg-[#111318]
-
-          transition
-
-          hover:border-[#1D66FF]
+            relative
+            flex
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-[#20252C]
+            bg-[#11151A]
+            text-[#8A939E]
+            transition
+            hover:border-[#303741]
+            hover:text-white
+            active:scale-95
           "
+          aria-label="Notifications"
         >
-
-          <Bell size={22}/>
+          <Bell
+            size={17}
+            strokeWidth={1.8}
+          />
 
           <span
             className="
-            absolute
-
-            right-4
-            top-4
-
-            h-2.5
-            w-2.5
-
-            rounded-full
-
-            bg-red-500
+              absolute
+              right-[8px]
+              top-[7px]
+              h-1.5
+              w-1.5
+              rounded-full
+              bg-[#4D8DFF]
             "
           />
-
         </button>
 
+        <button
+          type="button"
+          className="
+            hidden
+            h-10
+            w-10
+            items-center
+            justify-center
+            rounded-xl
+            border
+            border-[#20252C]
+            bg-[#11151A]
+            text-[#8A939E]
+            transition
+            hover:border-[#303741]
+            hover:text-white
+            active:scale-95
+            sm:flex
+          "
+          aria-label="Settings"
+        >
+          <Settings2
+            size={17}
+            strokeWidth={1.8}
+          />
+        </button>
       </div>
-
     </header>
-
   );
-
 }

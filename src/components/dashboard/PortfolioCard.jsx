@@ -1,369 +1,260 @@
 import {
   Eye,
   EyeOff,
-  ArrowDownToLine,
-  ArrowUpFromLine,
-  Users,
-  History,
+  LockKeyhole,
+  Wallet,
 } from "lucide-react";
 
 import { useState } from "react";
+import { useTradeWalletContext } from "../../context/TradeWalletContext";
 
-export default function PortfolioCard({
-
+export default function PortfolioCard() {
+  const {
   balance = 0,
+  availableBalance = 0,
+  lockedBalance = 0,
+  isLocked = false,
+} = useTradeWalletContext();
 
-  todayIncome = 0,
+  const [hidden, setHidden] = useState(false);
 
-  dailyRate = 1,
+ 
 
-  packageName = "Starter",
-
-  onDeposit,
-
-  onWithdraw,
-
-  onTeam,
-
-  onHistory,
-
-}) {
-
-  const [hideBalance, setHideBalance] = useState(false);
-
-  const formatMoney = (amount) =>
-    Number(amount).toLocaleString(undefined, {
+  const formatMoney = (value) =>
+    Number(value).toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
 
   return (
-
     <section
       className="
-      overflow-hidden
-
-      rounded-4xl
-
-      border
-      border-white/5
-
-      bg-linear-to-br
-      from-[#111318]
-      to-[#0C1018]
-
-      shadow-[0_0_50px_rgba(0,0,0,.35)]
+        relative
+        overflow-hidden
+        rounded-[24px]
+        border
+        border-white/[0.07]
+        bg-[#0D1117]
+        p-5
+        shadow-[0_18px_50px_rgba(0,0,0,0.28)]
+        sm:p-6
       "
     >
-
-      {/* Background Glow */}
-
+      {/* subtle background glow */}
       <div
         className="
-        absolute
-        pointer-events-none
-        h-72
-        w-72
-        rounded-full
-        bg-[#1D66FF]/10
-        blur-[120px]
+          pointer-events-none
+          absolute
+          -right-20
+          -top-24
+          h-48
+          w-48
+          rounded-full
+          bg-[#1D66FF]/[0.07]
+          blur-3xl
         "
       />
 
-      <div className="relative p-5 lg:p-8">
-
+      <div className="relative">
         {/* Header */}
-
-        <div className="flex items-start justify-between">
-
-          <div>
-
-            <p className="text-sm text-zinc-500">
-              Total Portfolio
-            </p>
-
-            <div className="mt-3 flex items-center gap-3">
-
-              <h1
-                className="
-                text-4xl
-                font-bold
-                tracking-tight
-
-                lg:text-5xl
-                "
-              >
-                {hideBalance
-                  ? "********"
-                  : `$${formatMoney(balance)}`}
-              </h1>
-
-              <button
-                onClick={() =>
-                  setHideBalance(!hideBalance)
-                }
-                className="
-                rounded-full
-
-                bg-[#171B22]
-
-                p-2
-
-                hover:bg-[#1E2430]
-                "
-              >
-                {hideBalance
-                  ? <Eye size={18} />
-                  : <EyeOff size={18} />
-                }
-              </button>
-
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="
+                flex
+                h-9
+                w-9
+                items-center
+                justify-center
+                rounded-xl
+                border
+                border-[#315EA8]/30
+                bg-[#1D66FF]/10
+                text-[#6EA2FF]
+              "
+            >
+              <Wallet
+                size={17}
+                strokeWidth={1.8}
+              />
             </div>
 
+            <div>
+              <p
+                className="
+                  text-[10px]
+                  font-medium
+                  uppercase
+                  tracking-[0.16em]
+                  text-[#68717D]
+                "
+              >
+                Portfolio
+              </p>
+
+              <p
+                className="
+                  mt-0.5
+                  text-[13px]
+                  font-medium
+                  text-[#B8C0CA]
+                "
+              >
+                Total wallet value
+              </p>
+            </div>
           </div>
 
-          <div
+          <button
+            type="button"
+            onClick={() => setHidden((value) => !value)}
             className="
-            rounded-full
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-xl
+              border
+              border-white/[0.06]
+              bg-white/[0.025]
+              text-[#68717D]
+              transition
+              hover:text-white
+              active:scale-95
+            "
+            aria-label={
+              hidden
+                ? "Show balance"
+                : "Hide balance"
+            }
+          >
+            {hidden ? (
+              <Eye size={16} />
+            ) : (
+              <EyeOff size={16} />
+            )}
+          </button>
+        </div>
 
-            bg-[#1D66FF]/15
-
-            px-4
-            py-2
-
-            text-sm
-
-            font-medium
-
-            text-[#6FA6FF]
+        {/* Balance */}
+        <div className="mt-7">
+          <p
+            className="
+              text-[11px]
+              font-medium
+              uppercase
+              tracking-[0.14em]
+              text-[#606975]
             "
           >
-            {packageName}
-          </div>
+            Available balance
+          </p>
 
+          <div className="mt-2 flex items-baseline gap-2">
+            <span
+              className="
+                text-[32px]
+                font-semibold
+                tracking-[-0.035em]
+                text-white
+                sm:text-[38px]
+              "
+            >
+              {hidden
+                ? "••••••"
+                : `$${formatMoney(availableBalance)}`}
+            </span>
+
+            {!hidden && (
+              <span
+                className="
+                  text-[13px]
+                  font-medium
+                  text-[#68717D]
+                "
+              >
+                USDT
+              </span>
+            )}
+          </div>
         </div>
 
-        {/* Statistics */}
-
+        {/* Bottom stats */}
         <div
           className="
-          mt-8
-
-          grid
-
-          grid-cols-2
-
-          gap-5
-
-          lg:grid-cols-3
+            mt-6
+            grid
+            grid-cols-2
+            gap-2
+            border-t
+            border-white/[0.06]
+            pt-4
           "
         >
+          <div>
+            <p
+              className="
+                text-[10px]
+                uppercase
+                tracking-[0.12em]
+                text-[#606975]
+              "
+            >
+              Available
+            </p>
 
-          <Stat
-            title="Today's Profit"
-            value={
-              hideBalance
-                ? "*****"
-                : `+$${formatMoney(todayIncome)}`
-            }
-            color="text-[#00C076]"
-          />
+            <p
+              className="
+                mt-1
+                text-[13px]
+                font-semibold
+                text-[#DCE1E7]
+              "
+            >
+              {hidden
+                ? "••••"
+                : `$${formatMoney(availableBalance)}`}
+            </p>
+          </div>
 
-          <Stat
-            title="Daily Return"
-            value={`${dailyRate}%`}
-          />
+          <div className="border-l border-white/[0.06] pl-4">
+            <p
+              className="
+                text-[10px]
+                uppercase
+                tracking-[0.12em]
+                text-[#606975]
+              "
+            >
+              {isLocked
+                ? "In Trade"
+                : "Locked"}
+            </p>
 
-          <Stat
-            title="Investment"
-            value={
-              hideBalance
-                ? "*****"
-                : `$${formatMoney(balance)}`
-            }
-            className="col-span-2 lg:col-span-1"
-          />
+            <div className="mt-1 flex items-center gap-1.5">
+              {isLocked && (
+                <LockKeyhole
+                  size={12}
+                  className="text-[#F6465D]"
+                />
+              )}
 
+              <p
+                className="
+                  text-[13px]
+                  font-semibold
+                  text-[#DCE1E7]
+                "
+              >
+                {hidden
+                  ? "••••"
+                  : `$${formatMoney(lockedBalance)}`}
+              </p>
+            </div>
+          </div>
         </div>
-
       </div>
-
-      {/* Bottom Actions */}
-
-      <div
-        className="
-        grid
-
-        grid-cols-4
-
-        border-t
-
-        border-white/5
-
-        bg-[#0B0F15]
-        "
-      >
-
-        <Action
-
-          icon={ArrowDownToLine}
-
-          title="Deposit"
-
-          onClick={onDeposit}
-
-        />
-
-        <Action
-
-          icon={ArrowUpFromLine}
-
-          title="Withdraw"
-
-          onClick={onWithdraw}
-
-        />
-
-        <Action
-
-          icon={Users}
-
-          title="Team"
-
-          onClick={onTeam}
-
-        />
-
-        <Action
-
-          icon={History}
-
-          title="History"
-
-          onClick={onHistory}
-
-        />
-
-      </div>
-
     </section>
-
   );
-
-}
-
-function Stat({
-
-  title,
-
-  value,
-
-  color = "text-white",
-
-  className = "",
-
-}) {
-
-  return (
-
-    <div className={className}>
-
-      <p className="text-xs text-zinc-500">
-
-        {title}
-
-      </p>
-
-      <h3
-        className={`
-        mt-2
-
-        text-xl
-
-        font-semibold
-
-        lg:text-2xl
-
-        ${color}
-        `}
-      >
-
-        {value}
-
-      </h3>
-
-    </div>
-
-  );
-
-}
-
-function Action({
-
-  icon: Icon,
-
-  title,
-
-  onClick,
-
-}) {
-
-  return (
-
-    <button
-
-      onClick={onClick}
-
-      className="
-      flex
-
-      flex-col
-
-      items-center
-
-      justify-center
-
-      gap-2
-
-      py-5
-
-      transition-all
-
-      duration-300
-
-      hover:bg-[#171B22]
-
-      active:scale-95
-      "
-
-    >
-
-      <Icon
-
-        size={22}
-
-        className="text-[#1D66FF]"
-
-      />
-
-      <span
-        className="
-        text-xs
-
-        font-medium
-
-        text-zinc-300
-
-        lg:text-sm
-        "
-      >
-
-        {title}
-
-      </span>
-
-    </button>
-
-  );
-
 }

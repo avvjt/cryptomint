@@ -1,74 +1,108 @@
 @layer components {
 
-  /* ========================================
-     Surfaces
-  ======================================== */
+
+  /* =======================================================
+     SURFACES
+  ======================================================= */
 
   .surface {
-    @apply bg-[#0B0E11];
+    background: #05080C;
   }
 
   .surface-card {
-    @apply bg-[#12161C];
+    background: #0F1318;
   }
 
   .surface-hover {
-    @apply hover:bg-[#1A1F28];
+    transition:
+      background-color 200ms ease;
+  }
+
+  .surface-hover:hover {
+    background: #141920;
   }
 
 
-  /* ========================================
-     Borders
-  ======================================== */
+  /* =======================================================
+     BORDERS
+  ======================================================= */
 
   .border-soft {
-    @apply border border-[#252932];
+    border: 1px solid #171C22;
+  }
+
+  .border-normal {
+    border: 1px solid #1D232B;
+  }
+
+  .border-strong {
+    border: 1px solid #272E37;
   }
 
   .divider-soft {
-    @apply border-b border-[#252932];
+    border-bottom: 1px solid #171C22;
   }
 
 
-  /* ========================================
-     Radius
-  ======================================== */
+  /* =======================================================
+     RADIUS
+  ======================================================= */
 
   .radius-card {
-    @apply rounded-2xl;
+    border-radius: 16px;
   }
 
   .radius-btn {
-    @apply rounded-full;
+    border-radius: 9999px;
   }
 
 
-  /* ========================================
-     Typography
-  ======================================== */
+  /* =======================================================
+     TYPOGRAPHY
+  ======================================================= */
 
   .heading-xl {
-    @apply text-[34px] font-semibold text-white;
+    font-size: 34px;
+    line-height: 1.2;
+
+    font-weight: 600;
+
+    color: #F5F7FA;
   }
 
   .heading-lg {
-    @apply text-[22px] font-semibold text-white;
+    font-size: 22px;
+    line-height: 1.3;
+
+    font-weight: 600;
+
+    color: #F5F7FA;
   }
 
   .heading-md {
-    @apply text-[18px] font-semibold text-white;
+    font-size: 18px;
+    line-height: 1.4;
+
+    font-weight: 600;
+
+    color: #F5F7FA;
   }
 
+
+  /* =======================================================
+     TEXT
+  ======================================================= */
+
   .text-primary {
-    @apply text-white;
+    color: #F5F7FA;
   }
 
   .text-secondary {
-    @apply text-zinc-300;
+    color: #A1A8B3;
   }
 
   .text-muted {
-    @apply text-zinc-500;
+    color: #626A75;
   }
 
   .text-success {
@@ -80,23 +114,251 @@
   }
 
 
-  /* ========================================
-     Buttons
-  ======================================== */
+  /* =======================================================
+     BUTTONS
+  ======================================================= */
 
   .btn-outline {
-    @apply h-8 px-6 rounded-full border border-white/10 text-sm text-white transition-colors duration-200;
+
+    display: inline-flex;
+
+    height: 32px;
+
+    align-items: center;
+    justify-content: center;
+
+    padding-left: 24px;
+    padding-right: 24px;
+
+    border: 1px solid #272E37;
+
+    border-radius: 9999px;
+
+    background: transparent;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    color: #F5F7FA;
+
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+
   }
 
   .btn-outline:hover {
-    border-color: white;
+
+    border-color: #3A424D;
+
+    background: #11161C;
+
+    color: #FFFFFF;
+
   }
 
+
   .btn-primary {
-    @apply rounded-xl bg-[#1D66FF] text-white transition-colors duration-200;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #1D66FF;
+
+    color: #FFFFFF;
+
+    transition:
+      background-color 200ms ease,
+      transform 150ms ease;
+
   }
 
   .btn-primary:hover {
-    background: #3578ff;
+    background: #3578FF;
   }
+
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+
+  /* =======================================================
+     CARDS
+  ======================================================= */
+
+  .card {
+
+    border: 1px solid #171C22;
+
+    border-radius: 16px;
+
+    background: #0F1318;
+
+  }
+
+  .card-hover {
+
+    transition:
+      border-color 200ms ease,
+      background-color 200ms ease;
+
+  }
+
+  .card-hover:hover {
+
+    border-color: #232A33;
+
+    background: #11161C;
+
+  }
+
+
+  /* =======================================================
+     INPUTS
+  ======================================================= */
+
+  .input-dark {
+
+    width: 100%;
+
+    border: 1px solid #1D232B;
+
+    border-radius: 10px;
+
+    background: #0B0F14;
+
+    color: #F5F7FA;
+
+    outline: none;
+
+    transition:
+      border-color 200ms ease,
+      background-color 200ms ease;
+
+  }
+
+  .input-dark::placeholder {
+    color: #626A75;
+  }
+
+  .input-dark:hover {
+    border-color: #252D36;
+  }
+
+  .input-dark:focus {
+
+    border-color: #315FAE;
+
+    background: #0D1218;
+
+  }
+
+
+  /* =======================================================
+     DIVIDERS
+  ======================================================= */
+
+  .divider {
+
+    width: 100%;
+
+    height: 1px;
+
+    background: #171C22;
+
+  }
+
+
+  /* =======================================================
+     TABLE
+  ======================================================= */
+
+  .table-border {
+
+    border: 1px solid #171C22;
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+  }
+
+  .table-row {
+
+    border-bottom: 1px solid #171C22;
+
+    transition:
+      background-color 150ms ease;
+
+  }
+
+  .table-row:hover {
+    background: #11161C;
+  }
+
+  .table-row:last-child {
+    border-bottom: none;
+  }
+
+
+  /* =======================================================
+     BADGES
+  ======================================================= */
+
+  .badge {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 9999px;
+
+    padding:
+      4px
+      9px;
+
+    font-size: 11px;
+    font-weight: 500;
+
+  }
+
+  .badge-success {
+
+    background: rgba(0, 192, 118, 0.10);
+
+    color: #00C076;
+
+    border:
+      1px solid rgba(0, 192, 118, 0.15);
+
+  }
+
+  .badge-danger {
+
+    background: rgba(255, 77, 103, 0.10);
+
+    color: #FF4D67;
+
+    border:
+      1px solid rgba(255, 77, 103, 0.15);
+
+  }
+
+  .badge-blue {
+
+    background: rgba(29, 102, 255, 0.10);
+
+    color: #6E9EFF;
+
+    border:
+      1px solid rgba(29, 102, 255, 0.15);
+
+  }
+
 }

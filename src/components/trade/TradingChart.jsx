@@ -1,101 +1,469 @@
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   AdvancedRealTimeChart,
 } from "react-ts-tradingview-widgets";
 
+import {
+  BarChart3,
+  Maximize2,
+  Settings2,
+  Loader2,
+} from "lucide-react";
+
+const TIMEFRAMES = [
+  {
+    label: "1m",
+    value: "1",
+  },
+  {
+    label: "5m",
+    value: "5",
+  },
+  {
+    label: "15m",
+    value: "15",
+  },
+  {
+    label: "30m",
+    value: "30",
+  },
+  {
+    label: "1H",
+    value: "60",
+  },
+  {
+    label: "4H",
+    value: "240",
+  },
+  {
+    label: "1D",
+    value: "D",
+  },
+];
+
 export default function TradingChart() {
+  const [searchParams] = useSearchParams();
+
+  const symbol =
+    searchParams.get("symbol")?.toUpperCase() ||
+    "BTCUSDT";
+
+  const [timeframe, setTimeframe] =
+    useState("15");
+
+  const [loading, setLoading] =
+    useState(true);
+
+  /*
+   * Whenever the coin changes,
+   * immediately show the loading state.
+   */
+  useEffect(() => {
+    setLoading(true);
+  }, [symbol]);
+
+  /*
+   * TradingView can take a little time to
+   * initialize its iframe.
+   *
+   * This removes the loading state after
+   * a reasonable amount of time even if
+   * TradingView doesn't expose a ready event.
+   */
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1800);
+
+    return () => clearTimeout(timer);
+  }, [symbol, timeframe]);
+
+  const tradingViewSymbol =
+    `BINANCE:${symbol}`;
 
   return (
-
     <section
       className="
-      overflow-hidden
+        relative
+        overflow-hidden
 
-      rounded-[32px]
+        border-b
+        border-[#1A1E24]
 
-      border
-      border-white/5
-
-      bg-[#111318]
+        bg-[#0B0E11]
       "
     >
 
+      {/* =====================================================
+          CHART TOOLBAR
+      ===================================================== */}
+
       <div
         className="
-        flex
+          flex
+          h-10
 
-        items-center
+          items-center
+          justify-between
 
-        justify-between
+          border-b
+          border-[#171B21]
 
-        border-b
-        border-white/5
-
-        p-6
+          px-2
+          sm:px-3
         "
       >
 
-        <div>
+        {/* Timeframes */}
 
-          <p
+        <div
+          className="
+            flex
+            items-center
+            gap-0.5
+
+            overflow-x-auto
+
+            scrollbar-hide
+          "
+        >
+
+          {TIMEFRAMES.map((item) => {
+            const active =
+              timeframe === item.value;
+
+            return (
+              <button
+                key={item.value}
+                type="button"
+                onClick={() =>
+                  setTimeframe(item.value)
+                }
+                className={`
+                  shrink-0
+
+                  rounded-md
+
+                  px-2
+                  py-1
+
+                  text-[11px]
+
+                  transition
+
+                  ${
+                    active
+                      ? "bg-[#1D232B] text-white"
+                      : "text-[#69727E] hover:bg-[#151A20] hover:text-white"
+                  }
+                `}
+              >
+                {item.label}
+              </button>
+            );
+          })}
+
+        </div>
+
+
+        {/* Right controls */}
+
+        <div
+          className="
+            flex
+            shrink-0
+            items-center
+            gap-1
+          "
+        >
+
+          <button
+            type="button"
             className="
-            text-xs
+              hidden
+              rounded-md
 
-            uppercase
+              px-2
+              py-1
 
-            tracking-[0.25em]
+              text-[11px]
 
-            text-zinc-500
+              text-[#69727E]
+
+              hover:bg-[#171C22]
+              hover:text-white
+
+              sm:block
             "
           >
-            Live Chart
-          </p>
+            Original
+          </button>
 
-          <h2
+          <button
+            type="button"
             className="
-            mt-2
+              hidden
+              rounded-md
 
-            text-2xl
+              px-2
+              py-1
 
-            font-bold
+              text-[11px]
+
+              text-[#69727E]
+
+              hover:bg-[#171C22]
+              hover:text-white
+
+              sm:block
             "
           >
-            BTC / USDT
-          </h2>
+            TradingView
+          </button>
+
+          <button
+            type="button"
+            className="
+              flex
+              h-7
+              w-7
+
+              items-center
+              justify-center
+
+              rounded-md
+
+              text-[#69727E]
+
+              transition
+
+              hover:bg-[#171C22]
+              hover:text-white
+            "
+          >
+            <Settings2 size={14} />
+          </button>
+
+          <button
+            type="button"
+            className="
+              flex
+              h-7
+              w-7
+
+              items-center
+              justify-center
+
+              rounded-md
+
+              text-[#69727E]
+
+              transition
+
+              hover:bg-[#171C22]
+              hover:text-white
+            "
+          >
+            <Maximize2 size={14} />
+          </button>
 
         </div>
 
       </div>
 
-      <AdvancedRealTimeChart
 
-        theme="dark"
+      {/* =====================================================
+          CHART
+      ===================================================== */}
 
-        symbol="BINANCE:BTCUSDT"
+      <div
+        className="
+          relative
 
-        autosize
+          h-[420px]
 
-        interval="30"
+          sm:h-[500px]
 
-        timezone="Etc/UTC"
+          lg:h-[560px]
 
-        hide_side_toolbar={false}
+          xl:h-[calc(100vh-330px)]
 
-        allow_symbol_change={true}
+          min-h-[420px]
+        "
+      >
 
-        withdateranges={true}
+        {/* Loading overlay */}
 
-        save_image={true}
+        {loading && (
+          <div
+            className="
+              absolute
+              inset-0
+              z-10
 
-        style="1"
+              flex
+              items-center
+              justify-center
 
-        locale="en"
+              bg-[#0B0E11]
+            "
+          >
 
-        enable_publishing={false}
+            <div
+              className="
+                flex
+                flex-col
+                items-center
+                gap-3
+              "
+            >
 
-      />
+              <Loader2
+                size={22}
+                className="
+                  animate-spin
+                  text-[#4D8DFF]
+                "
+              />
+
+              <div className="text-center">
+
+                <p
+                  className="
+                    text-[12px]
+                    font-medium
+                    text-[#D8DDE4]
+                  "
+                >
+                  Loading {symbol.replace("USDT", "/USDT")}
+                </p>
+
+                <p
+                  className="
+                    mt-1
+                    text-[10px]
+                    text-[#59616D]
+                  "
+                >
+                  Connecting to Binance market
+                </p>
+
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+
+        {/*
+
+          IMPORTANT:
+
+          key={tradingViewSymbol + timeframe}
+
+          forces TradingView to create a new
+          widget whenever either the coin or
+          timeframe changes.
+
+        */}
+
+        <AdvancedRealTimeChart
+          key={`${tradingViewSymbol}-${timeframe}`}
+
+          theme="dark"
+
+          symbol={tradingViewSymbol}
+
+          autosize
+
+          interval={timeframe}
+
+          timezone="Etc/UTC"
+
+          hide_side_toolbar={false}
+
+          allow_symbol_change={false}
+
+          withdateranges={false}
+
+          save_image={false}
+
+          style="1"
+
+          locale="en"
+
+          enable_publishing={false}
+
+          hide_top_toolbar={false}
+
+          hide_legend={false}
+
+          backgroundColor="#0B0E11"
+
+          gridLineColor="#171B21"
+        />
+
+      </div>
+
+
+      {/* =====================================================
+          BOTTOM INFO
+      ===================================================== */}
+
+      <div
+        className="
+          flex
+          h-8
+
+          items-center
+          gap-5
+
+          overflow-x-auto
+
+          border-t
+          border-[#171B21]
+
+          px-3
+
+          scrollbar-hide
+
+          text-[10px]
+
+          text-[#68717D]
+        "
+      >
+
+        <span
+          className="
+            flex
+            shrink-0
+            items-center
+            gap-1
+          "
+        >
+          <BarChart3 size={11} />
+
+          VOL(
+          {symbol.replace("USDT", "")}
+          )
+        </span>
+
+        <span className="shrink-0">
+          MA(5)
+        </span>
+
+        <span className="shrink-0">
+          MA(10)
+        </span>
+
+        <span className="shrink-0">
+          MA(20)
+        </span>
+
+      </div>
 
     </section>
-
   );
-
 }
