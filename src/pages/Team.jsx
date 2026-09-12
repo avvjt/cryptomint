@@ -14,6 +14,8 @@ export default function Team() {
 
   const [activeLevel, setActiveLevel] = useState("A");
   const [copied, setCopied] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
+  
 
   if (loading && !team) {
     return (
@@ -372,11 +374,10 @@ export default function Team() {
                   key={levelName}
                   type="button"
                   onClick={() => handleLevelChange(levelName)}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    activeLevel === levelName
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${activeLevel === levelName
                       ? "bg-[#1A2535] text-white"
                       : "text-gray-500 hover:text-gray-300"
-                  }`}
+                    }`}
                 >
                   Level {levelName}
                 </button>
@@ -409,6 +410,7 @@ export default function Team() {
                 <TeamMember
                   key={member.id}
                   member={member}
+                  onClick={() => setSelectedMember(member)}
                 />
               ))
             )}
@@ -520,6 +522,12 @@ export default function Team() {
         </section>
 
       </div>
+      {selectedMember && (
+        <MemberDetailSheet
+          member={selectedMember}
+          onClose={() => setSelectedMember(null)}
+        />
+      )}
     </main>
   );
 }
@@ -565,52 +573,237 @@ function IncomeItem({ label, value, rate }) {
 }
 
 
-function TeamMember({ member }) {
-  return (
-    <div className="flex items-center justify-between gap-4 px-5 py-4">
+function TeamMember({ member, onClick }) {
+  const initial =
+    member.name?.charAt(0)?.toUpperCase() || "U";
 
+  const earning =
+    Number(member.todayEarning || 0);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex w-full items-center justify-between gap-4 border-b border-[#1A1E24] px-5 py-4 text-left transition last:border-0 hover:bg-[#11161D] active:bg-[#141A22] sm:px-6"
+    >
       <div className="flex min-w-0 items-center gap-3">
 
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1A2535] text-sm font-semibold text-[#4D8DFF]">
-          {member.name?.charAt(0)?.toUpperCase() || "U"}
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#1A1E24] bg-[#172131] text-sm font-semibold text-[#4D8DFF]">
+          {initial}
         </div>
 
         <div className="min-w-0">
-
-          <p className="truncate text-sm font-medium">
+          <p className="truncate text-sm font-medium text-gray-200">
             {member.name}
           </p>
 
-          <p className="mt-0.5 truncate text-xs text-gray-500">
+          <p className="mt-0.5 truncate text-xs text-gray-600">
             @{member.username?.replace(/^@/, "")}
           </p>
-
         </div>
 
       </div>
 
-      <div className="shrink-0 text-right">
+      <div className="flex shrink-0 items-center gap-3">
 
-        <span
-          className={`inline-flex rounded-full px-2 py-1 text-[10px] font-medium ${
+        <div className="text-right">
+          <p className="text-sm font-medium text-gray-300">
+            ${earning.toFixed(2)}
+          </p>
+
+          <p className="mt-0.5 text-[10px] text-gray-600">
+            today
+          </p>
+        </div>
+
+        <div
+          className={`h-1.5 w-1.5 rounded-full ${
             member.status === "ACTIVE"
-              ? "bg-[#10251E] text-[#08B77A]"
-              : "bg-[#211E16] text-[#C5A55A]"
+              ? "bg-[#08B77A]"
+              : "bg-[#C5A55A]"
           }`}
-        >
-          {member.status}
-        </span>
+        />
 
-        <p className="mt-1 text-xs text-gray-500">
-          ${Number(member.todayEarning || 0).toFixed(2)} today
-        </p>
+        <ArrowUpRight
+          size={15}
+          className="text-gray-700 transition group-hover:text-gray-400"
+        />
 
       </div>
+    </button>
+  );
+}
 
+function MemberDetailSheet({ member, onClose }) {
+  const earning =
+    Number(member.todayEarning || 0);
+
+  const isActive =
+    member.status === "ACTIVE";
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-[2px] sm:items-center sm:p-4"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="w-full max-w-md overflow-hidden rounded-t-3xl border border-[#1A1E24] bg-[#101318] shadow-2xl sm:rounded-2xl">
+
+        {/* Mobile handle */}
+        <div className="flex justify-center pt-3 sm:hidden">
+          <div className="h-1 w-10 rounded-full bg-[#2A3038]" />
+        </div>
+
+        {/* Header */}
+        <div className="border-b border-[#1A1E24] px-5 pb-5 pt-4 sm:p-6">
+
+          <div className="flex items-start justify-between">
+
+            <div className="flex items-center gap-3">
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#1A1E24] bg-[#172131] text-base font-semibold text-[#4D8DFF]">
+                {member.name?.charAt(0)?.toUpperCase() || "U"}
+              </div>
+
+              <div>
+                <p className="text-base font-semibold text-gray-200">
+                  {member.name}
+                </p>
+
+                <p className="mt-0.5 text-xs text-gray-600">
+                  @{member.username?.replace(/^@/, "")}
+                </p>
+              </div>
+
+            </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-600 transition hover:bg-[#1A1E24] hover:text-gray-300"
+              aria-label="Close"
+            >
+              <span className="text-lg leading-none">
+                ×
+              </span>
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* Content */}
+        <div className="p-5 sm:p-6">
+
+          {/* Status */}
+          <div className="flex items-center justify-between rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-4">
+
+            <div>
+              <p className="text-[10px] uppercase tracking-[0.15em] text-gray-600">
+                Relationship
+              </p>
+
+              <p className="mt-1 text-sm font-medium text-gray-300">
+                Level {member.level}
+              </p>
+            </div>
+
+            <span
+              className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${
+                isActive
+                  ? "bg-[#10251E] text-[#08B77A]"
+                  : "bg-[#211E16] text-[#C5A55A]"
+              }`}
+            >
+              {member.status}
+            </span>
+
+          </div>
+
+          {/* Earnings */}
+          <div className="mt-3 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-4">
+
+            <p className="text-[10px] uppercase tracking-[0.15em] text-gray-600">
+              Today's earning
+            </p>
+
+            <p className="mt-2 text-2xl font-semibold tracking-tight">
+              ${earning.toFixed(2)}
+            </p>
+
+          </div>
+
+          {/* Relationship info */}
+          <div className="mt-3 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-4">
+
+            <p className="text-[10px] uppercase tracking-[0.15em] text-gray-600">
+              Team relationship
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-gray-400">
+              {member.level === "A"
+                ? "This member was directly referred by you."
+                : member.level === "B"
+                  ? "This member was referred by someone in your Level A network."
+                  : "This member was referred through your Level B network."}
+            </p>
+
+          </div>
+
+          {/* Backend-ready information */}
+          <div className="mt-3 grid grid-cols-2 gap-3">
+
+            <DetailItem
+              label="Team level"
+              value={`Level ${member.level}`}
+            />
+
+            <DetailItem
+              label="Status"
+              value={member.status}
+            />
+
+          </div>
+
+        </div>
+
+        {/* Footer */}
+        <div className="border-t border-[#1A1E24] p-5 sm:p-6">
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full rounded-xl border border-[#1A1E24] bg-[#0B0E12] py-3 text-sm font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E]"
+          >
+            Close
+          </button>
+
+        </div>
+
+      </div>
     </div>
   );
 }
 
+
+function DetailItem({ label, value }) {
+  return (
+    <div className="rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
+
+      <p className="text-[10px] uppercase tracking-wide text-gray-600">
+        {label}
+      </p>
+
+      <p className="mt-1.5 text-sm font-medium text-gray-300">
+        {value}
+      </p>
+
+    </div>
+  );
+}
 
 function HierarchyRow({ level, text }) {
   return (

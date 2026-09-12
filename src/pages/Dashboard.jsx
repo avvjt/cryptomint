@@ -14,7 +14,7 @@ export default function Dashboard() {
       <div className="mx-auto max-w-[1700px]">
         <DashboardHeader />
 
-        <DepositVerificationCard />
+        {/* <DepositVerificationCard /> */}
 
         <PortfolioCard />
 
