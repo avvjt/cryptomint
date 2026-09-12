@@ -10,7 +10,6 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { GoogleLogin } from "@react-oauth/google";
-import { FaApple } from "react-icons/fa";
 
 export default function Signup() {
   const navigate = useNavigate();
