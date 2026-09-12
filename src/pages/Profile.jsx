@@ -691,13 +691,9 @@ function ProfileDetails({
 
       <InfoRow
         label="Email"
-        value={profile.email || "Not provided"}
+        value={profile.email}
       />
 
-      <InfoRow
-        label="Phone"
-        value={profile.phone || "Not provided"}
-      />
 
     </div>
   );
@@ -743,13 +739,7 @@ function EditProfileForm({
           disabled
         />
 
-        <FormInput
-          label="Phone"
-          name="phone"
-          value={form.phone}
-          onChange={onChange}
-          disabled
-        />
+        
 
       </div>
 
@@ -959,6 +949,45 @@ function SecurityRow({
   );
 }
 
+{/* =============================================================
+   LOGOUT
+============================================================= */}
+
+<section className="mt-6">
+  <button
+    type="button"
+    onClick={handleLogout}
+    className="
+      w-full
+      rounded-2xl
+      border
+      border-red-500/20
+      bg-red-500/5
+      px-5
+      py-4
+      text-left
+      transition
+      hover:border-red-500/30
+      hover:bg-red-500/10
+    "
+  >
+    <div className="flex items-center justify-between">
+      <div>
+        <p className="text-sm font-semibold text-red-400">
+          Log out
+        </p>
+
+        <p className="mt-1 text-xs text-[#737B88]">
+          Sign out of your CryptoMintX account
+        </p>
+      </div>
+
+      <span className="text-lg text-red-400">
+        →
+      </span>
+    </div>
+  </button>
+</section>
 
 /* =============================================================
    INITIALS
