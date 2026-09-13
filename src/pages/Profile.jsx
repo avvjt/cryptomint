@@ -177,12 +177,12 @@ export default function Profile() {
     setEditing(false);
 
   } catch (error) {
-    console.error("Update profile error:", error);
+  console.error("Update profile error:", error);
 
-    setMessage(
-      "Unable to connect to the server."
-    );
-  }
+  setMessage(
+    error.message || "Unable to connect to the server."
+  );
+}
 };
 
   const handleAvatarClick = () => {
