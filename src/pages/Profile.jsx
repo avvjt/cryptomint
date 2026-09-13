@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useAccountStatusContext } from "../context/AccountStatusContext";
+import { useNavigate } from "react-router-dom";
 
 const PROFILE_STORAGE_KEY = "cryptomintx_profile";
 
@@ -7,7 +8,6 @@ const DEFAULT_PROFILE = {
   fullName: "CryptoMintX User",
   username: "user",
   email: "",
-  phone: "",
   avatar: "",
 };
 
@@ -26,27 +26,72 @@ export default function Profile() {
 
   const [avatarError, setAvatarError] = useState("");
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(
-        PROFILE_STORAGE_KEY
-      );
+  const [showChangePassword, setShowChangePassword] =
+    useState(false);
 
-      if (saved) {
-        const parsed = JSON.parse(saved);
+  const [currentPassword, setCurrentPassword] =
+    useState("");
+
+  const [newPassword, setNewPassword] =
+    useState("");
+
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
+
+  const [passwordMessage, setPasswordMessage] =
+    useState("");
+
+  const [passwordLoading, setPasswordLoading] =
+    useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login", { replace: true });
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/auth/me`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          localStorage.removeItem("token");
+          navigate("/login", { replace: true });
+          return;
+        }
+
+        const user = data.user;
 
         const nextProfile = {
-          ...DEFAULT_PROFILE,
-          ...parsed,
+          fullName: user.fullName || "CryptoMintX User",
+          username: user.username || "user",
+          email: user.email || "",
+          avatar: user.avatarUrl || "",
         };
 
         setProfile(nextProfile);
         setForm(nextProfile);
+      } catch (error) {
+        console.error("Unable to load profile:", error);
       }
-    } catch (error) {
-      console.error("Unable to load profile:", error);
-    }
-  }, []);
+    };
+
+    fetchProfile();
+  }, [navigate]);
 
   const handleEdit = () => {
     setForm(profile);
@@ -69,50 +114,76 @@ export default function Profile() {
     }));
   };
 
-  const handleSave = () => {
-    const fullName = form.fullName.trim();
-    const username = form.username.trim();
+  const handleSave = async () => {
+  const fullName = form.fullName.trim();
+  const username = form.username.trim();
 
-    if (!fullName) {
-      setMessage("Full name is required.");
-      return;
-    }
+  if (!fullName) {
+    setMessage("Full name is required.");
+    return;
+  }
 
-    if (!username) {
-      setMessage("Username is required.");
+  if (!username) {
+    setMessage("Username is required.");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  try {
+    setMessage("");
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/profile`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          fullName,
+          username,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setMessage(
+        data.message || "Unable to update profile."
+      );
       return;
     }
 
     const updatedProfile = {
-      ...form,
-      fullName,
-      username,
+      ...profile,
+      fullName: data.user.fullName,
+      username: data.user.username,
+      email: data.user.email,
+      avatar: data.user.avatarUrl || "",
     };
 
     setProfile(updatedProfile);
     setForm(updatedProfile);
 
-    localStorage.setItem(
-      PROFILE_STORAGE_KEY,
-      JSON.stringify(updatedProfile)
-    );
-
-    /*
-      BACKEND LATER:
-
-      PATCH /api/profile
-
-      {
-        fullName,
-        username
-      }
-
-      The backend becomes the source of truth.
-    */
-
     setMessage("Profile updated successfully.");
     setEditing(false);
-  };
+
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    setMessage(
+      "Unable to connect to the server."
+    );
+  }
+};
 
   const handleAvatarClick = () => {
     setAvatarError("");
@@ -120,92 +191,130 @@ export default function Profile() {
     fileInputRef.current?.click();
   };
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files?.[0];
+  const handleAvatarChange = async (event) => {
+  const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+  if (!file) {
+    return;
+  }
 
-    setAvatarError("");
+  setAvatarError("");
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
+  const allowedTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
+  ];
 
-    if (!allowedTypes.includes(file.type)) {
-      setAvatarError(
-        "Please choose a JPG, PNG, or WebP image."
-      );
-
-      event.target.value = "";
-
-      return;
-    }
-
-    const maxSize =
-      5 * 1024 * 1024;
-
-    if (file.size > maxSize) {
-      setAvatarError(
-        "Profile picture must be smaller than 5 MB."
-      );
-
-      event.target.value = "";
-
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      const avatar =
-        String(reader.result || "");
-
-      const updatedProfile = {
-        ...profile,
-        avatar,
-      };
-
-      setProfile(updatedProfile);
-      setForm(updatedProfile);
-
-      localStorage.setItem(
-        PROFILE_STORAGE_KEY,
-        JSON.stringify(updatedProfile)
-      );
-
-      /*
-        BACKEND LATER:
-
-        POST /api/profile/avatar
-
-        FormData:
-          avatar: file
-
-        Backend returns:
-          {
-            avatarUrl: "https://..."
-          }
-
-        We then store only avatarUrl.
-      */
-    };
-
-    reader.onerror = () => {
-      setAvatarError(
-        "Unable to read this image."
-      );
-    };
-
-    reader.readAsDataURL(file);
+  if (!allowedTypes.includes(file.type)) {
+    setAvatarError(
+      "Please choose a JPG, PNG, or WebP image."
+    );
 
     event.target.value = "";
-  };
+    return;
+  }
 
-  const handleRemoveAvatar = () => {
+  const maxSize = 5 * 1024 * 1024;
+
+  if (file.size > maxSize) {
+    setAvatarError(
+      "Profile picture must be smaller than 5 MB."
+    );
+
+    event.target.value = "";
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  try {
+    const formData = new FormData();
+
+    formData.append("avatar", file);
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/profile/avatar`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setAvatarError(
+        data.message ||
+        "Unable to upload profile picture."
+      );
+      return;
+    }
+
+    const avatar =
+  `${import.meta.env.VITE_API_BASE_URL}${data.avatarUrl}`;
+
+    const updatedProfile = {
+      ...profile,
+      avatar,
+    };
+
+    setProfile(updatedProfile);
+    setForm(updatedProfile);
+
+  } catch (error) {
+    console.error(
+      "Avatar upload error:",
+      error
+    );
+
+    setAvatarError(
+      "Unable to connect to the server."
+    );
+  } finally {
+    event.target.value = "";
+  }
+};
+
+  const handleRemoveAvatar = async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login", { replace: true });
+    return;
+  }
+
+  try {
+    setAvatarError("");
+
+    const res = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/profile/avatar`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setAvatarError(
+        data.message ||
+        "Unable to remove profile picture."
+      );
+      return;
+    }
+
     const updatedProfile = {
       ...profile,
       avatar: "",
@@ -214,24 +323,110 @@ export default function Profile() {
     setProfile(updatedProfile);
     setForm(updatedProfile);
 
-    localStorage.setItem(
-      PROFILE_STORAGE_KEY,
-      JSON.stringify(updatedProfile)
+  } catch (error) {
+    console.error(
+      "Remove avatar error:",
+      error
     );
 
-    /*
-      BACKEND LATER:
-
-      DELETE /api/profile/avatar
-    */
-  };
+    setAvatarError(
+      "Unable to connect to the server."
+    );
+  }
+};
 
   const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("cryptomintx_profile");
+    localStorage.removeItem("token");
+    localStorage.removeItem("cryptomintx_profile");
 
-  window.location.href = "/login";
-};
+    navigate("/login", { replace: true });
+  };
+
+  const handleChangePassword = async (event) => {
+    event.preventDefault();
+
+    setPasswordMessage("");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordMessage(
+        "Please fill in all password fields."
+      );
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      setPasswordMessage(
+        "New password must be at least 8 characters."
+      );
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage(
+        "New passwords do not match."
+      );
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/change-password`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword,
+            newPassword,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setPasswordMessage(
+          data.message || "Unable to change password."
+        );
+        return;
+      }
+
+      setPasswordMessage(
+        "Password changed successfully."
+      );
+
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+
+      setTimeout(() => {
+        setShowChangePassword(false);
+        setPasswordMessage("");
+      }, 1500);
+    } catch (error) {
+      console.error(
+        "Change password error:",
+        error
+      );
+
+      setPasswordMessage(
+        "Unable to connect to the server."
+      );
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
 
   const initials = getInitials(
     profile.fullName,
@@ -381,10 +576,9 @@ export default function Profile() {
                     text-[11px]
                     font-medium
 
-                    ${
-                      isActive
-                        ? "border-[#08B77A]/30 bg-[#08B77A]/10 text-[#08B77A]"
-                        : "border-[#F59E0B]/30 bg-[#F59E0B]/10 text-[#F59E0B]"
+                    ${isActive
+                      ? "border-[#08B77A]/30 bg-[#08B77A]/10 text-[#08B77A]"
+                      : "border-[#F59E0B]/30 bg-[#F59E0B]/10 text-[#F59E0B]"
                     }
                   `}
                 >
@@ -644,16 +838,33 @@ export default function Profile() {
               title="Change password"
               description="Update your account password"
               onClick={() => {
-                /*
-                  Navigate later to:
-
-                  /settings/security/password
-                */
-                alert(
-                  "Password settings will be connected to the backend."
+                setPasswordMessage("");
+                setShowChangePassword(
+                  (current) => !current
                 );
               }}
             />
+
+            {showChangePassword && (
+              <ChangePasswordForm
+                currentPassword={currentPassword}
+                newPassword={newPassword}
+                confirmPassword={confirmPassword}
+                setCurrentPassword={setCurrentPassword}
+                setNewPassword={setNewPassword}
+                setConfirmPassword={setConfirmPassword}
+                onSubmit={handleChangePassword}
+                onCancel={() => {
+                  setShowChangePassword(false);
+                  setPasswordMessage("");
+                  setCurrentPassword("");
+                  setNewPassword("");
+                  setConfirmPassword("");
+                }}
+                message={passwordMessage}
+                loading={passwordLoading}
+              />
+            )}
 
             <SecurityRow
               title="Two-factor authentication"
@@ -673,11 +884,11 @@ export default function Profile() {
    LOGOUT
 ============================================================= */}
 
-<section className="mt-6">
-  <button
-    type="button"
-    onClick={handleLogout}
-    className="
+        <section className="mt-6">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="
       w-full
       rounded-2xl
       border
@@ -690,24 +901,24 @@ export default function Profile() {
       hover:border-red-500/30
       hover:bg-red-500/10
     "
-  >
-    <div className="flex items-center justify-between">
-      <div>
-        <p className="text-sm font-semibold text-red-400">
-          Log out
-        </p>
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-semibold text-red-400">
+                  Log out
+                </p>
 
-        <p className="mt-1 text-xs text-[#737B88]">
-          Sign out of your CryptoMintX account
-        </p>
-      </div>
+                <p className="mt-1 text-xs text-[#737B88]">
+                  Sign out of your CryptoMintX account
+                </p>
+              </div>
 
-      <span className="text-lg text-red-400">
-        →
-      </span>
-    </div>
-  </button>
-</section>
+              <span className="text-lg text-red-400">
+                →
+              </span>
+            </div>
+          </button>
+        </section>
 
       </div>
 
@@ -786,7 +997,7 @@ function EditProfileForm({
           disabled
         />
 
-        
+
 
       </div>
 
@@ -898,10 +1109,9 @@ function FormInput({
           text-white
           outline-none
 
-          ${
-            disabled
-              ? "cursor-not-allowed opacity-50"
-              : "focus:border-[#4D8DFF]"
+          ${disabled
+            ? "cursor-not-allowed opacity-50"
+            : "focus:border-[#4D8DFF]"
           }
         `}
       />
@@ -1023,4 +1233,193 @@ function getInitials(
   return value
     .slice(0, 2)
     .toUpperCase();
+}
+
+function ChangePasswordForm({
+  currentPassword,
+  newPassword,
+  confirmPassword,
+  setCurrentPassword,
+  setNewPassword,
+  setConfirmPassword,
+  onSubmit,
+  onCancel,
+  message,
+  loading,
+}) {
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="
+        border-t
+        border-[#1A1E24]
+        bg-[#0A0D11]
+        p-5
+      "
+    >
+      <div className="space-y-4">
+
+        {/* Current password */}
+        <div>
+          <label className="block text-xs text-[#737B89]">
+            Current password
+          </label>
+
+          <input
+            type="password"
+            value={currentPassword}
+            onChange={(e) =>
+              setCurrentPassword(e.target.value)
+            }
+            autoComplete="current-password"
+            className="
+              mt-2
+              w-full
+              rounded-xl
+              border
+              border-[#1A1E24]
+              bg-[#090B0E]
+              px-4
+              py-3
+              text-sm
+              text-white
+              outline-none
+              focus:border-[#4D8DFF]
+            "
+            placeholder="Enter current password"
+          />
+        </div>
+
+        {/* New password */}
+        <div>
+          <label className="block text-xs text-[#737B89]">
+            New password
+          </label>
+
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(e) =>
+              setNewPassword(e.target.value)
+            }
+            autoComplete="new-password"
+            className="
+              mt-2
+              w-full
+              rounded-xl
+              border
+              border-[#1A1E24]
+              bg-[#090B0E]
+              px-4
+              py-3
+              text-sm
+              text-white
+              outline-none
+              focus:border-[#4D8DFF]
+            "
+            placeholder="Enter new password"
+          />
+
+          <p className="mt-1 text-[11px] text-[#555D68]">
+            Minimum 8 characters
+          </p>
+        </div>
+
+        {/* Confirm password */}
+        <div>
+          <label className="block text-xs text-[#737B89]">
+            Confirm new password
+          </label>
+
+          <input
+            type="password"
+            value={confirmPassword}
+            onChange={(e) =>
+              setConfirmPassword(e.target.value)
+            }
+            autoComplete="new-password"
+            className="
+              mt-2
+              w-full
+              rounded-xl
+              border
+              border-[#1A1E24]
+              bg-[#090B0E]
+              px-4
+              py-3
+              text-sm
+              text-white
+              outline-none
+              focus:border-[#4D8DFF]
+            "
+            placeholder="Confirm new password"
+          />
+        </div>
+
+        {/* Message */}
+        {message && (
+          <div
+            className="
+              rounded-xl
+              border
+              border-[#4D8DFF]/20
+              bg-[#4D8DFF]/5
+              p-3
+            "
+          >
+            <p className="text-xs text-[#AAB1BD]">
+              {message}
+            </p>
+          </div>
+        )}
+
+        {/* Buttons */}
+        <div className="flex gap-3 pt-1">
+
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={loading}
+            className="
+              flex-1
+              rounded-xl
+              border
+              border-[#1A1E24]
+              py-3
+              text-sm
+              font-medium
+              text-[#AAB1BD]
+              hover:bg-[#14181E]
+              hover:text-white
+              disabled:opacity-50
+            "
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="
+              flex-1
+              rounded-xl
+              bg-[#4D8DFF]
+              py-3
+              text-sm
+              font-semibold
+              text-white
+              hover:bg-[#3D7EF0]
+              disabled:cursor-not-allowed
+              disabled:opacity-50
+            "
+          >
+            {loading
+              ? "Updating..."
+              : "Change password"}
+          </button>
+
+        </div>
+      </div>
+    </form>
+  );
 }
