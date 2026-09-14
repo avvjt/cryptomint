@@ -1,9 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-
-import {
-  useTradeWalletContext,
-} from "../context/TradeWalletContext";
 
 import {
   useAccountStatusContext,
@@ -22,12 +18,6 @@ export default function Wallet() {
     useSearchParams();
 
   const {
-    balance,
-    lockedBalance,
-    tradeHistory,
-  } = useTradeWalletContext();
-
-  const {
     isActive,
     status,
   } = useAccountStatusContext();
@@ -42,14 +32,97 @@ export default function Wallet() {
     setShowActivationModal,
   ] = useState(false);
 
-  const availableBalance =
-    Number(balance || 0);
+  const [walletData, setWalletData] = useState(null);
+  const [depositHistory, setDepositHistory] = useState([]);
+  const [walletTransactions, setWalletTransactions] = useState([]);
+  const [walletLoading, setWalletLoading] = useState(true);
+  const [walletError, setWalletError] = useState("");
 
-  const locked =
-    Number(lockedBalance || 0);
+  const availableBalance = Number(
+    walletData?.availableBalance || 0
+  );
 
-  const totalBalance =
-    availableBalance + locked;
+  const locked = Number(
+    walletData?.lockedBalance || 0
+  );
+
+  const totalBalance = Number(
+    walletData?.totalBalance ?? availableBalance + locked
+  );
+
+  const fetchWalletData = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      setWalletLoading(true);
+      setWalletError("");
+
+      const headers = {
+        Authorization: `Bearer ${token}`,
+      };
+
+      const [walletRes, depositsRes, transactionsRes] =
+        await Promise.all([
+          fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/wallet`,
+            { headers }
+          ),
+          fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/wallet/deposits`,
+            { headers }
+          ),
+          fetch(
+            `${import.meta.env.VITE_API_BASE_URL}/api/wallet/transactions`,
+            { headers }
+          ),
+        ]);
+
+      if ([walletRes, depositsRes, transactionsRes].some((res) => res.status === 401)) {
+        localStorage.removeItem("token");
+        navigate("/login");
+        return;
+      }
+
+      const walletJson = await walletRes.json();
+      const depositsJson = await depositsRes.json();
+      const transactionsJson = await transactionsRes.json();
+
+      if (!walletRes.ok) {
+        throw new Error(walletJson.message || "Failed to load wallet");
+      }
+
+      if (!depositsRes.ok) {
+        throw new Error(depositsJson.message || "Failed to load deposits");
+      }
+
+      if (!transactionsRes.ok) {
+        throw new Error(
+          transactionsJson.message ||
+            "Failed to load transactions"
+        );
+      }
+
+      setWalletData(walletJson.wallet || null);
+      setDepositHistory(depositsJson.deposits || []);
+      setWalletTransactions(transactionsJson.transactions || []);
+    } catch (error) {
+      console.error("Wallet loading error:", error);
+      setWalletError(
+        error.message || "Unable to load wallet"
+      );
+    } finally {
+      setWalletLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchWalletData();
+  }, []);
 
   const handleTabChange = (tab) => {
     setSearchParams({
@@ -59,6 +132,44 @@ export default function Wallet() {
           : "deposit",
     });
   };
+
+  if (walletLoading) {
+    return (
+      <main className="min-h-screen bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="rounded-2xl border border-[#1A1E24] bg-[#0D1014] p-6">
+            <p className="text-sm text-[#737B89]">
+              Loading wallet...
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (walletError) {
+    return (
+      <main className="min-h-screen bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="rounded-2xl border border-[#1A1E24] bg-[#0D1014] p-6">
+            <p className="text-sm font-medium">
+              Unable to load wallet
+            </p>
+            <p className="mt-2 text-sm text-[#737B89]">
+              {walletError}
+            </p>
+            <button
+              type="button"
+              onClick={fetchWalletData}
+              className="mt-4 rounded-xl bg-[#4D8DFF] px-4 py-2 text-sm font-semibold text-white"
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main
@@ -561,6 +672,7 @@ export default function Wallet() {
               onActivate={() => {
                 handleTabChange("Deposit");
               }}
+              onWithdrawalSubmitted={fetchWalletData}
             />
 
           </section>
@@ -627,7 +739,7 @@ export default function Wallet() {
           </div>
 
           <WalletActivity
-            tradeHistory={tradeHistory}
+            tradeHistory={walletTransactions}
           />
 
         </section>
@@ -691,6 +803,7 @@ function WithdrawPanel({
   isActive,
   availableBalance,
   onActivate,
+  onWithdrawalSubmitted,
 }) {
 
   const [
@@ -721,6 +834,11 @@ function WithdrawPanel({
     submitting,
     setSubmitting,
   ] = useState(false);
+
+  const [
+    withdrawalResult,
+    setWithdrawalResult,
+  ] = useState(null);
 
 
   /* =========================================================
@@ -837,7 +955,7 @@ function WithdrawPanel({
               </p>
 
               <p className="mt-1 text-xs text-[#737B89]">
-                Status: Pending
+                Status: {withdrawalResult?.status || "PENDING"}
               </p>
 
             </div>
@@ -858,6 +976,11 @@ function WithdrawPanel({
             <SummaryRow
               label="Amount"
               value={`${Number(amount).toFixed(2)} USDT`}
+            />
+
+            <SummaryRow
+              label="Address"
+              value={withdrawalResult?.destinationAddress || address}
             />
 
             <SummaryRow
@@ -899,6 +1022,7 @@ function WithdrawPanel({
           type="button"
           onClick={() => {
             setSubmitted(false);
+            setWithdrawalResult(null);
             setAmount("");
             setAddress("");
             setError("");
@@ -1026,35 +1150,59 @@ function WithdrawPanel({
 
 
     try {
-
       setSubmitting(true);
 
+      const token = localStorage.getItem("token");
 
-      /*
-        Demo frontend only.
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
-        We deliberately do NOT change the wallet balance
-        here because the backend will become the source of
-        truth later.
-      */
-
-      await new Promise((resolve) =>
-        window.setTimeout(resolve, 500)
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/withdrawals`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            amount: withdrawalAmount,
+            destinationAddress: normalizedAddress,
+          }),
+        }
       );
 
+      const data = await res.json();
 
+      if (res.status === 401) {
+        localStorage.removeItem("token");
+        navigate("/login");
+        return;
+      }
+
+      if (!res.ok) {
+        setError(
+          data.message ||
+            "Unable to submit withdrawal request."
+        );
+        return;
+      }
+
+      setWithdrawalResult(data.withdrawal || null);
       setSubmitted(true);
 
+      if (onWithdrawalSubmitted) {
+        await onWithdrawalSubmitted();
+      }
     } catch (err) {
-
+      console.error("Withdrawal error:", err);
       setError(
-        "Unable to submit withdrawal request."
+        "Unable to connect to the server. Please try again."
       );
-
     } finally {
-
       setSubmitting(false);
-
     }
   };
 
@@ -1405,84 +1553,81 @@ function SummaryRow({
 function WalletActivity({
   tradeHistory = [],
 }) {
-
   if (!tradeHistory.length) {
-
     return (
       <div className="p-5">
-
         <p className="text-sm text-[#737B89]">
           No wallet activity yet.
         </p>
-
       </div>
     );
   }
 
-
-  const recent =
-    [...tradeHistory]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt) -
-          new Date(a.createdAt)
-      )
-      .slice(0, 5);
-
+  const recent = [...tradeHistory]
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt) - new Date(a.createdAt)
+    )
+    .slice(0, 5);
 
   return (
     <div className="divide-y divide-[#1A1E24]">
+      {recent.map((item) => {
+        const id = item._id || item.id;
+        const type = String(item.type || "TRANSACTION").toUpperCase();
+        const isDeposit = type === "DEPOSIT";
+        const isWithdrawal = type === "WITHDRAWAL";
 
-      {recent.map((item) => (
+        const title = isDeposit
+          ? "USDT Deposit"
+          : isWithdrawal
+            ? "USDT Withdrawal"
+            : type === "TRADE"
+              ? "Trade"
+              : "Wallet Transaction";
 
-        <div
-          key={item.id}
-          className="
-            flex
-            items-center
-            justify-between
-            gap-4
-            p-5
-          "
-        >
+        const amountPrefix = isDeposit ? "+" : isWithdrawal ? "-" : "";
+        const status = String(item.status || "PENDING");
 
-          <div className="min-w-0">
+        return (
+          <div
+            key={id}
+            className="flex items-center justify-between gap-4 p-5"
+          >
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium">
+                {title}
+              </p>
 
-            <p className="truncate text-sm font-medium">
-              {item.packageName
-                ? `Auto Trade · ${item.packageName}`
-                : `Trade · ${item.symbol}`}
-            </p>
+              <p className="mt-1 text-xs text-[#737B89]">
+                {formatWalletDate(item.createdAt)}
+              </p>
+            </div>
 
-            <p className="mt-1 text-xs text-[#737B89]">
-              {formatWalletDate(item.createdAt)}
-            </p>
+            <div className="shrink-0 text-right">
+              <p className="text-sm font-medium">
+                {amountPrefix}
+                {Number(item.amount || 0).toFixed(2)} USDT
+              </p>
 
+              <p
+                className={`mt-1 text-xs ${
+                  status === "FAILED"
+                    ? "text-[#F6465D]"
+                    : status === "COMPLETED"
+                      ? "text-[#08B77A]"
+                      : "text-[#F59E0B]"
+                }`}
+              >
+                {status}
+              </p>
+            </div>
           </div>
-
-
-          <div className="shrink-0 text-right">
-
-            <p className="text-sm font-medium">
-              {Number(item.amount || 0).toFixed(2)}
-              {" "}
-              USDT
-            </p>
-
-            <p className="mt-1 text-xs text-[#08B77A]">
-              {item.status || "Completed"}
-            </p>
-
-          </div>
-
-        </div>
-
-      ))}
-
+        );
+      })}
     </div>
   );
 }
-
 
 /* =============================================================
    DATE FORMAT
