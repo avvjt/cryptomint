@@ -8,16 +8,6 @@ import {
 
 const AccountStatusContext = createContext(null);
 
-const DEMO_MODE = true;
-
-const DEMO_DATA = {
-  status: "PENDING",
-  depositAddress:
-    "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-  depositAmount: 0,
-  confirmations: 0,
-  requiredConfirmations: 12,
-};
 
 export function AccountStatusProvider({ children }) {
   const [status, setStatus] = useState("PENDING");
@@ -30,45 +20,86 @@ export function AccountStatusProvider({ children }) {
   const [error, setError] = useState("");
 
   const refreshStatus = useCallback(async () => {
-    try {
-      setError("");
+  try {
+    setError("");
 
-      if (DEMO_MODE) {
-        setStatus(DEMO_DATA.status);
-        setDepositAddress(DEMO_DATA.depositAddress);
-        setDepositAmount(DEMO_DATA.depositAmount);
-        setConfirmations(DEMO_DATA.confirmations);
-        setRequiredConfirmations(DEMO_DATA.requiredConfirmations);
+    const token = localStorage.getItem("token");
 
-        setLoading(false);
-        return;
-      }
-
-      const response = await fetch("/api/account/status", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Unable to fetch account status");
-      }
-
-      const data = await response.json();
-
-      setStatus(data.status || "PENDING");
-      setDepositAddress(data.depositAddress || "");
-      setDepositAmount(Number(data.depositAmount || 0));
-      setConfirmations(Number(data.confirmations || 0));
-      setRequiredConfirmations(
-        Number(data.requiredConfirmations || 12)
-      );
-    } catch (err) {
-      console.error("Account status error:", err);
-      setError(err.message || "Unable to load account status");
-    } finally {
+    if (!token) {
+      setStatus("PENDING");
+      setDepositAddress("");
+      setDepositAmount(0);
+      setConfirmations(0);
       setLoading(false);
+      return;
     }
-  }, []);
+
+    // Fetch user status
+    const userResponse = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/auth/me`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (userResponse.status === 401) {
+      localStorage.removeItem("token");
+      setStatus("PENDING");
+      setDepositAddress("");
+      setLoading(false);
+      return;
+    }
+
+    if (!userResponse.ok) {
+      throw new Error("Unable to fetch account status");
+    }
+
+    const userData = await userResponse.json();
+    const user = userData.user;
+
+    setStatus(user?.accountStatus || "PENDING");
+
+    // Fetch wallet
+    const walletResponse = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL}/api/wallet`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!walletResponse.ok) {
+      throw new Error("Unable to fetch wallet");
+    }
+
+    const walletData = await walletResponse.json();
+
+    const wallet = walletData.wallet;
+
+    // Real deposit address from MongoDB
+    setDepositAddress(wallet?.depositAddress || "");
+
+    // These remain placeholders until blockchain
+    // deposit detection is implemented.
+    setDepositAmount(0);
+    setConfirmations(0);
+    setRequiredConfirmations(12);
+
+  } catch (err) {
+    console.error("Account status error:", err);
+
+    setError(
+      err.message || "Unable to load account status"
+    );
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   useEffect(() => {
     refreshStatus();
