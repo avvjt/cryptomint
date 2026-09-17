@@ -20,6 +20,7 @@ import Assets from "../pages/Assets";
 import GuestRoute from "../layouts/GuestRoute";
 import Wallet from "../pages/Wallet";
 import History from "../pages/History";
+import Admin from "../pages/Admin";
 
 export default function AppRoutes() {
   return (
@@ -47,6 +48,7 @@ export default function AppRoutes() {
           <Route path="/markets/:symbol" element={<MarketDetails />} />
           <Route path="/wallet" element={<Wallet />} />
           <Route path="/history" element={<History />} />
+          <Route path="/admin" element={<Admin />} />
         </Route>
       </Route>
     </Routes>
