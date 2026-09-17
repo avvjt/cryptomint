@@ -1,4 +1,15 @@
 import { useEffect, useState } from "react";
+import {
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  CheckCircle2,
+  Clock3,
+  XCircle,
+  Copy,
+  RefreshCw,
+  ShieldCheck,
+  Wallet,
+} from "lucide-react";
 
 const API = import.meta.env.VITE_API_BASE_URL;
 
@@ -9,6 +20,7 @@ const Admin = () => {
   const [withdrawals, setWithdrawals] = useState([]);
 
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
 
   const token = localStorage.getItem("token");
@@ -17,9 +29,14 @@ const Admin = () => {
   // FETCH ADMIN DATA
   // ==========================================
 
-  const fetchAdminData = async () => {
+  const fetchAdminData = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+
       setError("");
 
       const headers = {
@@ -62,6 +79,7 @@ const Admin = () => {
       );
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -70,7 +88,7 @@ const Admin = () => {
   }, []);
 
   // ==========================================
-  // UPDATE WITHDRAWAL STATUS
+  // UPDATE WITHDRAWAL
   // ==========================================
 
   const updateWithdrawal = async (
@@ -125,8 +143,7 @@ const Admin = () => {
         );
       }
 
-      // Refresh both tables
-      await fetchAdminData();
+      await fetchAdminData(true);
     } catch (error) {
       console.error(
         "Withdrawal update error:",
@@ -141,76 +158,334 @@ const Admin = () => {
   };
 
   // ==========================================
-  // FORMAT DATE
+  // HELPERS
   // ==========================================
 
   const formatDate = (date) => {
     if (!date) return "-";
 
-    return new Date(date).toLocaleString();
+    return new Date(date).toLocaleString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
+
+  const shortAddress = (address, start = 8, end = 6) => {
+    if (!address) return "-";
+
+    if (address.length <= start + end) {
+      return address;
+    }
+
+    return `${address.slice(0, start)}...${address.slice(
+      -end
+    )}`;
+  };
+
+  const copyText = async (text) => {
+    if (!text) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (error) {
+      console.error("Copy failed:", error);
+    }
+  };
+
+  const statusStyle = (status) => {
+    switch (status) {
+      case "CONFIRMED":
+      case "COMPLETED":
+        return {
+          wrapper:
+            "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+          icon: <CheckCircle2 size={14} />,
+        };
+
+      case "PROCESSING":
+      case "PENDING":
+        return {
+          wrapper:
+            "bg-amber-500/10 border-amber-500/20 text-amber-400",
+          icon: <Clock3 size={14} />,
+        };
+
+      case "FAILED":
+        return {
+          wrapper:
+            "bg-red-500/10 border-red-500/20 text-red-400",
+          icon: <XCircle size={14} />,
+        };
+
+      default:
+        return {
+          wrapper:
+            "bg-white/5 border-white/10 text-gray-400",
+          icon: <Clock3 size={14} />,
+        };
+    }
+  };
+
+  // ==========================================
+  // LOADING
+  // ==========================================
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#07090d] text-white flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+
+          <p className="text-sm text-gray-400">
+            Loading admin panel...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // STATS
+  // ==========================================
+
+  const confirmedDeposits = deposits.filter(
+    (item) => item.status === "CONFIRMED"
+  ).length;
+
+  const pendingWithdrawals = withdrawals.filter(
+    (item) =>
+      item.status === "PENDING" ||
+      item.status === "PROCESSING"
+  ).length;
+
+  const totalDeposited = deposits.reduce(
+    (sum, item) => sum + Number(item.amount || 0),
+    0
+  );
+
+  const totalWithdrawn = withdrawals
+    .filter((item) => item.status === "COMPLETED")
+    .reduce(
+      (sum, item) => sum + Number(item.amount || 0),
+      0
+    );
 
   // ==========================================
   // UI
   // ==========================================
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading admin panel...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-[#07090d] text-white px-4 py-6 md:px-8 lg:px-10">
 
-      {/* HEADER */}
+      <div className="max-w-[1600px] mx-auto">
 
-      <div className="max-w-7xl mx-auto">
+        {/* ======================================
+            HEADER
+        ====================================== */}
 
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold">
-            Admin Panel
-          </h1>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-5 mb-8">
 
-          <p className="text-gray-500 mt-1">
-            Manage deposits and withdrawals
-          </p>
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+
+              <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center">
+                <ShieldCheck
+                  size={21}
+                  className="text-white"
+                />
+              </div>
+
+              <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">
+                Admin Panel
+              </h1>
+
+            </div>
+
+            <p className="text-sm text-gray-500">
+              Monitor deposits and manage withdrawal requests.
+            </p>
+          </div>
+
+          <button
+            onClick={() => fetchAdminData(true)}
+            disabled={refreshing}
+            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] transition text-sm text-gray-300 disabled:opacity-50"
+          >
+            <RefreshCw
+              size={16}
+              className={
+                refreshing ? "animate-spin" : ""
+              }
+            />
+
+            Refresh
+          </button>
+
         </div>
 
-        {/* ERROR */}
+        {/* ======================================
+            STATS
+        ====================================== */}
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-7">
+
+          <div className="rounded-2xl border border-white/10 bg-[#0d1117] p-4 md:p-5">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <span className="text-xs text-gray-500">
+                Total Deposits
+              </span>
+
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <ArrowDownToLine
+                  size={16}
+                  className="text-emerald-400"
+                />
+              </div>
+
+            </div>
+
+            <p className="text-xl md:text-2xl font-semibold">
+              {deposits.length}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              {totalDeposited.toFixed(2)} USDT
+            </p>
+
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-[#0d1117] p-4 md:p-5">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <span className="text-xs text-gray-500">
+                Confirmed
+              </span>
+
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                <CheckCircle2
+                  size={16}
+                  className="text-emerald-400"
+                />
+              </div>
+
+            </div>
+
+            <p className="text-xl md:text-2xl font-semibold">
+              {confirmedDeposits}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              Successfully received
+            </p>
+
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-[#0d1117] p-4 md:p-5">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <span className="text-xs text-gray-500">
+                Pending Withdrawals
+              </span>
+
+              <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+                <Clock3
+                  size={16}
+                  className="text-amber-400"
+                />
+              </div>
+
+            </div>
+
+            <p className="text-xl md:text-2xl font-semibold">
+              {pendingWithdrawals}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              Need admin action
+            </p>
+
+          </div>
+
+          <div className="rounded-2xl border border-white/10 bg-[#0d1117] p-4 md:p-5">
+
+            <div className="flex items-center justify-between mb-4">
+
+              <span className="text-xs text-gray-500">
+                Completed Withdrawals
+              </span>
+
+              <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <ArrowUpFromLine
+                  size={16}
+                  className="text-blue-400"
+                />
+              </div>
+
+            </div>
+
+            <p className="text-xl md:text-2xl font-semibold">
+              {totalWithdrawn.toFixed(2)}
+            </p>
+
+            <p className="text-xs text-gray-500 mt-1">
+              USDT paid out
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* ======================================
+            ERROR
+        ====================================== */}
 
         {error && (
-          <div className="mb-5 rounded-lg bg-red-100 px-4 py-3 text-red-700">
+          <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
             {error}
           </div>
         )}
 
-        {/* TABS */}
+        {/* ======================================
+            TABS
+        ====================================== */}
 
-        <div className="flex gap-2 border-b mb-6">
+        <div className="flex items-center gap-1 p-1 rounded-xl border border-white/10 bg-[#0d1117] w-fit mb-6">
 
           <button
             onClick={() => setActiveTab("deposits")}
-            className={`px-5 py-3 font-medium border-b-2 ${
+            className={`flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-lg text-sm font-medium transition ${
               activeTab === "deposits"
-                ? "border-black text-black"
-                : "border-transparent text-gray-500"
+                ? "bg-white text-black shadow-lg"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            Deposits ({deposits.length})
+            <ArrowDownToLine size={16} />
+            Deposits
+            <span className="text-xs opacity-60">
+              {deposits.length}
+            </span>
           </button>
 
           <button
             onClick={() => setActiveTab("withdrawals")}
-            className={`px-5 py-3 font-medium border-b-2 ${
+            className={`flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-lg text-sm font-medium transition ${
               activeTab === "withdrawals"
-                ? "border-black text-black"
-                : "border-transparent text-gray-500"
+                ? "bg-white text-black shadow-lg"
+                : "text-gray-400 hover:text-white hover:bg-white/5"
             }`}
           >
-            Withdrawals ({withdrawals.length})
+            <ArrowUpFromLine size={16} />
+            Withdrawals
+            <span className="text-xs opacity-60">
+              {withdrawals.length}
+            </span>
           </button>
 
         </div>
@@ -220,40 +495,59 @@ const Admin = () => {
         ====================================== */}
 
         {activeTab === "deposits" && (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="rounded-2xl border border-white/10 bg-[#0d1117] overflow-hidden">
+
+            <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+
+              <div>
+                <h2 className="font-medium">
+                  Deposit History
+                </h2>
+
+                <p className="text-xs text-gray-500 mt-1">
+                  Automatic blockchain deposits
+                </p>
+              </div>
+
+              <Wallet
+                size={18}
+                className="text-gray-600"
+              />
+
+            </div>
 
             <div className="overflow-x-auto">
 
               <table className="w-full text-sm">
 
-                <thead className="bg-gray-100">
+                <thead>
+                  <tr className="border-b border-white/10 text-xs text-gray-500">
 
-                  <tr>
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       User
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Amount
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Deposit Address
                     </th>
 
-                    <th className="text-left px-4 py-3">
-                      Tx Hash
+                    <th className="text-left px-5 py-4 font-medium">
+                      Transaction
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Status
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Date
                     </th>
-                  </tr>
 
+                  </tr>
                 </thead>
 
                 <tbody>
@@ -262,60 +556,119 @@ const Admin = () => {
                     <tr>
                       <td
                         colSpan="6"
-                        className="text-center py-10 text-gray-500"
+                        className="text-center py-16 text-gray-500"
                       >
                         No deposits yet
                       </td>
                     </tr>
                   ) : (
-                    deposits.map((deposit) => (
-                      <tr
-                        key={deposit._id}
-                        className="border-t"
-                      >
+                    deposits.map((deposit) => {
+                      const status =
+                        statusStyle(deposit.status);
 
-                        <td className="px-4 py-3">
-                          <div>
-                            <div className="font-medium">
+                      return (
+                        <tr
+                          key={deposit._id}
+                          className="border-b border-white/[0.06] last:border-0 hover:bg-white/[0.02] transition"
+                        >
+
+                          <td className="px-5 py-4">
+
+                            <div className="font-medium text-gray-200">
                               {deposit.user?.fullName ||
-                                "Unknown"}
+                                "Unknown User"}
                             </div>
 
-                            <div className="text-gray-500">
-                              {deposit.user?.email ||
-                                "-"}
+                            <div className="text-xs text-gray-500 mt-1">
+                              {deposit.user?.email || "-"}
                             </div>
-                          </div>
-                        </td>
 
-                        <td className="px-4 py-3 font-medium">
-                          {deposit.amount} USDT
-                        </td>
+                          </td>
 
-                        <td className="px-4 py-3">
-                          <span className="font-mono text-xs">
-                            {deposit.depositAddress}
-                          </span>
-                        </td>
+                          <td className="px-5 py-4">
 
-                        <td className="px-4 py-3">
-                          <span className="font-mono text-xs">
-                            {deposit.txHash}
-                          </span>
-                        </td>
+                            <div className="font-medium text-white">
+                              {Number(
+                                deposit.amount
+                              ).toFixed(4)}
+                            </div>
 
-                        <td className="px-4 py-3">
-                          {deposit.status}
-                        </td>
+                            <div className="text-xs text-gray-500">
+                              USDT · BEP20
+                            </div>
 
-                        <td className="px-4 py-3">
-                          {formatDate(
-                            deposit.createdAt
-                          )}
-                        </td>
+                          </td>
 
-                      </tr>
-                    ))
+                          <td className="px-5 py-4">
+
+                            <div className="flex items-center gap-2">
+
+                              <span className="font-mono text-xs text-gray-400">
+                                {shortAddress(
+                                  deposit.depositAddress
+                                )}
+                              </span>
+
+                              <button
+                                onClick={() =>
+                                  copyText(
+                                    deposit.depositAddress
+                                  )
+                                }
+                                className="text-gray-600 hover:text-white transition"
+                              >
+                                <Copy size={14} />
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                          <td className="px-5 py-4">
+
+                            <div className="flex items-center gap-2">
+
+                              <span className="font-mono text-xs text-gray-400">
+                                {shortAddress(
+                                  deposit.txHash
+                                )}
+                              </span>
+
+                              <button
+                                onClick={() =>
+                                  copyText(
+                                    deposit.txHash
+                                  )
+                                }
+                                className="text-gray-600 hover:text-white transition"
+                              >
+                                <Copy size={14} />
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                          <td className="px-5 py-4">
+
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs ${status.wrapper}`}
+                            >
+                              {status.icon}
+                              {deposit.status}
+                            </span>
+
+                          </td>
+
+                          <td className="px-5 py-4 text-xs text-gray-500 whitespace-nowrap">
+                            {formatDate(
+                              deposit.createdAt
+                            )}
+                          </td>
+
+                        </tr>
+                      );
+                    })
                   )}
 
                 </tbody>
@@ -332,114 +685,166 @@ const Admin = () => {
         ====================================== */}
 
         {activeTab === "withdrawals" && (
-          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="rounded-2xl border border-white/10 bg-[#0d1117] overflow-hidden">
+
+            <div className="px-5 py-4 border-b border-white/10">
+
+              <h2 className="font-medium">
+                Withdrawal Requests
+              </h2>
+
+              <p className="text-xs text-gray-500 mt-1">
+                Review and process user withdrawal requests
+              </p>
+
+            </div>
 
             <div className="overflow-x-auto">
 
               <table className="w-full text-sm">
 
-                <thead className="bg-gray-100">
+                <thead>
+                  <tr className="border-b border-white/10 text-xs text-gray-500">
 
-                  <tr>
-
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       User
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Amount
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Destination
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Status
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Tx Hash
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Date
                     </th>
 
-                    <th className="text-left px-4 py-3">
+                    <th className="text-left px-5 py-4 font-medium">
                       Action
                     </th>
 
                   </tr>
-
                 </thead>
 
                 <tbody>
 
                   {withdrawals.length === 0 ? (
                     <tr>
-
                       <td
                         colSpan="7"
-                        className="text-center py-10 text-gray-500"
+                        className="text-center py-16 text-gray-500"
                       >
-                        No withdrawals yet
+                        No withdrawal requests yet
                       </td>
-
                     </tr>
                   ) : (
-                    withdrawals.map(
-                      (withdrawal) => (
+                    withdrawals.map((withdrawal) => {
+                      const status =
+                        statusStyle(
+                          withdrawal.status
+                        );
+
+                      return (
                         <tr
                           key={withdrawal._id}
-                          className="border-t"
+                          className="border-b border-white/[0.06] last:border-0 hover:bg-white/[0.02] transition"
                         >
 
-                          <td className="px-4 py-3">
-                            <div>
-                              <div className="font-medium">
-                                {withdrawal.user
-                                  ?.fullName ||
-                                  "Unknown"}
-                              </div>
+                          <td className="px-5 py-4">
 
-                              <div className="text-gray-500">
-                                {withdrawal.user
-                                  ?.email || "-"}
-                              </div>
+                            <div className="font-medium text-gray-200">
+                              {withdrawal.user
+                                ?.fullName ||
+                                "Unknown User"}
                             </div>
-                          </td>
 
-                          <td className="px-4 py-3 font-medium">
-                            {withdrawal.amount} USDT
-                          </td>
-
-                          <td className="px-4 py-3">
-                            <span className="font-mono text-xs">
-                              {
-                                withdrawal.destinationAddress
-                              }
-                            </span>
-                          </td>
-
-                          <td className="px-4 py-3">
-                            {withdrawal.status}
-                          </td>
-
-                          <td className="px-4 py-3">
-                            <span className="font-mono text-xs">
-                              {withdrawal.txHash ||
+                            <div className="text-xs text-gray-500 mt-1">
+                              {withdrawal.user?.email ||
                                 "-"}
-                            </span>
+                            </div>
+
                           </td>
 
-                          <td className="px-4 py-3">
+                          <td className="px-5 py-4">
+
+                            <div className="font-medium text-white">
+                              {Number(
+                                withdrawal.amount
+                              ).toFixed(4)}
+                            </div>
+
+                            <div className="text-xs text-gray-500">
+                              USDT · BEP20
+                            </div>
+
+                          </td>
+
+                          <td className="px-5 py-4">
+
+                            <div className="flex items-center gap-2">
+
+                              <span className="font-mono text-xs text-gray-400">
+                                {shortAddress(
+                                  withdrawal.destinationAddress
+                                )}
+                              </span>
+
+                              <button
+                                onClick={() =>
+                                  copyText(
+                                    withdrawal.destinationAddress
+                                  )
+                                }
+                                className="text-gray-600 hover:text-white transition"
+                              >
+                                <Copy size={14} />
+                              </button>
+
+                            </div>
+
+                          </td>
+
+                          <td className="px-5 py-4">
+
+                            <span
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-xs ${status.wrapper}`}
+                            >
+                              {status.icon}
+                              {withdrawal.status}
+                            </span>
+
+                          </td>
+
+                          <td className="px-5 py-4">
+
+                            <span className="font-mono text-xs text-gray-500">
+                              {withdrawal.txHash
+                                ? shortAddress(
+                                    withdrawal.txHash
+                                  )
+                                : "-"}
+                            </span>
+
+                          </td>
+
+                          <td className="px-5 py-4 text-xs text-gray-500 whitespace-nowrap">
                             {formatDate(
                               withdrawal.createdAt
                             )}
                           </td>
 
-                          <td className="px-4 py-3">
+                          <td className="px-5 py-4">
 
                             {withdrawal.status ===
                               "PENDING" && (
@@ -452,9 +857,9 @@ const Admin = () => {
                                       "PROCESSING"
                                     )
                                   }
-                                  className="px-3 py-2 rounded-lg bg-black text-white text-xs"
+                                  className="px-3 py-2 rounded-lg bg-white text-black text-xs font-medium hover:bg-gray-200 transition"
                                 >
-                                  Processing
+                                  Process
                                 </button>
 
                                 <button
@@ -464,9 +869,9 @@ const Admin = () => {
                                       "FAILED"
                                     )
                                   }
-                                  className="px-3 py-2 rounded-lg bg-red-600 text-white text-xs"
+                                  className="px-3 py-2 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition"
                                 >
-                                  Failed
+                                  Fail
                                 </button>
 
                               </div>
@@ -483,9 +888,9 @@ const Admin = () => {
                                       "COMPLETED"
                                     )
                                   }
-                                  className="px-3 py-2 rounded-lg bg-green-600 text-white text-xs"
+                                  className="px-3 py-2 rounded-lg bg-emerald-500 text-black text-xs font-semibold hover:bg-emerald-400 transition"
                                 >
-                                  Completed
+                                  Complete
                                 </button>
 
                                 <button
@@ -495,9 +900,9 @@ const Admin = () => {
                                       "FAILED"
                                     )
                                   }
-                                  className="px-3 py-2 rounded-lg bg-red-600 text-white text-xs"
+                                  className="px-3 py-2 rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 text-xs hover:bg-red-500/20 transition"
                                 >
-                                  Failed
+                                  Fail
                                 </button>
 
                               </div>
@@ -507,7 +912,7 @@ const Admin = () => {
                               "COMPLETED" ||
                               withdrawal.status ===
                                 "FAILED") && (
-                              <span className="text-gray-400 text-xs">
+                              <span className="text-xs text-gray-600">
                                 Final
                               </span>
                             )}
@@ -515,8 +920,8 @@ const Admin = () => {
                           </td>
 
                         </tr>
-                      )
-                    )
+                      );
+                    })
                   )}
 
                 </tbody>
