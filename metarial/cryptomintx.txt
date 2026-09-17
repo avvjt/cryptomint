@@ -1,0 +1,110 @@
+Website Flow:
+
+- signup/login 
+Singup 
+
+        Username
+        Password
+        Email id
+        Email opt
+        referral code if available 
+
+Minimum Deposit 
+ 50 USDT
+
+Minimum withdrawal 
+ 50usdt
+
+Withdrawal Time 24h
+
+
+
+After creating a account depends on user deposit, they will get return everyday
+Example: if user deposit 100 then he will get 1% return of that base amount not compounded intrest/return..if 5000 then 1.5%
+
+Package      Price range(USDT)   Daily yield/return
+Starter         $50 - 200            1%            
+Pro             $201 - 1000          1.5%           
+master          $1001 - 2000         2.5%         
+Elite           $2001 - 4500         3%         
+Empire          $4501 - 10000        3.3%         
+
+
+- Refer bonus-5% (if new user create a account with referral code and deposit x amount, that person who refer will get 5% of x amount 1 time)
+
+
+- Every use have user level, here is the user level decide/increment criteria
+User level increment criteria:
+
+User Level      Level A    Level B+C    Total 
+Level 1           —           —          —
+Level 2           3           5          8
+Level 3           6           20         26
+Level 4          15           35         50
+Level 5          25           70         95
+Level 6          50           150        200
+
+Example: level1 need 3 A-user and 5 B+C-user total 8 User to reached level2
+that way user level will increment and its help them to get more percentage of commission from team income.
+- Below is team income commission structure 
+
+
+Commission Structure:
+User Level      Level A    Level B     Level C
+Level 1           —           —          —
+Level 2          12%         5%         2%
+Level 3          13%         6%         3%
+Level 4          15%         7%         5%
+Level 5          16%         8%         7%
+Level 6          18%         9%         8%
+
+Example: level2 user get 12% Commission from lavel 1 todays earning, 5% of B's todays earning, 2% from C.
+thats the reason referral is impotent for team daily earning/team hierarchy
+
+Team hierarchy:
+lets suppose i reffer someone called x so he is my level A..if x reffer y so that person will become my level B.. and y become level A for x..so thats how team hierarchy continue till level C
+
+
+
+Core System Logic
+• Automatically calculate commissions based on user level and team hierarchy.
+• Commission percentages update dynamically after user upgrades.
+• Separate tracking for Level A, Level B, and Level C team income.
+User Dashboard Features
+• Display total team earnings and separate team incomes.
+• Provide commission history with filters.
+• Show current level, upgrade progress, and benefits.
+
+
+cryptomintx1819_db_user
+Ror6vS0FLXBW2COK
+mongodb+srv://cryptomintx1819_db_user:Ror6vS0FLXBW2COK@cluster0.wt6ztvb.mongodb.net/
+
+
+Deposit BEP20 address
+0x71C7656EC7ab88b098defB751B7401B5f6d8976F
+
+Token /abhi@gmail.com
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNzQ1NWVmZTZmMjRlMGYyMjllMzZiMSIsImlhdCI6MTc4OTM2ODc2MiwiZXhwIjoxNzg5MzcyMzYyfQ.GB_csnDUcUgN0HSyYW7GrDtb3FNqZBFIFglJddV7964
+
+
+
+
+  
+
+
+xpub6FQK9jma9JFqVWF1SKSm4ufgZupio7k8maFYgZsAREKDXE4Sh6HpN9uvPMgy8KZeiSSSFwciXr5wvufvuG7zL3zUkScD4GxBpXbigo88nkg
+
+
+H1fM3MAx.FIQbANdsJcEg0amsAyOZMQ2YbUgs9IpE
+
+
+
+
+
+
+
+
+   
+
+
