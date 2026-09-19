@@ -28,52 +28,54 @@ export default function useDashboard() {
   const [error, setError] =
     useState("");
 
-  const fetchDashboard =
-    useCallback(async () => {
-      try {
-        setLoading(true);
-        setError("");
+  const fetchDashboard = useCallback(async () => {
+  try {
+    setLoading(true);
+    setError("");
 
-        const response =
-          await fetch(
-            `${API_BASE_URL}/api/dashboard`,
-            {
-              method: "GET",
-              headers: getHeaders(),
-            }
-          );
+    console.log(
+      "🔥 DASHBOARD API:",
+      `${API_BASE_URL}/api/dashboard`
+    );
 
-        const data =
-          await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data.message ||
-              "Failed to load dashboard."
-          );
-        }
-
-        setDashboard(
-          data.dashboard || null
-        );
-
-        return data.dashboard;
-      } catch (error) {
-        console.error(
-          "Dashboard API error:",
-          error
-        );
-
-        setError(
-          error.message ||
-            "Failed to load dashboard."
-        );
-
-        return null;
-      } finally {
-        setLoading(false);
+    const response = await fetch(
+      `${API_BASE_URL}/api/dashboard`,
+      {
+        method: "GET",
+        headers: getHeaders(),
       }
-    }, []);
+    );
+
+    const data = await response.json();
+
+    console.log("🔥 DASHBOARD RESPONSE:", data);
+
+    console.log(
+      "🔥 BACKEND AVAILABLE BALANCE:",
+      data?.dashboard?.wallet?.availableBalance
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to load dashboard."
+      );
+    }
+
+    setDashboard(data.dashboard || null);
+
+    return data.dashboard;
+  } catch (error) {
+    console.error("Dashboard API error:", error);
+
+    setError(
+      error.message || "Failed to load dashboard."
+    );
+
+    return null;
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
   useEffect(() => {
     fetchDashboard();

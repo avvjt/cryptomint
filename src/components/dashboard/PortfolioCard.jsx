@@ -6,7 +6,7 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
-import { useDashboard } from "../../hooks/useDashboard";
+import useDashboard from "../../hooks/useDashboard";
 
 export default function PortfolioCard() {
   const { dashboard, loading } = useDashboard();

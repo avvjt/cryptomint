@@ -6,7 +6,7 @@ import {
   History,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useDashboard } from "../../hooks/useDashboard";
+import  useDashboard from "../../hooks/useDashboard";
 import CoinLogo from "../markets/CoinLogo";
 
 function formatMoney(value) {

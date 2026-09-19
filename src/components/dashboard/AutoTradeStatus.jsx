@@ -6,7 +6,7 @@ import {
   LockKeyhole,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useDashboard } from "../../hooks/useDashboard";
+import useDashboard from "../../hooks/useDashboard";
 
 function formatMoney(value) {
   return `$${Number(value || 0).toLocaleString("en-US", {
