@@ -6,7 +6,7 @@ import {
   History,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useTradeWalletContext } from "../../context/TradeWalletContext";
+import { useDashboard } from "../../hooks/useDashboard";
 import CoinLogo from "../markets/CoinLogo";
 
 function formatMoney(value) {
@@ -32,27 +32,43 @@ function formatTime(date) {
 }
 
 function getBaseSymbol(symbol = "") {
-  return symbol.endsWith("USDT")
-    ? symbol.slice(0, -4)
-    : symbol;
+  return symbol.endsWith("USDT") ? symbol.slice(0, -4) : symbol;
 }
 
 export default function RecentActivity() {
   const navigate = useNavigate();
+  const { dashboard, loading } = useDashboard();
 
-  const { tradeHistory = [] } = useTradeWalletContext();
+  const trades = dashboard?.recentTrades || [];
 
-  const recentTrades = [...tradeHistory]
+  const recentTrades = [...trades]
     .sort(
       (a, b) =>
-        new Date(b.createdAt).getTime() -
-        new Date(a.createdAt).getTime()
+        new Date(b.createdAt || b.completedAt).getTime() -
+        new Date(a.createdAt || a.completedAt).getTime()
     )
     .slice(0, 5);
 
+  if (loading) {
+    return (
+      <section className="mt-7">
+        <div className="mb-3">
+          <h2 className="text-[15px] font-semibold text-white">
+            Recent Activity
+          </h2>
+
+          <p className="mt-1 text-[11px] text-[#68717D]">
+            Your latest trading activity
+          </p>
+        </div>
+
+        <div className="h-48 animate-pulse rounded-2xl border border-[#1A1E24] bg-[#0D1014]" />
+      </section>
+    );
+  }
+
   return (
     <section className="mt-7">
-      {/* Header */}
       <div className="mb-3 flex items-center justify-between">
         <div>
           <h2 className="text-[15px] font-semibold text-white">
@@ -64,7 +80,7 @@ export default function RecentActivity() {
           </p>
         </div>
 
-        {tradeHistory.length > 0 && (
+        {recentTrades.length > 0 && (
           <button
             type="button"
             onClick={() => navigate("/trade")}
@@ -76,7 +92,6 @@ export default function RecentActivity() {
         )}
       </div>
 
-      {/* Empty state */}
       {recentTrades.length === 0 ? (
         <div className="rounded-2xl border border-[#1A1E24] bg-[#0D1014] px-5 py-10 text-center">
           <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-xl border border-[#1A1E24] bg-[#11151A]">
@@ -102,24 +117,36 @@ export default function RecentActivity() {
       ) : (
         <div className="overflow-hidden rounded-2xl border border-[#1A1E24] bg-[#0D1014]">
           {recentTrades.map((trade, index) => {
-            const baseSymbol = getBaseSymbol(trade.symbol);
-            const isAutoTrade = trade.type === "Auto Trade";
+            const symbol = trade.symbol || "USDT";
+            const baseSymbol = getBaseSymbol(symbol);
+
+            const isAutoTrade =
+              trade.type === "AUTO" ||
+              trade.type === "Auto Trade";
+
+            const amount =
+              Number(trade.amount) ||
+              Number(trade.baseAmount) ||
+              0;
+
+            const returnAmount =
+              Number(trade.returnAmount) ||
+              Number(trade.earningAmount) ||
+              0;
 
             return (
               <div
-                key={trade.id}
+                key={trade._id || trade.id || index}
                 className={`flex items-center gap-3 px-4 py-4 ${
                   index !== recentTrades.length - 1
                     ? "border-b border-[#1A1E24]"
                     : ""
                 }`}
               >
-                {/* Coin */}
                 <div className="shrink-0">
-                  <CoinLogo symbol={trade.symbol} />
+                  <CoinLogo symbol={symbol} />
                 </div>
 
-                {/* Main info */}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate text-[12px] font-semibold text-white">
@@ -139,19 +166,20 @@ export default function RecentActivity() {
 
                   <div className="mt-1 flex items-center gap-1.5 text-[9px] text-[#59616D]">
                     <Clock3 size={10} />
-                    <span>{formatTime(trade.createdAt)}</span>
+                    <span>
+                      {formatTime(trade.createdAt || trade.completedAt)}
+                    </span>
                   </div>
                 </div>
 
-                {/* Amount */}
                 <div className="text-right">
                   <p className="text-[12px] font-medium text-white">
-                    {formatMoney(trade.amount)}
+                    {formatMoney(amount)}
                   </p>
 
-                  {isAutoTrade && Number(trade.returnAmount || 0) > 0 ? (
+                  {returnAmount > 0 ? (
                     <p className="mt-1 text-[9px] font-medium text-[#08B77A]">
-                      +{formatMoney(trade.returnAmount)}
+                      +{formatMoney(returnAmount)}
                     </p>
                   ) : (
                     <p className="mt-1 text-[9px] text-[#59616D]">
@@ -160,7 +188,6 @@ export default function RecentActivity() {
                   )}
                 </div>
 
-                {/* Type icon */}
                 <div
                   className={`hidden h-8 w-8 shrink-0 items-center justify-center rounded-lg sm:flex ${
                     isAutoTrade
@@ -169,10 +196,7 @@ export default function RecentActivity() {
                   }`}
                 >
                   {isAutoTrade ? (
-                    <Bot
-                      size={14}
-                      className="text-[#F6465D]"
-                    />
+                    <Bot size={14} className="text-[#F6465D]" />
                   ) : (
                     <ArrowUpRight
                       size={14}
