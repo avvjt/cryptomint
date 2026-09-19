@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Copy, Check, Users, TrendingUp, Gift, ChevronRight } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Users,
+  TrendingUp,
+  Gift,
+  ChevronRight,
+  ArrowUpRight,
+} from "lucide-react";
 import { useTeam } from "../hooks/useTeam";
 import { TEAM_COMMISSION_RATES } from "../config/teamConfig";
 
@@ -15,7 +23,6 @@ export default function Team() {
   const [activeLevel, setActiveLevel] = useState("A");
   const [copied, setCopied] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
-  
 
   if (loading && !team) {
     return (
@@ -59,14 +66,47 @@ export default function Team() {
   if (!team) return null;
 
   const {
-    level,
-    referralCode,
-    stats,
-    progress,
-    commission,
-    income,
-    referralBonus,
+    level = 1,
+    referralCode = "",
+    stats = {},
+    progress = {},
+    commission = {},
+    income = {},
+    referralBonus = {},
   } = team;
+
+  // Backend returns A / B / C.
+  // Keep frontend display names levelA / levelB / levelC.
+  const commissionRates = {
+    levelA: Number(
+      commission.A ?? commission.levelA ?? 0
+    ),
+    levelB: Number(
+      commission.B ?? commission.levelB ?? 0
+    ),
+    levelC: Number(
+      commission.C ?? commission.levelC ?? 0
+    ),
+  };
+
+  const safeStats = {
+    total: Number(stats.total || 0),
+    levelA: Number(stats.levelA || 0),
+    levelB: Number(stats.levelB || 0),
+    levelC: Number(stats.levelC || 0),
+  };
+
+  const safeIncome = {
+    today: Number(income.today || 0),
+    levelA: Number(income.levelA || 0),
+    levelB: Number(income.levelB || 0),
+    levelC: Number(income.levelC || 0),
+  };
+
+  const safeReferralBonus = {
+    rate: Number(referralBonus.rate ?? 5),
+    earned: Number(referralBonus.earned || 0),
+  };
 
   const copyReferralCode = async () => {
     try {
@@ -78,22 +118,27 @@ export default function Team() {
         setCopied(false);
       }, 1500);
     } catch {
-      // Clipboard may be unavailable in some environments.
+      // Clipboard may be unavailable.
     }
   };
 
   const handleLevelChange = async (levelName) => {
     setActiveLevel(levelName);
-
     await fetchMembers(levelName);
   };
 
-  const totalRequired = progress?.requiredTotal || 0;
-  const totalMembers = stats?.total || 0;
+  const totalRequired = Number(
+    progress?.requiredTotal || 0
+  );
+
+  const totalMembers = safeStats.total;
 
   const progressPercent =
     totalRequired > 0
-      ? Math.min((totalMembers / totalRequired) * 100, 100)
+      ? Math.min(
+          (totalMembers / totalRequired) * 100,
+          100
+        )
       : 100;
 
   return (
@@ -116,7 +161,6 @@ export default function Team() {
 
           {/* Level */}
           <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
@@ -150,7 +194,7 @@ export default function Team() {
                   </span>
 
                   <span className="font-medium text-gray-300">
-                    {stats.total}/{progress.requiredTotal}
+                    {safeStats.total}/{progress.requiredTotal}
                   </span>
                 </div>
 
@@ -168,8 +212,9 @@ export default function Team() {
                     <p className="text-gray-500">
                       Level A
                     </p>
+
                     <p className="mt-1 font-medium">
-                      {stats.levelA} / {progress.requiredA}
+                      {safeStats.levelA} / {progress.requiredA}
                     </p>
                   </div>
 
@@ -177,8 +222,10 @@ export default function Team() {
                     <p className="text-gray-500">
                       Level B + C
                     </p>
+
                     <p className="mt-1 font-medium">
-                      {stats.levelB + stats.levelC} / {progress.requiredBC}
+                      {safeStats.levelB + safeStats.levelC} /{" "}
+                      {progress.requiredBC}
                     </p>
                   </div>
                 </div>
@@ -198,7 +245,6 @@ export default function Team() {
 
           {/* Team stats */}
           <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
@@ -206,7 +252,7 @@ export default function Team() {
                 </p>
 
                 <p className="mt-2 text-4xl font-semibold">
-                  {stats.total}
+                  {safeStats.total}
                 </p>
               </div>
 
@@ -219,37 +265,33 @@ export default function Team() {
             </div>
 
             <div className="mt-6 grid grid-cols-3 gap-2">
-
               <TeamStat
                 label="Level A"
-                value={stats.levelA}
+                value={safeStats.levelA}
               />
 
               <TeamStat
                 label="Level B"
-                value={stats.levelB}
+                value={safeStats.levelB}
               />
 
               <TeamStat
                 label="Level C"
-                value={stats.levelC}
+                value={safeStats.levelC}
               />
-
             </div>
           </section>
 
           {/* Referral */}
           <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-
             <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
               Referral code
             </p>
 
             <div className="mt-3 flex items-center gap-2">
-
               <div className="min-w-0 flex-1 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-4 py-3">
                 <p className="truncate font-mono text-sm font-medium tracking-wide">
-                  {referralCode}
+                  {referralCode || "—"}
                 </p>
               </div>
 
@@ -264,12 +306,10 @@ export default function Team() {
                   <Copy size={18} />
                 )}
               </button>
-
             </div>
 
             <div className="mt-4 flex items-center justify-between rounded-xl bg-[#0B0E12] p-3">
               <div className="flex items-center gap-3">
-
                 <div className="rounded-lg bg-[#172131] p-2">
                   <Gift
                     size={17}
@@ -286,26 +326,23 @@ export default function Team() {
                     One-time bonus
                   </p>
                 </div>
-
               </div>
 
               <div className="text-right">
                 <p className="text-sm font-semibold">
-                  {referralBonus.rate}%
+                  {safeReferralBonus.rate}%
                 </p>
 
                 <p className="text-xs text-gray-500">
-                  Earned ${referralBonus.earned}
+                  Earned ${safeReferralBonus.earned.toFixed(2)}
                 </p>
               </div>
             </div>
-
           </section>
         </div>
 
         {/* Income */}
         <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
@@ -313,7 +350,7 @@ export default function Team() {
               </p>
 
               <p className="mt-2 text-3xl font-semibold">
-                ${income.today.toFixed(2)}
+                ${safeIncome.today.toFixed(2)}
               </p>
             </div>
 
@@ -323,40 +360,37 @@ export default function Team() {
               </p>
 
               <p className="mt-1 text-sm font-medium">
-                A {commission.levelA}% · B {commission.levelB}% · C{" "}
-                {commission.levelC}%
+                A {commissionRates.levelA}% · B{" "}
+                {commissionRates.levelB}% · C{" "}
+                {commissionRates.levelC}%
               </p>
             </div>
           </div>
 
           <div className="mt-5 grid grid-cols-3 gap-3">
-
             <IncomeItem
               label="Level A"
-              value={income.levelA}
-              rate={commission.levelA}
+              value={safeIncome.levelA}
+              rate={commissionRates.levelA}
             />
 
             <IncomeItem
               label="Level B"
-              value={income.levelB}
-              rate={commission.levelB}
+              value={safeIncome.levelB}
+              rate={commissionRates.levelB}
             />
 
             <IncomeItem
               label="Level C"
-              value={income.levelC}
-              rate={commission.levelC}
+              value={safeIncome.levelC}
+              rate={commissionRates.levelC}
             />
-
           </div>
         </section>
 
         {/* Team members */}
         <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318]">
-
           <div className="border-b border-[#1A1E24] p-5">
-
             <div>
               <h2 className="text-base font-semibold">
                 Team members
@@ -368,29 +402,28 @@ export default function Team() {
             </div>
 
             <div className="mt-4 grid grid-cols-3 rounded-xl bg-[#0B0E12] p-1">
-
               {["A", "B", "C"].map((levelName) => (
                 <button
                   key={levelName}
                   type="button"
-                  onClick={() => handleLevelChange(levelName)}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${activeLevel === levelName
+                  onClick={() =>
+                    handleLevelChange(levelName)
+                  }
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                    activeLevel === levelName
                       ? "bg-[#1A2535] text-white"
                       : "text-gray-500 hover:text-gray-300"
-                    }`}
+                  }`}
                 >
                   Level {levelName}
                 </button>
               ))}
-
             </div>
           </div>
 
           <div className="divide-y divide-[#1A1E24]">
-
             {members.length === 0 ? (
               <div className="px-5 py-12 text-center">
-
                 <Users
                   size={28}
                   className="mx-auto text-gray-600"
@@ -403,24 +436,23 @@ export default function Team() {
                 <p className="mt-1 text-xs text-gray-600">
                   Members will appear here when they join your network.
                 </p>
-
               </div>
             ) : (
               members.map((member) => (
                 <TeamMember
                   key={member.id}
                   member={member}
-                  onClick={() => setSelectedMember(member)}
+                  onClick={() =>
+                    setSelectedMember(member)
+                  }
                 />
               ))
             )}
-
           </div>
         </section>
 
         {/* Commission explanation */}
         <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-base font-semibold">
@@ -439,9 +471,7 @@ export default function Team() {
           </div>
 
           <div className="mt-5 overflow-x-auto">
-
             <table className="w-full min-w-[420px] text-left text-sm">
-
               <thead>
                 <tr className="border-b border-[#1A1E24] text-xs text-gray-500">
                   <th className="pb-3 font-medium">
@@ -463,45 +493,42 @@ export default function Team() {
               </thead>
 
               <tbody>
-                {Object.entries(TEAM_COMMISSION_RATES).map(
-                  ([levelNumber, rates]) => (
-                    <tr
-                      key={levelNumber}
-                      className="border-b border-[#1A1E24] last:border-0"
-                    >
-                      <td className="py-3 font-medium">
-                        Level {levelNumber}
-                      </td>
+                {Object.entries(
+                  TEAM_COMMISSION_RATES
+                ).map(([levelNumber, rates]) => (
+                  <tr
+                    key={levelNumber}
+                    className="border-b border-[#1A1E24] last:border-0"
+                  >
+                    <td className="py-3 font-medium">
+                      Level {levelNumber}
+                    </td>
 
-                      <td className="py-3 text-gray-400">
-                        {rates.A}%
-                      </td>
+                    <td className="py-3 text-gray-400">
+                      {rates.A}%
+                    </td>
 
-                      <td className="py-3 text-gray-400">
-                        {rates.B}%
-                      </td>
+                    <td className="py-3 text-gray-400">
+                      {rates.B}%
+                    </td>
 
-                      <td className="py-3 text-gray-400">
-                        {rates.C}%
-                      </td>
-                    </tr>
-                  )
-                )}
+                    <td className="py-3 text-gray-400">
+                      {rates.C}%
+                    </td>
+                  </tr>
+                ))}
               </tbody>
-
             </table>
           </div>
         </section>
 
         {/* Hierarchy explanation */}
         <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-
           <h2 className="text-base font-semibold">
             How the team hierarchy works
           </h2>
 
           <div className="mt-4 space-y-3">
-
             <HierarchyRow
               level="A"
               text="People you directly refer"
@@ -516,12 +543,10 @@ export default function Team() {
               level="C"
               text="People referred by your Level B members"
             />
-
           </div>
-
         </section>
-
       </div>
+
       {selectedMember && (
         <MemberDetailSheet
           member={selectedMember}
@@ -531,7 +556,6 @@ export default function Team() {
     </main>
   );
 }
-
 
 /* ---------------- Components ---------------- */
 
@@ -549,11 +573,11 @@ function TeamStat({ label, value }) {
   );
 }
 
-
 function IncomeItem({ label, value, rate }) {
+  const safeValue = Number(value || 0);
+
   return (
     <div className="rounded-xl bg-[#0B0E12] p-4">
-
       <div className="flex items-center justify-between">
         <p className="text-xs text-gray-500">
           {label}
@@ -565,13 +589,11 @@ function IncomeItem({ label, value, rate }) {
       </div>
 
       <p className="mt-2 text-lg font-semibold">
-        ${value.toFixed(2)}
+        ${safeValue.toFixed(2)}
       </p>
-
     </div>
   );
 }
-
 
 function TeamMember({ member, onClick }) {
   const initial =
@@ -587,7 +609,6 @@ function TeamMember({ member, onClick }) {
       className="group flex w-full items-center justify-between gap-4 border-b border-[#1A1E24] px-5 py-4 text-left transition last:border-0 hover:bg-[#11161D] active:bg-[#141A22] sm:px-6"
     >
       <div className="flex min-w-0 items-center gap-3">
-
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#1A1E24] bg-[#172131] text-sm font-semibold text-[#4D8DFF]">
           {initial}
         </div>
@@ -601,11 +622,9 @@ function TeamMember({ member, onClick }) {
             @{member.username?.replace(/^@/, "")}
           </p>
         </div>
-
       </div>
 
       <div className="flex shrink-0 items-center gap-3">
-
         <div className="text-right">
           <p className="text-sm font-medium text-gray-300">
             ${earning.toFixed(2)}
@@ -628,7 +647,6 @@ function TeamMember({ member, onClick }) {
           size={15}
           className="text-gray-700 transition group-hover:text-gray-400"
         />
-
       </div>
     </button>
   );
@@ -652,18 +670,13 @@ function MemberDetailSheet({ member, onClose }) {
     >
       <div className="w-full max-w-md overflow-hidden rounded-t-3xl border border-[#1A1E24] bg-[#101318] shadow-2xl sm:rounded-2xl">
 
-        {/* Mobile handle */}
         <div className="flex justify-center pt-3 sm:hidden">
           <div className="h-1 w-10 rounded-full bg-[#2A3038]" />
         </div>
 
-        {/* Header */}
         <div className="border-b border-[#1A1E24] px-5 pb-5 pt-4 sm:p-6">
-
           <div className="flex items-start justify-between">
-
             <div className="flex items-center gap-3">
-
               <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#1A1E24] bg-[#172131] text-base font-semibold text-[#4D8DFF]">
                 {member.name?.charAt(0)?.toUpperCase() || "U"}
               </div>
@@ -677,7 +690,6 @@ function MemberDetailSheet({ member, onClose }) {
                   @{member.username?.replace(/^@/, "")}
                 </p>
               </div>
-
             </div>
 
             <button
@@ -690,17 +702,11 @@ function MemberDetailSheet({ member, onClose }) {
                 ×
               </span>
             </button>
-
           </div>
-
         </div>
 
-        {/* Content */}
         <div className="p-5 sm:p-6">
-
-          {/* Status */}
           <div className="flex items-center justify-between rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-4">
-
             <div>
               <p className="text-[10px] uppercase tracking-[0.15em] text-gray-600">
                 Relationship
@@ -720,12 +726,9 @@ function MemberDetailSheet({ member, onClose }) {
             >
               {member.status}
             </span>
-
           </div>
 
-          {/* Earnings */}
           <div className="mt-3 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-4">
-
             <p className="text-[10px] uppercase tracking-[0.15em] text-gray-600">
               Today's earning
             </p>
@@ -733,12 +736,9 @@ function MemberDetailSheet({ member, onClose }) {
             <p className="mt-2 text-2xl font-semibold tracking-tight">
               ${earning.toFixed(2)}
             </p>
-
           </div>
 
-          {/* Relationship info */}
           <div className="mt-3 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-4">
-
             <p className="text-[10px] uppercase tracking-[0.15em] text-gray-600">
               Team relationship
             </p>
@@ -750,12 +750,9 @@ function MemberDetailSheet({ member, onClose }) {
                   ? "This member was referred by someone in your Level A network."
                   : "This member was referred through your Level B network."}
             </p>
-
           </div>
 
-          {/* Backend-ready information */}
           <div className="mt-3 grid grid-cols-2 gap-3">
-
             <DetailItem
               label="Team level"
               value={`Level ${member.level}`}
@@ -765,14 +762,10 @@ function MemberDetailSheet({ member, onClose }) {
               label="Status"
               value={member.status}
             />
-
           </div>
-
         </div>
 
-        {/* Footer */}
         <div className="border-t border-[#1A1E24] p-5 sm:p-6">
-
           <button
             type="button"
             onClick={onClose}
@@ -780,19 +773,15 @@ function MemberDetailSheet({ member, onClose }) {
           >
             Close
           </button>
-
         </div>
-
       </div>
     </div>
   );
 }
 
-
 function DetailItem({ label, value }) {
   return (
     <div className="rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
-
       <p className="text-[10px] uppercase tracking-wide text-gray-600">
         {label}
       </p>
@@ -800,7 +789,6 @@ function DetailItem({ label, value }) {
       <p className="mt-1.5 text-sm font-medium text-gray-300">
         {value}
       </p>
-
     </div>
   );
 }
@@ -808,7 +796,6 @@ function DetailItem({ label, value }) {
 function HierarchyRow({ level, text }) {
   return (
     <div className="flex items-center gap-3 rounded-xl bg-[#0B0E12] p-3">
-
       <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-[#1A1E24] text-xs font-semibold text-[#4D8DFF]">
         {level}
       </div>
@@ -816,11 +803,9 @@ function HierarchyRow({ level, text }) {
       <p className="text-sm text-gray-400">
         {text}
       </p>
-
     </div>
   );
 }
-
 
 function SkeletonCard() {
   return (
