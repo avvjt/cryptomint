@@ -5,818 +5,469 @@ import {
   useState,
 } from "react";
 
-const WALLET_KEY = "cryptomintx_wallet";
-const HISTORY_KEY = "cryptomintx_trade_history";
-const AUTO_TRADE_KEY = "cryptomintx_auto_trade";
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:3000";
 
-const LOCKED_UNTIL_KEY = "cryptomintx_locked_until";
-const AUTO_TRADE_BASE_KEY =
-  "cryptomintx_auto_trade_base";
-const AUTO_TRADE_RETURN_KEY =
-  "cryptomintx_auto_trade_return";
+const getAuthHeaders = () => {
+  const token =
+    localStorage.getItem("token");
 
-const DEFAULT_BALANCE = 1520.5;
-
-const AUTO_TRADE_LOCK_MS = 5 * 60 * 1000;
-const AUTO_TRADE_COOLDOWN_MS =
-  24 * 60 * 60 * 1000;
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
+};
 
 export default function useTradeWallet() {
   /*
-   * --------------------------------------------------
-   * BALANCE
-   * --------------------------------------------------
-   */
+  |--------------------------------------------------------------------------
+  | WALLET
+  |--------------------------------------------------------------------------
+  */
 
-  const [balance, setBalance] = useState(() => {
-    const saved = localStorage.getItem(WALLET_KEY);
+  const [wallet, setWallet] = useState(null);
 
-    if (saved === null) {
-      return DEFAULT_BALANCE;
-    }
+  const [loading, setLoading] =
+    useState(true);
 
-    const parsed = Number(saved);
+  const [processing, setProcessing] =
+    useState(false);
 
-    return Number.isFinite(parsed)
-      ? parsed
-      : DEFAULT_BALANCE;
-  });
+  const [error, setError] =
+    useState("");
 
   /*
-   * --------------------------------------------------
-   * TRADE HISTORY
-   * --------------------------------------------------
-   */
+  |--------------------------------------------------------------------------
+  | TRADE HISTORY
+  |--------------------------------------------------------------------------
+  */
 
-  const [tradeHistory, setTradeHistory] = useState(
-    () => {
+  const [tradeHistory, setTradeHistory] =
+    useState([]);
+
+  /*
+  |--------------------------------------------------------------------------
+  | LAST TRADE
+  |--------------------------------------------------------------------------
+  */
+
+  const [lastTrade, setLastTrade] =
+    useState(null);
+
+  /*
+  |--------------------------------------------------------------------------
+  | FETCH WALLET
+  |--------------------------------------------------------------------------
+  */
+
+  const fetchWallet = useCallback(
+    async () => {
       try {
-        const saved =
-          localStorage.getItem(HISTORY_KEY);
+        const response =
+          await fetch(
+            `${API_BASE_URL}/api/wallet`,
+            {
+              method: "GET",
+              headers:
+                getAuthHeaders(),
+            }
+          );
 
-        if (!saved) {
-          return [];
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Failed to load wallet."
+          );
         }
 
-        const parsed = JSON.parse(saved);
+        setWallet(
+          data.wallet || null
+        );
 
-        return Array.isArray(parsed)
-          ? parsed
-          : [];
-      } catch {
+        return data.wallet;
+      } catch (err) {
+        console.error(
+          "Wallet fetch error:",
+          err
+        );
+
+        setError(
+          err.message ||
+            "Failed to load wallet."
+        );
+
+        return null;
+      }
+    },
+    []
+  );
+
+  /*
+  |--------------------------------------------------------------------------
+  | FETCH TRADE HISTORY
+  |--------------------------------------------------------------------------
+  */
+
+  const fetchTradeHistory =
+    useCallback(async () => {
+      try {
+        const response =
+          await fetch(
+            `${API_BASE_URL}/api/trade/history`,
+            {
+              method: "GET",
+              headers:
+                getAuthHeaders(),
+            }
+          );
+
+        const data =
+          await response.json();
+
+        if (!response.ok) {
+          throw new Error(
+            data.message ||
+              "Failed to load trade history."
+          );
+        }
+
+        setTradeHistory(
+          Array.isArray(data.trades)
+            ? data.trades
+            : []
+        );
+
+        return data.trades || [];
+      } catch (err) {
+        console.error(
+          "Trade history error:",
+          err
+        );
+
         return [];
       }
-    }
-  );
+    }, []);
 
   /*
-   * --------------------------------------------------
-   * LAST AUTO TRADE
-   * --------------------------------------------------
-   */
-
-  const [lastAutoTrade, setLastAutoTrade] =
-    useState(() => {
-      const saved =
-        localStorage.getItem(AUTO_TRADE_KEY);
-
-      if (!saved) {
-        return null;
-      }
-
-      const parsed = Number(saved);
-
-      return Number.isFinite(parsed)
-        ? parsed
-        : null;
-    });
-
-  /*
-   * --------------------------------------------------
-   * LOCKED UNTIL
-   * --------------------------------------------------
-   */
-
-  const [lockedUntil, setLockedUntil] =
-    useState(() => {
-      const saved =
-        localStorage.getItem(
-          LOCKED_UNTIL_KEY
-        );
-
-      if (!saved) {
-        return null;
-      }
-
-      const parsed = Number(saved);
-
-      if (!Number.isFinite(parsed)) {
-        return null;
-      }
-
-      // Lock already finished.
-      if (parsed <= Date.now()) {
-        localStorage.removeItem(
-          LOCKED_UNTIL_KEY
-        );
-
-        return null;
-      }
-
-      return parsed;
-    });
-
-  /*
-   * --------------------------------------------------
-   * AUTO TRADE BASE AMOUNT
-   * --------------------------------------------------
-   */
-
-  const [autoTradeBase, setAutoTradeBase] =
-    useState(() => {
-      const saved =
-        localStorage.getItem(
-          AUTO_TRADE_BASE_KEY
-        );
-
-      if (!saved) {
-        return null;
-      }
-
-      const parsed = Number(saved);
-
-      return Number.isFinite(parsed)
-        ? parsed
-        : null;
-    });
-
-  /*
-   * --------------------------------------------------
-   * AUTO TRADE RETURN
-   * --------------------------------------------------
-   */
-
-  const [
-    autoTradeReturn,
-    setAutoTradeReturn,
-  ] = useState(() => {
-    const saved =
-      localStorage.getItem(
-        AUTO_TRADE_RETURN_KEY
-      );
-
-    if (!saved) {
-      return null;
-    }
-
-    const parsed = Number(saved);
-
-    return Number.isFinite(parsed)
-      ? parsed
-      : null;
-  });
-
-  /*
-   * --------------------------------------------------
-   * LIVE CLOCK
-   * --------------------------------------------------
-   *
-   * Updates every second.
-   *
-   * Used for:
-   * - Lock countdown
-   * - 24-hour Auto Trade cooldown
-   */
-
-  const [currentTime, setCurrentTime] =
-    useState(Date.now());
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 1000);
-
-    return () => {
-      window.clearInterval(timer);
-    };
-  }, []);
-
-  /*
-   * --------------------------------------------------
-   * SAVE BALANCE
-   * --------------------------------------------------
-   */
-
-  useEffect(() => {
-    localStorage.setItem(
-      WALLET_KEY,
-      String(balance)
-    );
-  }, [balance]);
-
-  /*
-   * --------------------------------------------------
-   * SAVE HISTORY
-   * --------------------------------------------------
-   */
-
-  useEffect(() => {
-    localStorage.setItem(
-      HISTORY_KEY,
-      JSON.stringify(tradeHistory)
-    );
-  }, [tradeHistory]);
-
-  /*
-   * --------------------------------------------------
-   * SAVE LAST AUTO TRADE
-   * --------------------------------------------------
-   */
-
-  useEffect(() => {
-    if (lastAutoTrade) {
-      localStorage.setItem(
-        AUTO_TRADE_KEY,
-        String(lastAutoTrade)
-      );
-    }
-  }, [lastAutoTrade]);
-
-  /*
-   * --------------------------------------------------
-   * SAVE LOCK
-   * --------------------------------------------------
-   */
-
-  useEffect(() => {
-    if (lockedUntil) {
-      localStorage.setItem(
-        LOCKED_UNTIL_KEY,
-        String(lockedUntil)
-      );
-    } else {
-      localStorage.removeItem(
-        LOCKED_UNTIL_KEY
-      );
-    }
-  }, [lockedUntil]);
-
-  /*
-   * --------------------------------------------------
-   * SAVE AUTO TRADE BASE
-   * --------------------------------------------------
-   */
-
-  useEffect(() => {
-    if (
-      autoTradeBase !== null &&
-      Number.isFinite(Number(autoTradeBase))
-    ) {
-      localStorage.setItem(
-        AUTO_TRADE_BASE_KEY,
-        String(autoTradeBase)
-      );
-    } else {
-      localStorage.removeItem(
-        AUTO_TRADE_BASE_KEY
-      );
-    }
-  }, [autoTradeBase]);
-
-  /*
-   * --------------------------------------------------
-   * SAVE AUTO TRADE RETURN
-   * --------------------------------------------------
-   */
-
-  useEffect(() => {
-    if (
-      autoTradeReturn !== null &&
-      Number.isFinite(Number(autoTradeReturn))
-    ) {
-      localStorage.setItem(
-        AUTO_TRADE_RETURN_KEY,
-        String(autoTradeReturn)
-      );
-    } else {
-      localStorage.removeItem(
-        AUTO_TRADE_RETURN_KEY
-      );
-    }
-  }, [autoTradeReturn]);
-
-  /*
-   * --------------------------------------------------
-   * RESTORE AUTO TRADE AFTER 5 MINUTES
-   * --------------------------------------------------
-   *
-   * This survives page refresh.
-   */
-
-  useEffect(() => {
-    if (!lockedUntil) {
-      return;
-    }
-
-    const remaining =
-      lockedUntil - Date.now();
-
-    /*
-     * Lock already finished while page
-     * was closed.
-     */
-
-    if (remaining <= 0) {
-      const base = Number(
-        localStorage.getItem(
-          AUTO_TRADE_BASE_KEY
-        )
-      );
-
-      const profit = Number(
-        localStorage.getItem(
-          AUTO_TRADE_RETURN_KEY
-        )
-      );
-
-      if (
-        Number.isFinite(base) &&
-        Number.isFinite(profit)
-      ) {
-        const restoredBalance =
-          Number(
-            (base + profit).toFixed(2)
-          );
-
-        setBalance(restoredBalance);
-      }
-
-      setLockedUntil(null);
-
-      setAutoTradeBase(null);
-      setAutoTradeReturn(null);
-
-      localStorage.removeItem(
-        AUTO_TRADE_BASE_KEY
-      );
-
-      localStorage.removeItem(
-        AUTO_TRADE_RETURN_KEY
-      );
-
-      return;
-    }
-
-    /*
-     * Wait until exact lock expiry.
-     */
-
-    const timer = window.setTimeout(() => {
-      const base = Number(
-        localStorage.getItem(
-          AUTO_TRADE_BASE_KEY
-        )
-      );
-
-      const profit = Number(
-        localStorage.getItem(
-          AUTO_TRADE_RETURN_KEY
-        )
-      );
-
-      if (
-        Number.isFinite(base) &&
-        Number.isFinite(profit)
-      ) {
-        const restoredBalance =
-          Number(
-            (base + profit).toFixed(2)
-          );
-
-        setBalance(restoredBalance);
-      }
-
-      setLockedUntil(null);
-
-      setAutoTradeBase(null);
-      setAutoTradeReturn(null);
-
-      localStorage.removeItem(
-        AUTO_TRADE_BASE_KEY
-      );
-
-      localStorage.removeItem(
-        AUTO_TRADE_RETURN_KEY
-      );
-    }, remaining);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [lockedUntil]);
-
-  /*
-   * --------------------------------------------------
-   * ADD TRADE HISTORY
-   * --------------------------------------------------
-   */
-
-  const addTrade = useCallback(
-    ({
-      symbol,
-      type,
-      amount,
-      returnAmount = 0,
-      packageName = null,
-    }) => {
-      const trade = {
-        id: `${Date.now()}-${Math.random()
-          .toString(36)
-          .slice(2)}`,
-
-        symbol,
-
-        type,
-
-        amount: Number(amount),
-
-        returnAmount:
-          Number(returnAmount) || 0,
-
-        packageName,
-
-        status: "Completed",
-
-        createdAt: Date.now(),
-      };
-
-      setTradeHistory((prev) => [
-        trade,
-        ...prev,
+  |--------------------------------------------------------------------------
+  | INITIAL LOAD
+  |--------------------------------------------------------------------------
+  */
+
+  const refresh = useCallback(
+    async () => {
+      setLoading(true);
+      setError("");
+
+      await Promise.all([
+        fetchWallet(),
+        fetchTradeHistory(),
       ]);
 
-      return trade;
+      setLoading(false);
     },
-    []
+    [
+      fetchWallet,
+      fetchTradeHistory,
+    ]
   );
 
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
   /*
-   * --------------------------------------------------
-   * NORMAL TRADE
-   * --------------------------------------------------
-   */
+  |--------------------------------------------------------------------------
+  | REAL MANUAL TRADE
+  |--------------------------------------------------------------------------
+  */
 
   const executeTrade = useCallback(
-    ({ symbol, amount }) => {
-      const value = Number(amount);
-
-      if (
-        !Number.isFinite(value) ||
-        value <= 0
-      ) {
+    async ({ symbol } = {}) => {
+      if (processing) {
         return {
           success: false,
           message:
-            "Invalid trade amount.",
+            "A trade is already being processed.",
         };
       }
 
-      /*
-       * Don't allow normal trading while
-       * Auto Trade is active.
-       */
+      setProcessing(true);
+      setError("");
 
-      if (
-        lockedUntil &&
-        lockedUntil > Date.now()
-      ) {
-        return {
-          success: false,
-          message:
-            "Your wallet is currently locked.",
-        };
-      }
+      try {
+        const response =
+          await fetch(
+            `${API_BASE_URL}/api/trade/manual`,
+            {
+              method: "POST",
+              headers:
+                getAuthHeaders(),
+              body: JSON.stringify({
+                symbol:
+                  symbol || null,
+              }),
+            }
+          );
 
-      /*
-       * Balance check.
-       */
+        const data =
+          await response.json();
 
-      if (value > balance) {
-        return {
-          success: false,
-          message:
-            "Insufficient wallet balance.",
-        };
-      }
+        if (!response.ok) {
+          return {
+            success: false,
+            message:
+              data.message ||
+              "Unable to complete trade.",
+          };
+        }
 
-      /*
-       * Deduct balance.
-       */
-
-      setBalance((prev) =>
-        Number(
-          (prev - value).toFixed(2)
-        )
-      );
-
-      /*
-       * Add history.
-       */
-
-      addTrade({
-        symbol,
-        type: "Trade",
-        amount: value,
-      });
-
-      return {
-        success: true,
-      };
-    },
-    [
-      balance,
-      lockedUntil,
-      addTrade,
-    ]
-  );
-
-  /*
-   * --------------------------------------------------
-   * AUTO TRADE
-   * --------------------------------------------------
-   */
-
-  const startAutoTrade = useCallback(
-    ({
-      symbol,
-      amount,
-      packageName,
-      dailyReturn,
-    }) => {
-      const value = Number(amount);
-      const rate = Number(dailyReturn);
-
-      /*
-       * Validate amount.
-       */
-
-      if (
-        !Number.isFinite(value) ||
-        value <= 0
-      ) {
-        return {
-          success: false,
-          message:
-            "Invalid amount.",
-        };
-      }
-
-      /*
-       * Validate return rate.
-       */
-
-      if (
-        !Number.isFinite(rate) ||
-        rate <= 0
-      ) {
-        return {
-          success: false,
-          message:
-            "Invalid Auto Trade return.",
-        };
-      }
-
-      /*
-       * Don't allow another Auto Trade
-       * while current one is processing.
-       */
-
-      if (
-        lockedUntil &&
-        lockedUntil > Date.now()
-      ) {
-        return {
-          success: false,
-          message:
-            "Your wallet is currently being processed.",
-        };
-      }
-
-      /*
-       * Balance check.
-       */
-
-      if (value > balance) {
-        return {
-          success: false,
-          message:
-            "Insufficient wallet balance.",
-        };
-      }
-
-      /*
-       * 24-hour restriction.
-       */
-
-      const now = Date.now();
-
-      if (
-        lastAutoTrade &&
-        now - lastAutoTrade <
-          AUTO_TRADE_COOLDOWN_MS
-      ) {
-        return {
-          success: false,
-          message:
-            "Auto Trade is already used today.",
-        };
-      }
-
-      /*
-       * Calculate fixed return.
-       *
-       * Example:
-       *
-       * $1,000 × 3% = $30
-       *
-       * Final:
-       *
-       * $1,030
-       *
-       * No compounding.
-       */
-
-      const returnAmount =
-        Number(
-          (value * rate).toFixed(2)
+        setLastTrade(
+          data.trade || null
         );
 
-      /*
-       * 5-minute lock.
-       */
+        /*
+         * Backend is the source of truth.
+         * Reload wallet after trade.
+         */
+        await Promise.all([
+          fetchWallet(),
+          fetchTradeHistory(),
+        ]);
 
-      const lockedUntilTime =
-        now + AUTO_TRADE_LOCK_MS;
+        return {
+          success: true,
+          message:
+            data.message ||
+            "Trade completed.",
+          trade: data.trade,
+          earning: data.earning,
+        };
+      } catch (err) {
+        console.error(
+          "Execute trade error:",
+          err
+        );
 
-      /*
-       * Store recovery information.
-       */
-
-      localStorage.setItem(
-        AUTO_TRADE_BASE_KEY,
-        String(value)
-      );
-
-      localStorage.setItem(
-        AUTO_TRADE_RETURN_KEY,
-        String(returnAmount)
-      );
-
-      /*
-       * IMPORTANT:
-       *
-       * Update React state immediately.
-       *
-       * This makes Dashboard and Trade UI
-       * update without refreshing.
-       */
-
-      setAutoTradeBase(value);
-      setAutoTradeReturn(returnAmount);
-
-      /*
-       * Wallet becomes temporarily unavailable.
-       */
-
-      setBalance(0);
-
-      setLockedUntil(
-        lockedUntilTime
-      );
-
-      /*
-       * Mark Auto Trade as used.
-       */
-
-      setLastAutoTrade(now);
-
-      /*
-       * Add history.
-       */
-
-      addTrade({
-        symbol,
-        type: "Auto Trade",
-        amount: value,
-        returnAmount,
-        packageName,
-      });
-
-      return {
-        success: true,
-        returnAmount,
-      };
+        return {
+          success: false,
+          message:
+            err.message ||
+            "Unable to complete trade.",
+        };
+      } finally {
+        setProcessing(false);
+      }
     },
     [
-      balance,
-      lastAutoTrade,
-      lockedUntil,
-      addTrade,
+      processing,
+      fetchWallet,
+      fetchTradeHistory,
     ]
   );
 
   /*
-   * --------------------------------------------------
-   * CAN AUTO TRADE
-   * --------------------------------------------------
-   */
+  |--------------------------------------------------------------------------
+  | REAL AUTO TRADE
+  |--------------------------------------------------------------------------
+  */
 
-  const canAutoTrade = useMemo(() => {
-    if (!lastAutoTrade) {
-      return true;
-    }
+  const startAutoTrade =
+    useCallback(
+      async ({ symbol } = {}) => {
+        if (processing) {
+          return {
+            success: false,
+            message:
+              "A trade is already being processed.",
+          };
+        }
 
-    return (
-      currentTime - lastAutoTrade >=
-      AUTO_TRADE_COOLDOWN_MS
+        setProcessing(true);
+        setError("");
+
+        try {
+          const response =
+            await fetch(
+              `${API_BASE_URL}/api/trade/auto`,
+              {
+                method: "POST",
+                headers:
+                  getAuthHeaders(),
+                body: JSON.stringify({
+                  symbol:
+                    symbol || null,
+                }),
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            return {
+              success: false,
+              message:
+                data.message ||
+                "Unable to start Auto Trade.",
+            };
+          }
+
+          setLastTrade(
+            data.trade || null
+          );
+
+          await Promise.all([
+            fetchWallet(),
+            fetchTradeHistory(),
+          ]);
+
+          return {
+            success: true,
+            message:
+              data.message ||
+              "Auto Trade completed.",
+            trade: data.trade,
+            earning: data.earning,
+          };
+        } catch (err) {
+          console.error(
+            "Auto Trade error:",
+            err
+          );
+
+          return {
+            success: false,
+            message:
+              err.message ||
+              "Unable to start Auto Trade.",
+          };
+        } finally {
+          setProcessing(false);
+        }
+      },
+      [
+        processing,
+        fetchWallet,
+        fetchTradeHistory,
+      ]
     );
-  }, [
-    lastAutoTrade,
-    currentTime,
-  ]);
 
   /*
-   * --------------------------------------------------
-   * DERIVED WALLET STATE
-   * --------------------------------------------------
-   */
+  |--------------------------------------------------------------------------
+  | BALANCES
+  |--------------------------------------------------------------------------
+  */
 
-  const isLocked =
-    Boolean(lockedUntil) &&
-    Number(lockedUntil) > currentTime;
+  const balance = Number(
+    wallet?.availableBalance || 0
+  );
 
-  const numericBalance =
-    Number(balance) || 0;
+  const availableBalance = balance;
 
-  const availableBalance = isLocked
-    ? 0
-    : numericBalance;
-
-  const lockedBalance = isLocked
-    ? numericBalance
-    : 0;
-
-  const lockRemaining = isLocked
-    ? Math.max(
-        0,
-        Number(lockedUntil) -
-          currentTime
-      )
-    : 0;
-
-  /*
-   * --------------------------------------------------
-   * FORMAT LOCK TIMER
-   * --------------------------------------------------
-   */
-
-  const formatDuration = useCallback(
-    (milliseconds) => {
-      const totalSeconds = Math.ceil(
-        Math.max(0, milliseconds) / 1000
-      );
-
-      const minutes = Math.floor(
-        totalSeconds / 60
-      );
-
-      const seconds =
-        totalSeconds % 60;
-
-      return `${String(minutes).padStart(
-        2,
-        "0"
-      )}:${String(seconds).padStart(
-        2,
-        "0"
-      )}`;
-    },
-    []
+  const lockedBalance = Number(
+    wallet?.lockedBalance || 0
   );
 
   /*
-   * --------------------------------------------------
-   * RETURN API
-   * --------------------------------------------------
-   */
+  |--------------------------------------------------------------------------
+  | DAILY TRADE STATUS
+  |--------------------------------------------------------------------------
+  */
+
+  const today = useMemo(() => {
+    return new Date()
+      .toISOString()
+      .slice(0, 10);
+  }, []);
+
+  const todayTrade =
+    tradeHistory.find(
+      (trade) =>
+        trade.date === today &&
+        trade.status ===
+          "COMPLETED"
+    );
+
+  const canAutoTrade =
+    !todayTrade && !processing;
+
+  /*
+  |--------------------------------------------------------------------------
+  | CURRENT LOCK
+  |--------------------------------------------------------------------------
+  |
+  | Your current backend does not create a
+  | 5-minute wallet lock. Therefore don't fake
+  | one in the frontend.
+  |
+  */
+
+  const lockedUntil = null;
+
+  const isLocked = false;
+
+  const lockRemaining = 0;
+
+  const formatDuration =
+    useCallback(
+      (milliseconds) => {
+        const totalSeconds =
+          Math.ceil(
+            Math.max(
+              0,
+              milliseconds
+            ) / 1000
+          );
+
+        const minutes =
+          Math.floor(
+            totalSeconds / 60
+          );
+
+        const seconds =
+          totalSeconds % 60;
+
+        return `${String(
+          minutes
+        ).padStart(
+          2,
+          "0"
+        )}:${String(
+          seconds
+        ).padStart(
+          2,
+          "0"
+        )}`;
+      },
+      []
+    );
+
+  /*
+  |--------------------------------------------------------------------------
+  | RETURN
+  |--------------------------------------------------------------------------
+  */
 
   return {
     /*
      * Wallet
      */
+    wallet,
     balance,
     availableBalance,
     lockedBalance,
+
+    /*
+     * Loading
+     */
+    loading,
+    processing,
+    error,
 
     /*
      * Lock
@@ -830,19 +481,24 @@ export default function useTradeWallet() {
      * History
      */
     tradeHistory,
+    lastTrade,
 
     /*
      * Auto Trade
      */
     canAutoTrade,
-    lastAutoTrade,
-    autoTradeBase,
-    autoTradeReturn,
 
     /*
      * Actions
      */
     executeTrade,
     startAutoTrade,
+
+    /*
+     * Refresh
+     */
+    refresh,
+    fetchWallet,
+    fetchTradeHistory,
   };
 }

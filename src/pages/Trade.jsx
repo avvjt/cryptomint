@@ -86,173 +86,134 @@ function TradeContent() {
 
 
 
-  const handleTrade = () => {
-
-  // Account must be active before trading
+const handleTrade = async () => {
   if (!isActive) {
     setShowActivationModal(true);
     return;
   }
 
   if (Number(balance) <= 0) {
-
     alert(
       "Your wallet balance is currently unavailable."
     );
-
-    return;
-  }
-
-  const result =
-    executeTrade({
-      symbol,
-      amount: Number(balance),
-    });
-
-  if (!result?.success) {
-
-    alert(
-      result?.message ||
-      "Unable to place trade."
-    );
-
     return;
   }
 
   setModal("trade");
+  setProcessing(true);
 
-  window.setTimeout(() => {
+  try {
+    /*
+     * 5-second visual loading.
+     */
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, 5000);
+    });
 
-    setModal(null);
+    /*
+     * REAL backend trade.
+     */
+    const result = await executeTrade({
+      symbol,
+    });
 
-  }, 3000);
+    if (!result?.success) {
+      setModal(null);
 
+      alert(
+        result?.message ||
+          "Unable to complete trade."
+      );
+
+      return;
+    }
+
+    /*
+     * Brief success state.
+     */
+    window.setTimeout(() => {
+      setModal(null);
+    }, 1500);
+  } finally {
+    setProcessing(false);
+  }
 };
 
 
-
-  const handleAutoTrade = () => {
-    // Account must be active before Auto Trade
+ const handleAutoTrade = async () => {
   if (!isActive) {
     setShowActivationModal(true);
     return;
   }
 
-    if (!canAutoTrade) {
+  if (!canAutoTrade) {
+    alert(
+      "Today's trade has already been completed."
+    );
+    return;
+  }
 
-      alert(
-        "Auto Trade has already been used today."
-      );
+  if (
+    lockedUntil &&
+    Number(lockedUntil) > Date.now()
+  ) {
+    alert(
+      "Your wallet is currently being processed."
+    );
+    return;
+  }
 
-      return;
-    }
+  if (Number(balance) <= 0) {
+    alert(
+      "Your wallet balance is unavailable."
+    );
+    return;
+  }
 
-    if (
-      lockedUntil &&
-      Number(lockedUntil) > Date.now()
-    ) {
+  /*
+   * Show the existing 5-second
+   * Auto Trade initialization UI.
+   */
+  setModal("auto");
+  setProcessing(true);
 
-      alert(
-        "Your wallet is currently being processed."
-      );
-
-      return;
-    }
-
-
-    /* No balance */
-
-    if (Number(balance) <= 0) {
-
-      alert(
-        "Your wallet balance is unavailable."
-      );
-
-      return;
-    }
-
-
-    /* Find user's package */
-
-    const selectedPackage =
-      getTradePackage(
-        Number(balance)
-      );
-
-
-    if (!selectedPackage) {
-
-      alert(
-        "Your balance does not match an available package."
-      );
-
-      return;
-    }
-
+  try {
+    /*
+     * Keep the 5-second visual experience.
+     */
+    await new Promise((resolve) => {
+      window.setTimeout(resolve, 5000);
+    });
 
     /*
-     * Show initialization modal
+     * After the loading animation,
+     * perform the REAL backend request.
      */
+    const result = await startAutoTrade({
+      symbol,
+    });
 
-    setModal("auto");
+    if (!result?.success) {
+      setModal(null);
 
-    setProcessing(true);
-
-
-    /*
-     * Simulate 5 second
-     * auto-trade initialization
-     */
-
-    window.setTimeout(() => {
-
-      const result =
-        startAutoTrade({
-
-          symbol,
-
-          amount:
-            Number(balance),
-
-          packageName:
-            selectedPackage.name,
-
-          dailyReturn:
-            selectedPackage.dailyRate,
-
-        });
-
-
-      setProcessing(false);
-
-
-      if (!result?.success) {
-
-        setModal(null);
-
-        alert(
-          result?.message ||
+      alert(
+        result?.message ||
           "Unable to start Auto Trade."
-        );
+      );
 
-        return;
-      }
+      return;
+    }
 
-
-      /*
-       * Keep success state
-       * visible briefly.
-       */
-
-      window.setTimeout(() => {
-
-        setModal(null);
-
-      }, 1500);
-
-    }, 5000);
-
-  };
+    /*
+     * Keep success modal visible briefly.
+     */
+    window.setTimeout(() => {
+      setModal(null);
+    }, 1500);
+  } finally {
+    setProcessing(false);
+  }
+};
 
 
   return (
