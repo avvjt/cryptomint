@@ -6,22 +6,25 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
-import { useTradeWalletContext } from "../../context/TradeWalletContext";
+import { useDashboard } from "../../hooks/useDashboard";
 
 export default function PortfolioCard() {
-  const {
-  balance = 0,
-  availableBalance = 0,
-  lockedBalance = 0,
-  isLocked = false,
-} = useTradeWalletContext();
+  const { dashboard, loading } = useDashboard();
 
   const [hidden, setHidden] = useState(false);
 
- 
+  const wallet = dashboard?.wallet || {};
+
+  const availableBalance = Number(
+    wallet.availableBalance || 0
+  );
+
+  const lockedBalance = Number(
+    wallet.lockedBalance || 0
+  );
 
   const formatMoney = (value) =>
-    Number(value).toLocaleString("en-US", {
+    Number(value || 0).toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
@@ -40,7 +43,6 @@ export default function PortfolioCard() {
         sm:p-6
       "
     >
-      {/* subtle background glow */}
       <div
         className="
           pointer-events-none
@@ -73,10 +75,7 @@ export default function PortfolioCard() {
                 text-[#6EA2FF]
               "
             >
-              <Wallet
-                size={17}
-                strokeWidth={1.8}
-              />
+              <Wallet size={17} strokeWidth={1.8} />
             </div>
 
             <div>
@@ -124,9 +123,7 @@ export default function PortfolioCard() {
               active:scale-95
             "
             aria-label={
-              hidden
-                ? "Show balance"
-                : "Hide balance"
+              hidden ? "Show balance" : "Hide balance"
             }
           >
             {hidden ? (
@@ -161,12 +158,14 @@ export default function PortfolioCard() {
                 sm:text-[38px]
               "
             >
-              {hidden
+              {loading
+                ? "••••••"
+                : hidden
                 ? "••••••"
                 : `$${formatMoney(availableBalance)}`}
             </span>
 
-            {!hidden && (
+            {!hidden && !loading && (
               <span
                 className="
                   text-[13px]
@@ -192,6 +191,7 @@ export default function PortfolioCard() {
             pt-4
           "
         >
+          {/* Available */}
           <div>
             <p
               className="
@@ -214,10 +214,13 @@ export default function PortfolioCard() {
             >
               {hidden
                 ? "••••"
+                : loading
+                ? "—"
                 : `$${formatMoney(availableBalance)}`}
             </p>
           </div>
 
+          {/* Locked */}
           <div className="border-l border-white/[0.06] pl-4">
             <p
               className="
@@ -227,13 +230,11 @@ export default function PortfolioCard() {
                 text-[#606975]
               "
             >
-              {isLocked
-                ? "In Trade"
-                : "Locked"}
+              {lockedBalance > 0 ? "In Trade" : "Locked"}
             </p>
 
             <div className="mt-1 flex items-center gap-1.5">
-              {isLocked && (
+              {lockedBalance > 0 && (
                 <LockKeyhole
                   size={12}
                   className="text-[#F6465D]"
@@ -249,6 +250,8 @@ export default function PortfolioCard() {
               >
                 {hidden
                   ? "••••"
+                  : loading
+                  ? "—"
                   : `$${formatMoney(lockedBalance)}`}
               </p>
             </div>
