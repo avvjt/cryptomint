@@ -1,21 +1,11 @@
 Website Flow:
 
-- signup/login 
-Singup 
-
-        Username
-        Password
-        Email id
-        Email opt
-        referral code if available 
 
 Minimum Deposit 
  50 USDT
 
 Minimum withdrawal 
  50usdt
-
-Withdrawal Time 24h
 
 
 
@@ -63,40 +53,6 @@ thats the reason referral is impotent for team daily earning/team hierarchy
 
 Team hierarchy:
 lets suppose i reffer someone called x so he is my level A..if x reffer y so that person will become my level B.. and y become level A for x..so thats how team hierarchy continue till level C
-
-
-
-Core System Logic
-• Automatically calculate commissions based on user level and team hierarchy.
-• Commission percentages update dynamically after user upgrades.
-• Separate tracking for Level A, Level B, and Level C team income.
-User Dashboard Features
-• Display total team earnings and separate team incomes.
-• Provide commission history with filters.
-• Show current level, upgrade progress, and benefits.
-
-
-cryptomintx1819_db_user
-Ror6vS0FLXBW2COK
-mongodb+srv://cryptomintx1819_db_user:Ror6vS0FLXBW2COK@cluster0.wt6ztvb.mongodb.net/
-
-
-Deposit BEP20 address
-0x71C7656EC7ab88b098defB751B7401B5f6d8976F
-
-Token /abhi@gmail.com
-eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhNzQ1NWVmZTZmMjRlMGYyMjllMzZiMSIsImlhdCI6MTc4OTM2ODc2MiwiZXhwIjoxNzg5MzcyMzYyfQ.GB_csnDUcUgN0HSyYW7GrDtb3FNqZBFIFglJddV7964
-
-
-
-
-  
-
-
-xpub6FQK9jma9JFqVWF1SKSm4ufgZupio7k8maFYgZsAREKDXE4Sh6HpN9uvPMgy8KZeiSSSFwciXr5wvufvuG7zL3zUkScD4GxBpXbigo88nkg
-
-
-H1fM3MAx.FIQbANdsJcEg0amsAyOZMQ2YbUgs9IpE
 
 
 

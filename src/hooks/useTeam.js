@@ -227,16 +227,12 @@ export function useTeam() {
   }, [fetchTeam]);
 
   return {
-    team,
-    members,
-
-    loading,
-    membersLoading,
-
-    error,
-
-    refreshTeam: fetchTeam,
-
-    loadMembers: fetchMembers,
-  };
+  team,
+  members,
+  loading,
+  membersLoading,
+  error,
+  refreshTeam: fetchTeam,
+  fetchMembers,
+};
 }

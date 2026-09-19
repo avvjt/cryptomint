@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Globe,
@@ -23,6 +23,21 @@ export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [referralCode, setReferralCode] = useState("");
+
+
+  useEffect(() => {
+    const params = new URLSearchParams(
+      window.location.search
+    );
+
+    const ref = params.get("ref");
+
+    if (ref) {
+      setReferralCode(ref.trim().toUpperCase());
+      setShowReferral(true);
+    }
+  }, []);
+
 
   // =========================================================
   // UI STATE
@@ -147,7 +162,7 @@ export default function Signup() {
       } else {
         setError(
           data.message ||
-            "Unable to create your account."
+          "Unable to create your account."
         );
       }
     } catch (err) {
@@ -189,8 +204,8 @@ export default function Signup() {
           },
 
           body: JSON.stringify({
-            token:
-              credentialResponse.credential,
+            token: credentialResponse.credential,
+            referralCode: referralCode.trim(),
           }),
         }
       );
@@ -207,7 +222,7 @@ export default function Signup() {
       } else {
         setError(
           data.message ||
-            "Google signup failed."
+          "Google signup failed."
         );
       }
     } catch (err) {
@@ -973,10 +988,9 @@ function SignupPanel({
             font-medium
             transition
 
-            ${
-              loading
-                ? "cursor-not-allowed bg-[#2858A6] text-white/70"
-                : "bg-[#F4F5F7] text-black hover:bg-white active:scale-[.99]"
+            ${loading
+              ? "cursor-not-allowed bg-[#2858A6] text-white/70"
+              : "bg-[#F4F5F7] text-black hover:bg-white active:scale-[.99]"
             }
           `}
         >
@@ -1473,10 +1487,9 @@ function MobileSignupForm({
           font-medium
           transition
 
-          ${
-            loading
-              ? "bg-[#2858A6] text-white/70"
-              : "bg-[#F4F5F7] text-black hover:bg-white"
+          ${loading
+            ? "bg-[#2858A6] text-white/70"
+            : "bg-[#F4F5F7] text-black hover:bg-white"
           }
         `}
       >
