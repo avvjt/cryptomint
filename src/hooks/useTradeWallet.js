@@ -12,6 +12,10 @@ const API_BASE_URL =
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
 
+  if (!token) {
+    return null;
+  }
+
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
@@ -35,11 +39,19 @@ export default function useTradeWallet() {
 
   const fetchWallet = useCallback(async () => {
     try {
+      const headers = getAuthHeaders();
+
+      // User is not logged in
+      if (!headers) {
+        setWallet(null);
+        return null;
+      }
+
       const response = await fetch(
         `${API_BASE_URL}/api/wallet`,
         {
           method: "GET",
-          headers: getAuthHeaders(),
+          headers,
           cache: "no-store",
         }
       );
@@ -47,15 +59,22 @@ export default function useTradeWallet() {
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          setWallet(null);
+          return null;
+        }
+
         throw new Error(
           data?.message ||
             "Failed to load wallet."
         );
       }
 
-      setWallet(data?.wallet || null);
+      const walletData = data?.wallet || null;
 
-      return data?.wallet || null;
+      setWallet(walletData);
+
+      return walletData;
     } catch (err) {
       console.error(
         "Wallet fetch error:",
@@ -80,11 +99,18 @@ export default function useTradeWallet() {
   const fetchTradeHistory = useCallback(
     async () => {
       try {
+        const headers = getAuthHeaders();
+
+        if (!headers) {
+          setTradeHistory([]);
+          return [];
+        }
+
         const response = await fetch(
           `${API_BASE_URL}/api/trade/history`,
           {
             method: "GET",
-            headers: getAuthHeaders(),
+            headers,
             cache: "no-store",
           }
         );
@@ -92,6 +118,11 @@ export default function useTradeWallet() {
         const data = await response.json();
 
         if (!response.ok) {
+          if (response.status === 401) {
+            setTradeHistory([]);
+            return [];
+          }
+
           throw new Error(
             data?.message ||
               "Failed to load trade history."
@@ -126,6 +157,16 @@ export default function useTradeWallet() {
    */
 
   const refresh = useCallback(async () => {
+    const token = localStorage.getItem("token");
+
+    // Not logged in
+    if (!token) {
+      setWallet(null);
+      setTradeHistory([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError("");
 
@@ -162,6 +203,15 @@ export default function useTradeWallet() {
         };
       }
 
+      const headers = getAuthHeaders();
+
+      if (!headers) {
+        return {
+          success: false,
+          message: "Please login first.",
+        };
+      }
+
       setProcessing(true);
       setError("");
 
@@ -170,7 +220,7 @@ export default function useTradeWallet() {
           `${API_BASE_URL}/api/trade/manual`,
           {
             method: "POST",
-            headers: getAuthHeaders(),
+            headers,
             body: JSON.stringify({
               symbol: symbol || null,
             }),
@@ -252,6 +302,15 @@ export default function useTradeWallet() {
         };
       }
 
+      const headers = getAuthHeaders();
+
+      if (!headers) {
+        return {
+          success: false,
+          message: "Please login first.",
+        };
+      }
+
       setProcessing(true);
       setError("");
 
@@ -260,7 +319,7 @@ export default function useTradeWallet() {
           `${API_BASE_URL}/api/trade/auto`,
           {
             method: "POST",
-            headers: getAuthHeaders(),
+            headers,
             body: JSON.stringify({
               symbol: symbol || null,
             }),
@@ -366,11 +425,6 @@ export default function useTradeWallet() {
 
   const canAutoTrade =
     !todayTrade && !processing;
-
-  /*
-   * Backend currently doesn't expose
-   * a timed lock, so don't fake one.
-   */
 
   const lockedUntil = null;
   const isLocked = false;

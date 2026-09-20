@@ -11,6 +11,10 @@ const API_BASE_URL =
 const getHeaders = () => {
   const token = localStorage.getItem("token");
 
+  if (!token) {
+    return null;
+  }
+
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
@@ -35,6 +39,14 @@ export default function useDashboard() {
         );
       }
 
+      const headers = getHeaders();
+
+if (!headers) {
+  setDashboard(null);
+  setLoading(false);
+  return null;
+}
+
       const response = await fetch(
         `${API_BASE_URL}/api/dashboard`,
         {
@@ -46,11 +58,6 @@ export default function useDashboard() {
 
       const data = await response.json();
 
-      console.log(
-        "🔥 DASHBOARD RESPONSE:",
-        data
-      );
-
       if (!response.ok) {
         throw new Error(
           data?.message ||
@@ -61,27 +68,12 @@ export default function useDashboard() {
       const dashboardData =
         data?.dashboard || null;
 
-      console.log(
-        "💰 AVAILABLE BALANCE:",
-        dashboardData?.wallet?.availableBalance
-      );
-
-      console.log(
-        "🔒 LOCKED BALANCE:",
-        dashboardData?.wallet?.lockedBalance
-      );
-
-      console.log(
-        "💰 TOTAL BALANCE:",
-        dashboardData?.wallet?.totalBalance
-      );
-
       setDashboard(dashboardData);
 
       return dashboardData;
     } catch (error) {
       console.error(
-        "❌ Dashboard API error:",
+        " Dashboard API error:",
         error
       );
 
