@@ -10,6 +10,8 @@ import {
   Zap,
 } from "lucide-react";
 
+import { useTradeWalletContext } from "../../context/TradeWalletContext";
+
 const PACKAGES = [
   {
     name: "Starter",
@@ -43,10 +45,6 @@ const PACKAGES = [
   },
 ];
 
-const DEMO_DEPOSIT = 1520.5;
-
-const STORAGE_KEY = "cryptomintx_auto_trade";
-
 function getPackage(amount) {
   return (
     PACKAGES.find(
@@ -57,281 +55,272 @@ function getPackage(amount) {
   );
 }
 
-function getTodayKey() {
-  const date = new Date();
-
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-");
-}
-
-function getStoredState() {
-  try {
-    const saved = localStorage.getItem(
-      STORAGE_KEY
-    );
-
-    if (!saved) {
-      return {
-        deposit: DEMO_DEPOSIT,
-        balance: DEMO_DEPOSIT,
-        lastRun: null,
-        lockedUntil: null,
-        earned: 0,
-      };
-    }
-
-    return JSON.parse(saved);
-  } catch {
-    return {
-      deposit: DEMO_DEPOSIT,
-      balance: DEMO_DEPOSIT,
-      lastRun: null,
-      lockedUntil: null,
-      earned: 0,
-    };
-  }
-}
-
-function saveState(state) {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(state)
-  );
-}
-
 export default function FloatingTradeActions() {
-  const [wallet, setWallet] =
-    useState(getStoredState);
+  /*
+   * ============================================================
+   * BACKEND WALLET
+   * ============================================================
+   *
+   * No localStorage balance.
+   * No DEMO_DEPOSIT.
+   * No fake wallet state.
+   *
+   * Backend is the source of truth.
+   */
+  const {
+    balance,
+    availableBalance,
+    lockedBalance,
+    canAutoTrade,
+    processing,
+    startAutoTrade,
+    executeTrade,
+    refresh,
+  } = useTradeWalletContext();
 
-  const [modal, setModal] =
-    useState(null);
-
-  const [initSeconds, setInitSeconds] =
-    useState(5);
-
-  const [remainingSeconds, setRemainingSeconds] =
-    useState(0);
-
-  const [processing, setProcessing] =
-    useState(false);
-
-  const [completed, setCompleted] =
-    useState(false);
-
-  const packageInfo = useMemo(
-    () => getPackage(wallet.deposit),
-    [wallet.deposit]
+  const walletBalance = Number(
+    availableBalance ?? balance ?? 0
   );
 
+  const walletLockedBalance = Number(
+    lockedBalance || 0
+  );
+
+  const [modal, setModal] = useState(null);
+  const [initSeconds, setInitSeconds] = useState(5);
+  const [completed, setCompleted] = useState(false);
+  const [localProcessing, setLocalProcessing] = useState(false);
+
+  /*
+   * Package is calculated from REAL backend balance.
+   */
+  const packageInfo = useMemo(
+    () => getPackage(walletBalance),
+    [walletBalance]
+  );
+
+  /*
+   * Expected daily return based on backend balance.
+   */
   const dailyReturn = useMemo(() => {
     if (!packageInfo) return 0;
 
     return (
-      wallet.deposit *
+      walletBalance *
       (packageInfo.roi / 100)
     );
-  }, [wallet.deposit, packageInfo]);
+  }, [walletBalance, packageInfo]);
 
   /*
-   * Check locked state on mount and every second.
+   * Backend may expose processing through the hook.
    */
-
-  useEffect(() => {
-    const checkLock = () => {
-      const current =
-        getStoredState();
-
-      if (
-        current.lockedUntil &&
-        Date.now() >=
-          Number(current.lockedUntil)
-      ) {
-        const pkg = getPackage(
-          current.deposit
-        );
-
-        const interest = pkg
-          ? current.deposit *
-            (pkg.roi / 100)
-          : 0;
-
-        const updated = {
-          ...current,
-
-          balance:
-            current.deposit + interest,
-
-          lockedUntil: null,
-
-          earned: interest,
-        };
-
-        saveState(updated);
-
-        setWallet(updated);
-
-        return;
-      }
-
-      setWallet(current);
-
-      if (current.lockedUntil) {
-        const seconds = Math.max(
-          0,
-          Math.ceil(
-            (Number(current.lockedUntil) -
-              Date.now()) /
-              1000
-          )
-        );
-
-        setRemainingSeconds(seconds);
-      } else {
-        setRemainingSeconds(0);
-      }
-    };
-
-    checkLock();
-
-    const interval =
-      setInterval(
-        checkLock,
-        1000
-      );
-
-    return () =>
-      clearInterval(interval);
-  }, []);
+  const isProcessing =
+    processing || localProcessing;
 
   /*
-   * Auto trade initialization:
-   * 5 seconds.
+   * If backend reports locked balance,
+   * don't allow another auto trade.
    */
+  const isLocked =
+    walletLockedBalance > 0;
 
+  /*
+   * ============================================================
+   * 5 SECOND INITIALIZATION
+   * ============================================================
+   *
+   * This is only UI loading.
+   * Money/trade processing happens on the backend.
+   */
   useEffect(() => {
-    if (!processing) return;
-
-    if (initSeconds <= 0) {
-      finishInitialization();
+    if (
+      modal !== "initializing" ||
+      !isProcessing
+    ) {
       return;
     }
 
-    const timer =
-      setTimeout(() => {
-        setInitSeconds(
-          (value) => value - 1
-        );
-      }, 1000);
+    if (initSeconds <= 0) {
+      return;
+    }
 
-    return () =>
-      clearTimeout(timer);
+    const timer = setTimeout(() => {
+      setInitSeconds((value) =>
+        Math.max(value - 1, 0)
+      );
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, [
-    processing,
+    modal,
+    isProcessing,
     initSeconds,
   ]);
 
-  function finishInitialization() {
-    const current =
-      getStoredState();
+  /*
+   * Once the 5-second UI finishes,
+   * send the REAL auto-trade request.
+   */
+  useEffect(() => {
+    if (
+      modal !== "initializing" ||
+      initSeconds > 0 ||
+      !localProcessing
+    ) {
+      return;
+    }
 
-    const lockedUntil =
-      Date.now() +
-      5 * 60 * 1000;
+    let cancelled = false;
 
-    const updated = {
-      ...current,
+    const runAutoTrade = async () => {
+      try {
+        const result = await startAutoTrade({
+          amount: walletBalance,
+          packageName:
+            packageInfo?.name || null,
+          dailyReturn,
+        });
 
-      balance: 0,
+        if (cancelled) return;
 
-      lockedUntil,
+        console.log(
+          "Auto Trade backend response:",
+          result
+        );
 
-      earned: 0,
+        setLocalProcessing(false);
+        setCompleted(true);
+
+        /*
+         * Refresh wallet/trade history from backend.
+         */
+        await refresh();
+
+        setTimeout(() => {
+          if (cancelled) return;
+
+          setCompleted(false);
+          setModal(null);
+        }, 1800);
+      } catch (error) {
+        if (cancelled) return;
+
+        console.error(
+          "Auto Trade failed:",
+          error
+        );
+
+        setLocalProcessing(false);
+        setModal("error");
+      }
     };
 
-    saveState(updated);
+    runAutoTrade();
 
-    setWallet(updated);
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    modal,
+    initSeconds,
+    localProcessing,
+    walletBalance,
+    packageInfo,
+    dailyReturn,
+    startAutoTrade,
+    refresh,
+  ]);
 
-    setRemainingSeconds(
-      5 * 60
-    );
-
-    setProcessing(false);
-
-    setCompleted(true);
-
-    setTimeout(() => {
-      setCompleted(false);
-      setModal(null);
-    }, 1800);
-  }
-
+  /*
+   * ============================================================
+   * AUTO TRADE
+   * ============================================================
+   */
   function handleAutoTrade() {
-    const current =
-      getStoredState();
-
     /*
-     * Still locked.
+     * No sufficient balance.
      */
-
-    if (
-      current.lockedUntil &&
-      Date.now() <
-        Number(current.lockedUntil)
-    ) {
-      setModal("locked");
+    if (walletBalance < 50) {
+      setModal("insufficient");
       return;
     }
 
     /*
-     * Once per day.
+     * Backend says today's trade already happened.
      */
-
-    if (
-      current.lastRun ===
-      getTodayKey()
-    ) {
+    if (!canAutoTrade) {
       setModal("already-run");
       return;
     }
 
     /*
-     * Mark today's run.
+     * Locked balance exists.
      */
-
-    const updated = {
-      ...current,
-
-      lastRun:
-        getTodayKey(),
-    };
-
-    saveState(updated);
-
-    setWallet(updated);
+    if (isLocked) {
+      setModal("locked");
+      return;
+    }
 
     /*
-     * Open initialization modal.
+     * Already processing.
      */
+    if (isProcessing) {
+      return;
+    }
 
+    /*
+     * Start UI initialization.
+     */
     setInitSeconds(5);
-
-    setProcessing(true);
-
     setCompleted(false);
-
+    setLocalProcessing(true);
     setModal("initializing");
   }
 
-  function handleTrade() {
-    setModal("coming-soon");
+  /*
+   * ============================================================
+   * MANUAL TRADE
+   * ============================================================
+   *
+   * Your current backend supports manual trade.
+   */
+  async function handleTrade() {
+    if (walletBalance < 50) {
+      setModal("insufficient");
+      return;
+    }
+
+    try {
+      setLocalProcessing(true);
+      setModal("manual-processing");
+
+      await executeTrade({
+        amount: walletBalance,
+      });
+
+      await refresh();
+
+      setLocalProcessing(false);
+      setCompleted(true);
+      setModal("manual-success");
+
+      setTimeout(() => {
+        setCompleted(false);
+        setModal(null);
+      }, 1800);
+    } catch (error) {
+      console.error(
+        "Manual trade failed:",
+        error
+      );
+
+      setLocalProcessing(false);
+      setModal("error");
+    }
   }
 
   function formatMoney(value) {
-    return Number(value).toLocaleString(
+    return Number(value || 0).toLocaleString(
       "en-US",
       {
         minimumFractionDigits: 2,
@@ -340,36 +329,17 @@ export default function FloatingTradeActions() {
     );
   }
 
-  function formatRemaining(seconds) {
-    const minutes =
-      Math.floor(seconds / 60);
-
-    const secs =
-      seconds % 60;
-
-    return `${String(minutes).padStart(
-      2,
-      "0"
-    )}:${String(secs).padStart(
-      2,
-      "0"
-    )}`;
-  }
-
-  const isLocked =
-    wallet.lockedUntil &&
-    Date.now() <
-      Number(wallet.lockedUntil);
-
-  const alreadyRun =
-    wallet.lastRun ===
-    getTodayKey();
+  /*
+   * ============================================================
+   * UI
+   * ============================================================
+   */
 
   return (
     <>
-      {/* =================================================
+      {/* =====================================================
           FLOATING DESKTOP / MOBILE ACTION BAR
-      ================================================= */}
+      ===================================================== */}
 
       <div
         className="
@@ -377,16 +347,11 @@ export default function FloatingTradeActions() {
           bottom-3
           left-0
           right-0
-
           z-[80]
-
           pointer-events-none
-
           px-3
-
           sm:bottom-5
           sm:px-5
-
           xl:left-1/2
           xl:right-auto
           xl:w-[560px]
@@ -396,18 +361,12 @@ export default function FloatingTradeActions() {
         <div
           className="
             pointer-events-auto
-
             rounded-[22px]
-
             border
             border-[#252B34]
-
             bg-[#090B0E]/95
-
             p-2
-
             shadow-[0_15px_50px_rgba(0,0,0,0.65)]
-
             backdrop-blur-2xl
           "
         >
@@ -418,7 +377,6 @@ export default function FloatingTradeActions() {
               flex
               items-center
               justify-between
-
               px-3
               pb-2
               pt-1
@@ -436,14 +394,10 @@ export default function FloatingTradeActions() {
                   flex
                   h-7
                   w-7
-
                   items-center
                   justify-center
-
                   rounded-full
-
                   bg-[#1D66FF]/10
-
                   text-[#4D8DFF]
                 "
               >
@@ -469,9 +423,7 @@ export default function FloatingTradeActions() {
                     text-white
                   "
                 >
-                  {formatMoney(
-                    wallet.balance
-                  )}{" "}
+                  {formatMoney(walletBalance)}{" "}
                   <span className="text-[#69727E]">
                     USDT
                   </span>
@@ -500,7 +452,6 @@ export default function FloatingTradeActions() {
                   items-center
                   justify-end
                   gap-1
-
                   text-[11px]
                   font-medium
                   text-[#00C076]
@@ -523,31 +474,28 @@ export default function FloatingTradeActions() {
               gap-2
             "
           >
-            {/* Small grid-like action */}
+            {/* Small Trade Icon */}
 
             <button
               type="button"
+              onClick={handleTrade}
+              disabled={isProcessing}
               className="
                 hidden
                 h-[48px]
                 w-[46px]
-
                 shrink-0
-
                 flex-col
                 items-center
                 justify-center
                 gap-1
-
                 rounded-full
-
                 text-[#68717D]
-
                 transition
-
                 hover:bg-[#15191F]
                 hover:text-white
-
+                disabled:cursor-not-allowed
+                disabled:opacity-40
                 sm:flex
               "
             >
@@ -563,29 +511,29 @@ export default function FloatingTradeActions() {
             <button
               type="button"
               onClick={handleTrade}
+              disabled={
+                isProcessing ||
+                walletBalance < 50
+              }
               className="
                 h-[48px]
-
                 flex-1
-
                 rounded-full
-
                 bg-[#08B77A]
-
                 text-[14px]
                 font-semibold
                 text-white
-
                 shadow-[0_5px_20px_rgba(8,183,122,0.18)]
-
                 transition-all
-
                 hover:bg-[#09C985]
-
                 active:scale-[0.98]
+                disabled:cursor-not-allowed
+                disabled:opacity-45
               "
             >
-              Trade
+              {isProcessing
+                ? "Processing..."
+                : "Trade"}
             </button>
 
             {/* Auto Trade */}
@@ -594,35 +542,25 @@ export default function FloatingTradeActions() {
               type="button"
               onClick={handleAutoTrade}
               disabled={
-                processing ||
+                isProcessing ||
                 isLocked ||
-                alreadyRun
+                !canAutoTrade ||
+                walletBalance < 50
               }
               className="
                 relative
-
                 h-[48px]
-
                 flex-1
-
                 overflow-hidden
-
                 rounded-full
-
                 bg-[#2157FF]
-
                 text-[14px]
                 font-semibold
                 text-white
-
                 shadow-[0_5px_20px_rgba(33,87,255,0.22)]
-
                 transition-all
-
                 hover:bg-[#326AFF]
-
                 active:scale-[0.98]
-
                 disabled:cursor-not-allowed
                 disabled:opacity-45
               "
@@ -637,11 +575,11 @@ export default function FloatingTradeActions() {
               >
                 <Bot size={16} />
 
-                {isLocked
-                  ? formatRemaining(
-                      remainingSeconds
-                    )
-                  : alreadyRun
+                {isProcessing
+                  ? "Processing..."
+                  : isLocked
+                  ? "Locked"
+                  : !canAutoTrade
                   ? "Done Today"
                   : "Auto Trade"}
               </span>
@@ -650,111 +588,29 @@ export default function FloatingTradeActions() {
         </div>
       </div>
 
-      {/* =================================================
+      {/* =====================================================
           MODALS
-      ================================================= */}
+      ===================================================== */}
 
       {modal && (
         <div
           className="
             fixed
             inset-0
-
             z-[100]
-
             flex
             items-center
             justify-center
-
             bg-black/75
-
             px-5
-
             backdrop-blur-md
           "
         >
-          {/* COMING SOON */}
+          {/* =================================================
+              INITIALIZING
+          ================================================= */}
 
-          {modal ===
-            "coming-soon" && (
-            <ModalShell
-              onClose={() =>
-                setModal(null)
-              }
-            >
-              <div
-                className="
-                  mx-auto
-                  flex
-                  h-14
-                  w-14
-
-                  items-center
-                  justify-center
-
-                  rounded-2xl
-
-                  bg-[#08B77A]/10
-
-                  text-[#08B77A]
-                "
-              >
-                <Zap size={26} />
-              </div>
-
-              <h2
-                className="
-                  mt-5
-                  text-center
-                  text-xl
-                  font-bold
-                  text-white
-                "
-              >
-                Trading is coming
-                soon
-              </h2>
-
-              <p
-                className="
-                  mt-2
-                  text-center
-                  text-sm
-                  leading-6
-                  text-[#68717D]
-                "
-              >
-                Live trading functionality
-                will be available soon.
-              </p>
-
-              <button
-                onClick={() =>
-                  setModal(null)
-                }
-                className="
-                  mt-6
-                  h-11
-                  w-full
-
-                  rounded-full
-
-                  bg-[#08B77A]
-
-                  text-sm
-                  font-semibold
-                  text-white
-                "
-              >
-                Okay
-              </button>
-            </ModalShell>
-          )}
-
-          {/* INITIALIZATION */}
-
-          {modal ===
-            "initializing" && (
+          {modal === "initializing" && (
             <ModalShell>
               {!completed ? (
                 <>
@@ -764,19 +620,13 @@ export default function FloatingTradeActions() {
                       flex
                       h-16
                       w-16
-
                       items-center
                       justify-center
-
                       rounded-full
-
                       border
                       border-[#2157FF]/30
-
                       bg-[#2157FF]/10
-
                       text-[#4D8DFF]
-
                       animate-pulse
                     "
                   >
@@ -789,10 +639,10 @@ export default function FloatingTradeActions() {
                       text-center
                       text-xl
                       font-bold
+                      text-white
                     "
                   >
-                    Initializing Auto
-                    Trade
+                    Initializing Auto Trade
                   </h2>
 
                   <p
@@ -811,7 +661,6 @@ export default function FloatingTradeActions() {
                   <div
                     className="
                       mt-6
-
                       flex
                       items-center
                       justify-center
@@ -822,15 +671,11 @@ export default function FloatingTradeActions() {
                         flex
                         h-16
                         w-16
-
                         items-center
                         justify-center
-
                         rounded-full
-
                         border
                         border-[#2157FF]
-
                         text-lg
                         font-bold
                         text-[#4D8DFF]
@@ -853,63 +698,17 @@ export default function FloatingTradeActions() {
                 </>
               ) : (
                 <>
-                  <div
-                    className="
-                      mx-auto
-                      flex
-                      h-16
-                      w-16
-
-                      items-center
-                      justify-center
-
-                      rounded-full
-
-                      bg-[#00C076]/10
-
-                      text-[#00C076]
-                    "
-                  >
-                    <CheckCircle2
-                      size={32}
-                    />
-                  </div>
-
-                  <h2
-                    className="
-                      mt-5
-                      text-center
-                      text-xl
-                      font-bold
-                    "
-                  >
-                    Auto Trade Started
-                  </h2>
-
-                  <p
-                    className="
-                      mt-2
-                      text-center
-                      text-sm
-                      leading-6
-                      text-[#68717D]
-                    "
-                  >
-                    Your balance is temporarily
-                    locked while the trade is
-                    being processed.
-                  </p>
+                  <SuccessContent
+                    title="Auto Trade Started"
+                    description="Your auto trade has been successfully processed."
+                  />
 
                   <div
                     className="
                       mt-5
-
                       rounded-2xl
-
                       bg-[#11151B]
-
                       p-4
-
                       text-center
                     "
                   >
@@ -925,11 +724,7 @@ export default function FloatingTradeActions() {
                         text-[#00C076]
                       "
                     >
-                      +
-                      {formatMoney(
-                        dailyReturn
-                      )}{" "}
-                      USDT
+                      +{formatMoney(dailyReturn)} USDT
                     </p>
                   </div>
                 </>
@@ -937,14 +732,78 @@ export default function FloatingTradeActions() {
             </ModalShell>
           )}
 
-          {/* LOCKED */}
+          {/* =================================================
+              MANUAL PROCESSING
+          ================================================= */}
 
-          {modal ===
-            "locked" && (
+          {modal === "manual-processing" && (
+            <ModalShell>
+              <div
+                className="
+                  mx-auto
+                  flex
+                  h-16
+                  w-16
+                  items-center
+                  justify-center
+                  rounded-full
+                  border
+                  border-[#08B77A]/30
+                  bg-[#08B77A]/10
+                  text-[#08B77A]
+                  animate-pulse
+                "
+              >
+                <Zap size={28} />
+              </div>
+
+              <h2
+                className="
+                  mt-5
+                  text-center
+                  text-xl
+                  font-bold
+                  text-white
+                "
+              >
+                Processing Trade
+              </h2>
+
+              <p
+                className="
+                  mt-2
+                  text-center
+                  text-sm
+                  leading-6
+                  text-[#68717D]
+                "
+              >
+                Your trade request is being
+                processed by the server.
+              </p>
+            </ModalShell>
+          )}
+
+          {/* =================================================
+              MANUAL SUCCESS
+          ================================================= */}
+
+          {modal === "manual-success" && (
+            <ModalShell>
+              <SuccessContent
+                title="Trade Completed"
+                description="Your trade was successfully processed."
+              />
+            </ModalShell>
+          )}
+
+          {/* =================================================
+              LOCKED
+          ================================================= */}
+
+          {modal === "locked" && (
             <ModalShell
-              onClose={() =>
-                setModal(null)
-              }
+              onClose={() => setModal(null)}
             >
               <div
                 className="
@@ -952,14 +811,10 @@ export default function FloatingTradeActions() {
                   flex
                   h-14
                   w-14
-
                   items-center
                   justify-center
-
                   rounded-2xl
-
                   bg-[#F6C344]/10
-
                   text-[#F6C344]
                 "
               >
@@ -972,6 +827,7 @@ export default function FloatingTradeActions() {
                   text-center
                   text-xl
                   font-bold
+                  text-white
                 "
               >
                 Auto Trade in Progress
@@ -986,8 +842,8 @@ export default function FloatingTradeActions() {
                   text-[#68717D]
                 "
               >
-                Your balance is currently
-                locked.
+                Your balance currently has
+                funds locked for processing.
               </p>
 
               <div
@@ -1000,7 +856,7 @@ export default function FloatingTradeActions() {
                 "
               >
                 <p className="text-xs text-[#68717D]">
-                  Remaining Time
+                  Locked Balance
                 </p>
 
                 <p
@@ -1011,25 +867,21 @@ export default function FloatingTradeActions() {
                     text-white
                   "
                 >
-                  {formatRemaining(
-                    remainingSeconds
-                  )}
+                  {formatMoney(
+                    walletLockedBalance
+                  )}{" "}
+                  USDT
                 </p>
               </div>
 
               <button
-                onClick={() =>
-                  setModal(null)
-                }
+                onClick={() => setModal(null)}
                 className="
                   mt-5
                   h-11
                   w-full
-
                   rounded-full
-
                   bg-[#171B22]
-
                   text-sm
                   font-semibold
                   text-white
@@ -1040,14 +892,13 @@ export default function FloatingTradeActions() {
             </ModalShell>
           )}
 
-          {/* ALREADY RUN */}
+          {/* =================================================
+              ALREADY RUN
+          ================================================= */}
 
-          {modal ===
-            "already-run" && (
+          {modal === "already-run" && (
             <ModalShell
-              onClose={() =>
-                setModal(null)
-              }
+              onClose={() => setModal(null)}
             >
               <div
                 className="
@@ -1055,14 +906,10 @@ export default function FloatingTradeActions() {
                   flex
                   h-14
                   w-14
-
                   items-center
                   justify-center
-
                   rounded-2xl
-
                   bg-[#2157FF]/10
-
                   text-[#4D8DFF]
                 "
               >
@@ -1075,6 +922,7 @@ export default function FloatingTradeActions() {
                   text-center
                   text-xl
                   font-bold
+                  text-white
                 "
               >
                 Already Completed
@@ -1094,23 +942,166 @@ export default function FloatingTradeActions() {
               </p>
 
               <button
-                onClick={() =>
-                  setModal(null)
-                }
+                onClick={() => setModal(null)}
                 className="
                   mt-6
                   h-11
                   w-full
-
                   rounded-full
-
                   bg-[#2157FF]
-
                   text-sm
                   font-semibold
+                  text-white
                 "
               >
                 Okay
+              </button>
+            </ModalShell>
+          )}
+
+          {/* =================================================
+              INSUFFICIENT BALANCE
+          ================================================= */}
+
+          {modal === "insufficient" && (
+            <ModalShell
+              onClose={() => setModal(null)}
+            >
+              <div
+                className="
+                  mx-auto
+                  flex
+                  h-14
+                  w-14
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  bg-[#F6C344]/10
+                  text-[#F6C344]
+                "
+              >
+                <Wallet size={26} />
+              </div>
+
+              <h2
+                className="
+                  mt-5
+                  text-center
+                  text-xl
+                  font-bold
+                  text-white
+                "
+              >
+                Insufficient Balance
+              </h2>
+
+              <p
+                className="
+                  mt-2
+                  text-center
+                  text-sm
+                  leading-6
+                  text-[#68717D]
+                "
+              >
+                You need at least 50 USDT
+                available to start a trade.
+              </p>
+
+              <p
+                className="
+                  mt-4
+                  text-center
+                  text-sm
+                  font-semibold
+                  text-white
+                "
+              >
+                Available:{" "}
+                {formatMoney(walletBalance)} USDT
+              </p>
+
+              <button
+                onClick={() => setModal(null)}
+                className="
+                  mt-6
+                  h-11
+                  w-full
+                  rounded-full
+                  bg-[#2157FF]
+                  text-sm
+                  font-semibold
+                  text-white
+                "
+              >
+                Okay
+              </button>
+            </ModalShell>
+          )}
+
+          {/* =================================================
+              ERROR
+          ================================================= */}
+
+          {modal === "error" && (
+            <ModalShell
+              onClose={() => setModal(null)}
+            >
+              <div
+                className="
+                  mx-auto
+                  flex
+                  h-14
+                  w-14
+                  items-center
+                  justify-center
+                  rounded-2xl
+                  bg-red-500/10
+                  text-red-400
+                "
+              >
+                <X size={26} />
+              </div>
+
+              <h2
+                className="
+                  mt-5
+                  text-center
+                  text-xl
+                  font-bold
+                  text-white
+                "
+              >
+                Trade Failed
+              </h2>
+
+              <p
+                className="
+                  mt-2
+                  text-center
+                  text-sm
+                  leading-6
+                  text-[#68717D]
+                "
+              >
+                The server could not process
+                your trade request.
+              </p>
+
+              <button
+                onClick={() => setModal(null)}
+                className="
+                  mt-6
+                  h-11
+                  w-full
+                  rounded-full
+                  bg-[#171B22]
+                  text-sm
+                  font-semibold
+                  text-white
+                "
+              >
+                Close
               </button>
             </ModalShell>
           )}
@@ -1120,6 +1111,58 @@ export default function FloatingTradeActions() {
   );
 }
 
+/* =====================================================
+   SUCCESS CONTENT
+===================================================== */
+
+function SuccessContent({
+  title,
+  description,
+}) {
+  return (
+    <>
+      <div
+        className="
+          mx-auto
+          flex
+          h-16
+          w-16
+          items-center
+          justify-center
+          rounded-full
+          bg-[#00C076]/10
+          text-[#00C076]
+        "
+      >
+        <CheckCircle2 size={32} />
+      </div>
+
+      <h2
+        className="
+          mt-5
+          text-center
+          text-xl
+          font-bold
+          text-white
+        "
+      >
+        {title}
+      </h2>
+
+      <p
+        className="
+          mt-2
+          text-center
+          text-sm
+          leading-6
+          text-[#68717D]
+        "
+      >
+        {description}
+      </p>
+    </>
+  );
+}
 
 /* =====================================================
    MODAL SHELL
@@ -1133,19 +1176,13 @@ function ModalShell({
     <div
       className="
         relative
-
         w-full
         max-w-[380px]
-
         rounded-[28px]
-
         border
         border-[#252B34]
-
         bg-[#0B0E11]
-
         p-6
-
         shadow-[0_25px_100px_rgba(0,0,0,0.7)]
       "
     >
@@ -1157,20 +1194,14 @@ function ModalShell({
             absolute
             right-4
             top-4
-
             flex
             h-8
             w-8
-
             items-center
             justify-center
-
             rounded-full
-
             text-[#68717D]
-
             transition
-
             hover:bg-[#171B22]
             hover:text-white
           "

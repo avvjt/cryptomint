@@ -1,31 +1,22 @@
-const withdraw = {
+import { useTradeWalletContext } from "../context/TradeWalletContext";
 
-  available: 1520.50,
+export const WITHDRAWAL_MINIMUM = 50;
 
-  minimum: 50,
-
-  history: [
-
-    {
-      id: 1,
-      amount: 100,
-      network: "TRC20",
-      address: "TF8.....k29",
-      status: "Completed",
-      date: "2026-08-01",
-    },
-
-    {
-      id: 2,
-      amount: 250,
-      network: "BEP20",
-      address: "0x8.....9Ab",
-      status: "Pending",
-      date: "2026-08-03",
-    },
-
-  ],
-
+export const WITHDRAWAL_FEES = {
+  TRC20: 1,
+  BEP20: 0.3,
+  ERC20: 8,
 };
 
-export default withdraw;
+export function useWithdrawData() {
+  const {
+    availableBalance,
+    loading,
+  } = useTradeWalletContext();
+
+  return {
+    available: Number(availableBalance || 0),
+    minimum: WITHDRAWAL_MINIMUM,
+    loading,
+  };
+}

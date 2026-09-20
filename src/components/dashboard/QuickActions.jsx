@@ -33,7 +33,7 @@ export default function QuickActions() {
   const navigate = useNavigate();
 
   return (
-    <section className="grid grid-cols-4 gap-2">
+    <section className="grid grid-cols-4 gap-2 my-4">
       {actions.map((action) => {
         const Icon = action.icon;
 

@@ -1,382 +1,155 @@
-import { useMemo, useState } from "react";
-import {
-  ArrowDownCircle,
-  ArrowUpCircle,
-  Wallet,
-  Coins,
-} from "lucide-react";
+import { useState } from "react";
+import { useTradeWalletContext } from "../../context/TradeWalletContext";
 
 const packages = [
   {
     name: "Starter",
     min: 50,
     max: 200,
-    roi: 1,
+    rate: 1,
   },
   {
     name: "Pro",
     min: 201,
     max: 1000,
-    roi: 1.5,
+    rate: 1.5,
   },
   {
     name: "Master",
     min: 1001,
     max: 2000,
-    roi: 2.5,
+    rate: 2.5,
   },
   {
     name: "Elite",
     min: 2001,
     max: 4500,
-    roi: 3,
+    rate: 3,
   },
   {
     name: "Empire",
     min: 4501,
     max: 10000,
-    roi: 3.3,
+    rate: 3.3,
   },
 ];
 
 export default function BuySellPanel() {
-
-  const [tab, setTab] = useState("Deposit");
+  const { availableBalance, loading } = useTradeWalletContext();
 
   const [amount, setAmount] = useState("");
 
-  const selected = useMemo(() => {
+  const balance = Number(availableBalance || 0);
 
-    const value = Number(amount);
+  const formatBalance = (value) =>
+    Number(value || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
 
-    return packages.find(
-      (p) => value >= p.min && value <= p.max
-    );
+  const selectedPackage = packages.find(
+    (pkg) => balance >= pkg.min && balance <= pkg.max
+  );
 
-  }, [amount]);
-
-  const dailyIncome = useMemo(() => {
-
-    if (!selected) return 0;
-
-    return (
-      Number(amount) *
-      (selected.roi / 100)
-    );
-
-  }, [amount, selected]);
+  const handleMax = () => {
+    if (balance > 0) {
+      setAmount(balance.toFixed(2));
+    }
+  };
 
   return (
+    <div className="rounded-2xl border border-white/10 bg-[#111419] p-5">
+      {/* Header */}
+      <div className="mb-5 flex items-center justify-between">
+        <div>
+          <p className="text-sm text-gray-400">Wallet Balance</p>
 
-    <section
-      className="
-      rounded-[32px]
-
-      border
-      border-white/5
-
-      bg-gradient-to-br
-      from-[#111318]
-      to-[#0D1119]
-
-      p-6
-      "
-    >
-
-      {/* Tabs */}
-
-      <div className="grid grid-cols-2 gap-3">
+          <h3 className="mt-1 text-xl font-bold text-white">
+            {loading ? "Loading..." : `${formatBalance(balance)} USDT`}
+          </h3>
+        </div>
 
         <button
-          onClick={() => setTab("Deposit")}
-          className={`
-          rounded-2xl
-
-          py-3
-
-          font-semibold
-
-          transition
-
-          ${
-            tab === "Deposit"
-
-              ? "bg-[#1D66FF]"
-
-              : "bg-[#171B22]"
-          }
-          `}
+          type="button"
+          onClick={handleMax}
+          disabled={loading || balance <= 0}
+          className="rounded-lg border border-white/10 px-3 py-1.5 text-xs font-semibold text-gray-300 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
         >
-
-          Deposit
-
+          MAX
         </button>
-
-        <button
-          onClick={() => setTab("Withdraw")}
-          className={`
-          rounded-2xl
-
-          py-3
-
-          font-semibold
-
-          transition
-
-          ${
-            tab === "Withdraw"
-
-              ? "bg-red-500"
-
-              : "bg-[#171B22]"
-          }
-          `}
-        >
-
-          Withdraw
-
-        </button>
-
       </div>
 
       {/* Amount */}
-
-      <div className="mt-8">
-
-        <label className="text-sm text-zinc-500">
-
+      <div>
+        <label className="mb-2 block text-sm text-gray-400">
           Amount
-
         </label>
 
-        <div
-          className="
-          mt-3
-
-          flex
-
-          items-center
-
-          rounded-2xl
-
-          bg-[#171B22]
-
-          px-5
-
-          h-14
-          "
-        >
-
-          <Coins
-            size={18}
-            className="text-zinc-500"
-          />
-
+        <div className="flex items-center rounded-xl border border-white/10 bg-[#090B0E] px-4">
           <input
-
             type="number"
-
             value={amount}
-
-            onChange={(e)=>
-              setAmount(e.target.value)
-            }
-
-            placeholder="50"
-
-            className="
-            flex-1
-
-            bg-transparent
-
-            px-4
-
-            outline-none
-            "
-
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Enter amount"
+            min="0"
+            max={balance}
+            className="w-full bg-transparent py-3 text-white outline-none placeholder:text-gray-600"
           />
 
-          <button
-            className="
-            rounded-full
-
-            bg-[#1D66FF]/10
-
-            px-4
-
-            py-1
-
-            text-sm
-
-            text-[#1D66FF]
-            "
-          >
-
-            MAX
-
-          </button>
-
+          <span className="text-sm font-semibold text-gray-400">
+            USDT
+          </span>
         </div>
-
       </div>
 
       {/* Package */}
+      {selectedPackage && (
+        <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-gray-400">
+              Current Package
+            </span>
 
-      <div
-        className="
-        mt-8
-
-        rounded-3xl
-
-        bg-[#171B22]
-
-        p-5
-        "
-      >
-
-        <div className="flex justify-between">
-
-          <span className="text-zinc-500">
-
-            Package
-
-          </span>
-
-          <span className="font-semibold">
-
-            {selected?.name ?? "--"}
-
-          </span>
-
-        </div>
-
-        <div className="mt-5 flex justify-between">
-
-          <span className="text-zinc-500">
-
-            Daily ROI
-
-          </span>
-
-          <span className="text-green-400">
-
-            {selected?.roi ?? 0}%
-
-          </span>
-
-        </div>
-
-        <div className="mt-5 flex justify-between">
-
-          <span className="text-zinc-500">
-
-            Daily Income
-
-          </span>
-
-          <span className="text-[#1D66FF] font-semibold">
-
-            {dailyIncome.toFixed(2)} USDT
-
-          </span>
-
-        </div>
-
-      </div>
-
-      {/* Balance */}
-
-      <div
-        className="
-        mt-8
-
-        rounded-3xl
-
-        border
-
-        border-white/5
-
-        p-5
-        "
-      >
-
-        <div className="flex items-center gap-3">
-
-          <Wallet
-            className="text-[#1D66FF]"
-            size={22}
-          />
-
-          <div>
-
-            <p className="text-sm text-zinc-500">
-
-              Wallet Balance
-
-            </p>
-
-            <h3 className="text-xl font-bold">
-
-              1520.50 USDT
-
-            </h3>
-
+            <span className="font-semibold text-white">
+              {selectedPackage.name}
+            </span>
           </div>
 
+          <div className="mt-2 flex items-center justify-between">
+            <span className="text-sm text-gray-400">
+              Daily Return
+            </span>
+
+            <span className="font-semibold text-green-400">
+              {selectedPackage.rate}%
+            </span>
+          </div>
         </div>
+      )}
 
+      {/* No package */}
+      {!loading && balance < 50 && (
+        <div className="mt-4 rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-3 text-sm text-yellow-400">
+          Minimum balance required is 50 USDT.
+        </div>
+      )}
+
+      {/* Actions */}
+      <div className="mt-5 grid grid-cols-2 gap-3">
+        <button
+          type="button"
+          className="rounded-xl bg-white py-3 font-semibold text-black transition hover:bg-gray-200"
+        >
+          Deposit
+        </button>
+
+        <button
+          type="button"
+          className="rounded-xl border border-white/10 py-3 font-semibold text-white transition hover:bg-white/5"
+        >
+          Withdraw
+        </button>
       </div>
-
-      {/* Button */}
-
-      <button
-        className={`
-        mt-8
-
-        flex
-
-        w-full
-
-        items-center
-
-        justify-center
-
-        gap-3
-
-        rounded-full
-
-        py-4
-
-        font-semibold
-
-        transition
-
-        ${
-          tab === "Deposit"
-
-            ? "bg-[#1D66FF] hover:bg-[#3A7BFF]"
-
-            : "bg-red-500 hover:bg-red-600"
-        }
-        `}
-      >
-
-        {
-
-          tab === "Deposit"
-
-          ? <ArrowDownCircle size={18}/>
-
-          : <ArrowUpCircle size={18}/>
-
-        }
-
-        {tab} Now
-
-      </button>
-
-    </section>
-
+    </div>
   );
-
 }
