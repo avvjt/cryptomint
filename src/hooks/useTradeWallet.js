@@ -7,11 +7,10 @@ import {
 
 const API_BASE_URL =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:3000";
+  "https://backendxmint.onrender.com";
 
 const getAuthHeaders = () => {
-  const token =
-    localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   return {
     "Content-Type": "application/json",
@@ -20,128 +19,94 @@ const getAuthHeaders = () => {
 };
 
 export default function useTradeWallet() {
-  /*
-  |--------------------------------------------------------------------------
-  | WALLET
-  |--------------------------------------------------------------------------
-  */
-
   const [wallet, setWallet] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState("");
 
-  const [loading, setLoading] =
-    useState(true);
-
-  const [processing, setProcessing] =
-    useState(false);
-
-  const [error, setError] =
-    useState("");
+  const [tradeHistory, setTradeHistory] = useState([]);
+  const [lastTrade, setLastTrade] = useState(null);
 
   /*
-  |--------------------------------------------------------------------------
-  | TRADE HISTORY
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * FETCH WALLET
+   * ============================================================
+   */
 
-  const [tradeHistory, setTradeHistory] =
-    useState([]);
-
-  /*
-  |--------------------------------------------------------------------------
-  | LAST TRADE
-  |--------------------------------------------------------------------------
-  */
-
-  const [lastTrade, setLastTrade] =
-    useState(null);
-
-  /*
-  |--------------------------------------------------------------------------
-  | FETCH WALLET
-  |--------------------------------------------------------------------------
-  */
-
-  const fetchWallet = useCallback(
-    async () => {
-      try {
-        const response =
-          await fetch(
-            `${API_BASE_URL}/api/wallet`,
-            {
-              method: "GET",
-              headers:
-                getAuthHeaders(),
-            }
-          );
-
-        const data =
-          await response.json();
-
-        if (!response.ok) {
-          throw new Error(
-            data.message ||
-              "Failed to load wallet."
-          );
+  const fetchWallet = useCallback(async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/wallet`,
+        {
+          method: "GET",
+          headers: getAuthHeaders(),
+          cache: "no-store",
         }
+      );
 
-        setWallet(
-          data.wallet || null
-        );
+      const data = await response.json();
 
-        return data.wallet;
-      } catch (err) {
-        console.error(
-          "Wallet fetch error:",
-          err
-        );
-
-        setError(
-          err.message ||
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
             "Failed to load wallet."
         );
-
-        return null;
       }
-    },
-    []
-  );
+
+      setWallet(data?.wallet || null);
+
+      return data?.wallet || null;
+    } catch (err) {
+      console.error(
+        "Wallet fetch error:",
+        err
+      );
+
+      setError(
+        err?.message ||
+          "Failed to load wallet."
+      );
+
+      return null;
+    }
+  }, []);
 
   /*
-  |--------------------------------------------------------------------------
-  | FETCH TRADE HISTORY
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * FETCH TRADE HISTORY
+   * ============================================================
+   */
 
-  const fetchTradeHistory =
-    useCallback(async () => {
+  const fetchTradeHistory = useCallback(
+    async () => {
       try {
-        const response =
-          await fetch(
-            `${API_BASE_URL}/api/trade/history`,
-            {
-              method: "GET",
-              headers:
-                getAuthHeaders(),
-            }
-          );
+        const response = await fetch(
+          `${API_BASE_URL}/api/trade/history`,
+          {
+            method: "GET",
+            headers: getAuthHeaders(),
+            cache: "no-store",
+          }
+        );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
           throw new Error(
-            data.message ||
+            data?.message ||
               "Failed to load trade history."
           );
         }
 
-        setTradeHistory(
-          Array.isArray(data.trades)
-            ? data.trades
-            : []
-        );
+        const trades = Array.isArray(
+          data?.trades
+        )
+          ? data.trades
+          : [];
 
-        return data.trades || [];
+        setTradeHistory(trades);
+
+        return trades;
       } catch (err) {
         console.error(
           "Trade history error:",
@@ -150,41 +115,42 @@ export default function useTradeWallet() {
 
         return [];
       }
-    }, []);
+    },
+    []
+  );
 
   /*
-  |--------------------------------------------------------------------------
-  | INITIAL LOAD
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * REFRESH
+   * ============================================================
+   */
 
-  const refresh = useCallback(
-    async () => {
-      setLoading(true);
-      setError("");
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    setError("");
 
+    try {
       await Promise.all([
         fetchWallet(),
         fetchTradeHistory(),
       ]);
-
+    } finally {
       setLoading(false);
-    },
-    [
-      fetchWallet,
-      fetchTradeHistory,
-    ]
-  );
+    }
+  }, [
+    fetchWallet,
+    fetchTradeHistory,
+  ]);
 
   useEffect(() => {
     refresh();
   }, [refresh]);
 
   /*
-  |--------------------------------------------------------------------------
-  | REAL MANUAL TRADE
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * MANUAL TRADE
+   * ============================================================
+   */
 
   const executeTrade = useCallback(
     async ({ symbol } = {}) => {
@@ -200,40 +166,36 @@ export default function useTradeWallet() {
       setError("");
 
       try {
-        const response =
-          await fetch(
-            `${API_BASE_URL}/api/trade/manual`,
-            {
-              method: "POST",
-              headers:
-                getAuthHeaders(),
-              body: JSON.stringify({
-                symbol:
-                  symbol || null,
-              }),
-            }
-          );
+        const response = await fetch(
+          `${API_BASE_URL}/api/trade/manual`,
+          {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              symbol: symbol || null,
+            }),
+          }
+        );
 
-        const data =
-          await response.json();
+        const data = await response.json();
 
         if (!response.ok) {
+          const message =
+            data?.message ||
+            "Unable to complete trade.";
+
+          setError(message);
+
           return {
             success: false,
-            message:
-              data.message ||
-              "Unable to complete trade.",
+            message,
           };
         }
 
         setLastTrade(
-          data.trade || null
+          data?.trade || null
         );
 
-        /*
-         * Backend is the source of truth.
-         * Reload wallet after trade.
-         */
         await Promise.all([
           fetchWallet(),
           fetchTradeHistory(),
@@ -242,10 +204,10 @@ export default function useTradeWallet() {
         return {
           success: true,
           message:
-            data.message ||
+            data?.message ||
             "Trade completed.",
-          trade: data.trade,
-          earning: data.earning,
+          trade: data?.trade,
+          earning: data?.earning,
         };
       } catch (err) {
         console.error(
@@ -253,11 +215,15 @@ export default function useTradeWallet() {
           err
         );
 
+        const message =
+          err?.message ||
+          "Unable to complete trade.";
+
+        setError(message);
+
         return {
           success: false,
-          message:
-            err.message ||
-            "Unable to complete trade.",
+          message,
         };
       } finally {
         setProcessing(false);
@@ -271,113 +237,119 @@ export default function useTradeWallet() {
   );
 
   /*
-  |--------------------------------------------------------------------------
-  | REAL AUTO TRADE
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * AUTO TRADE
+   * ============================================================
+   */
 
-  const startAutoTrade =
-    useCallback(
-      async ({ symbol } = {}) => {
-        if (processing) {
-          return {
-            success: false,
-            message:
-              "A trade is already being processed.",
-          };
-        }
+  const startAutoTrade = useCallback(
+    async ({ symbol } = {}) => {
+      if (processing) {
+        return {
+          success: false,
+          message:
+            "A trade is already being processed.",
+        };
+      }
 
-        setProcessing(true);
-        setError("");
+      setProcessing(true);
+      setError("");
 
-        try {
-          const response =
-            await fetch(
-              `${API_BASE_URL}/api/trade/auto`,
-              {
-                method: "POST",
-                headers:
-                  getAuthHeaders(),
-                body: JSON.stringify({
-                  symbol:
-                    symbol || null,
-                }),
-              }
-            );
-
-          const data =
-            await response.json();
-
-          if (!response.ok) {
-            return {
-              success: false,
-              message:
-                data.message ||
-                "Unable to start Auto Trade.",
-            };
+      try {
+        const response = await fetch(
+          `${API_BASE_URL}/api/trade/auto`,
+          {
+            method: "POST",
+            headers: getAuthHeaders(),
+            body: JSON.stringify({
+              symbol: symbol || null,
+            }),
           }
+        );
 
-          setLastTrade(
-            data.trade || null
-          );
+        const data = await response.json();
 
-          await Promise.all([
-            fetchWallet(),
-            fetchTradeHistory(),
-          ]);
+        if (!response.ok) {
+          const message =
+            data?.message ||
+            "Unable to start Auto Trade.";
 
-          return {
-            success: true,
-            message:
-              data.message ||
-              "Auto Trade completed.",
-            trade: data.trade,
-            earning: data.earning,
-          };
-        } catch (err) {
-          console.error(
-            "Auto Trade error:",
-            err
-          );
+          setError(message);
 
           return {
             success: false,
-            message:
-              err.message ||
-              "Unable to start Auto Trade.",
+            message,
           };
-        } finally {
-          setProcessing(false);
         }
-      },
-      [
-        processing,
-        fetchWallet,
-        fetchTradeHistory,
-      ]
-    );
+
+        setLastTrade(
+          data?.trade || null
+        );
+
+        await Promise.all([
+          fetchWallet(),
+          fetchTradeHistory(),
+        ]);
+
+        return {
+          success: true,
+          message:
+            data?.message ||
+            "Auto Trade completed.",
+          trade: data?.trade,
+          earning: data?.earning,
+        };
+      } catch (err) {
+        console.error(
+          "Auto Trade error:",
+          err
+        );
+
+        const message =
+          err?.message ||
+          "Unable to start Auto Trade.";
+
+        setError(message);
+
+        return {
+          success: false,
+          message,
+        };
+      } finally {
+        setProcessing(false);
+      }
+    },
+    [
+      processing,
+      fetchWallet,
+      fetchTradeHistory,
+    ]
+  );
 
   /*
-  |--------------------------------------------------------------------------
-  | BALANCES
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * BALANCES
+   * ============================================================
+   */
 
   const balance = Number(
-    wallet?.availableBalance || 0
+    wallet?.availableBalance ?? 0
   );
 
   const availableBalance = balance;
 
   const lockedBalance = Number(
-    wallet?.lockedBalance || 0
+    wallet?.lockedBalance ?? 0
   );
 
+  const totalBalance =
+    availableBalance + lockedBalance;
+
   /*
-  |--------------------------------------------------------------------------
-  | DAILY TRADE STATUS
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * DAILY TRADE STATUS
+   * ============================================================
+   */
 
   const today = useMemo(() => {
     return new Date()
@@ -389,114 +361,79 @@ export default function useTradeWallet() {
     tradeHistory.find(
       (trade) =>
         trade.date === today &&
-        trade.status ===
-          "COMPLETED"
+        trade.status === "COMPLETED"
     );
 
   const canAutoTrade =
     !todayTrade && !processing;
 
   /*
-  |--------------------------------------------------------------------------
-  | CURRENT LOCK
-  |--------------------------------------------------------------------------
-  |
-  | Your current backend does not create a
-  | 5-minute wallet lock. Therefore don't fake
-  | one in the frontend.
-  |
-  */
+   * Backend currently doesn't expose
+   * a timed lock, so don't fake one.
+   */
 
   const lockedUntil = null;
-
   const isLocked = false;
-
   const lockRemaining = 0;
 
-  const formatDuration =
-    useCallback(
-      (milliseconds) => {
-        const totalSeconds =
-          Math.ceil(
-            Math.max(
-              0,
-              milliseconds
-            ) / 1000
-          );
+  const formatDuration = useCallback(
+    (milliseconds) => {
+      const totalSeconds = Math.ceil(
+        Math.max(
+          0,
+          milliseconds
+        ) / 1000
+      );
 
-        const minutes =
-          Math.floor(
-            totalSeconds / 60
-          );
+      const minutes = Math.floor(
+        totalSeconds / 60
+      );
 
-        const seconds =
-          totalSeconds % 60;
+      const seconds =
+        totalSeconds % 60;
 
-        return `${String(
-          minutes
-        ).padStart(
-          2,
-          "0"
-        )}:${String(
-          seconds
-        ).padStart(
-          2,
-          "0"
-        )}`;
-      },
-      []
-    );
+      return `${String(minutes).padStart(
+        2,
+        "0"
+      )}:${String(seconds).padStart(
+        2,
+        "0"
+      )}`;
+    },
+    []
+  );
 
   /*
-  |--------------------------------------------------------------------------
-  | RETURN
-  |--------------------------------------------------------------------------
-  */
+   * ============================================================
+   * RETURN
+   * ============================================================
+   */
 
   return {
-    /*
-     * Wallet
-     */
     wallet,
+
     balance,
     availableBalance,
     lockedBalance,
+    totalBalance,
 
-    /*
-     * Loading
-     */
     loading,
     processing,
     error,
 
-    /*
-     * Lock
-     */
     lockedUntil,
     isLocked,
     lockRemaining,
     formatDuration,
 
-    /*
-     * History
-     */
     tradeHistory,
     lastTrade,
 
-    /*
-     * Auto Trade
-     */
     canAutoTrade,
 
-    /*
-     * Actions
-     */
     executeTrade,
     startAutoTrade,
 
-    /*
-     * Refresh
-     */
     refresh,
     fetchWallet,
     fetchTradeHistory,

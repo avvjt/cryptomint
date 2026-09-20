@@ -9,8 +9,7 @@ const API_BASE_URL =
   "http://localhost:3000";
 
 const getHeaders = () => {
-  const token =
-    localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   return {
     "Content-Type": "application/json",
@@ -19,63 +18,85 @@ const getHeaders = () => {
 };
 
 export default function useDashboard() {
-  const [dashboard, setDashboard] =
-    useState(null);
-
-  const [loading, setLoading] =
-    useState(true);
-
-  const [error, setError] =
-    useState("");
+  const [dashboard, setDashboard] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchDashboard = useCallback(async () => {
-  try {
-    setLoading(true);
-    setError("");
+    try {
+      setLoading(true);
+      setError("");
 
-    console.log(
-      "🔥 DASHBOARD API:",
-      `${API_BASE_URL}/api/dashboard`
-    );
+      const token = localStorage.getItem("token");
 
-    const response = await fetch(
-      `${API_BASE_URL}/api/dashboard`,
-      {
-        method: "GET",
-        headers: getHeaders(),
+      if (!token) {
+        throw new Error(
+          "Authentication token not found."
+        );
       }
-    );
 
-    const data = await response.json();
-
-    console.log("🔥 DASHBOARD RESPONSE:", data);
-
-    console.log(
-      "🔥 BACKEND AVAILABLE BALANCE:",
-      data?.dashboard?.wallet?.availableBalance
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to load dashboard."
+      const response = await fetch(
+        `${API_BASE_URL}/api/dashboard`,
+        {
+          method: "GET",
+          headers: getHeaders(),
+          cache: "no-store",
+        }
       );
+
+      const data = await response.json();
+
+      console.log(
+        "🔥 DASHBOARD RESPONSE:",
+        data
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message ||
+            "Failed to load dashboard."
+        );
+      }
+
+      const dashboardData =
+        data?.dashboard || null;
+
+      console.log(
+        "💰 AVAILABLE BALANCE:",
+        dashboardData?.wallet?.availableBalance
+      );
+
+      console.log(
+        "🔒 LOCKED BALANCE:",
+        dashboardData?.wallet?.lockedBalance
+      );
+
+      console.log(
+        "💰 TOTAL BALANCE:",
+        dashboardData?.wallet?.totalBalance
+      );
+
+      setDashboard(dashboardData);
+
+      return dashboardData;
+    } catch (error) {
+      console.error(
+        "❌ Dashboard API error:",
+        error
+      );
+
+      setDashboard(null);
+
+      setError(
+        error?.message ||
+          "Failed to load dashboard."
+      );
+
+      return null;
+    } finally {
+      setLoading(false);
     }
-
-    setDashboard(data.dashboard || null);
-
-    return data.dashboard;
-  } catch (error) {
-    console.error("Dashboard API error:", error);
-
-    setError(
-      error.message || "Failed to load dashboard."
-    );
-
-    return null;
-  } finally {
-    setLoading(false);
-  }
-}, []);
+  }, []);
 
   useEffect(() => {
     fetchDashboard();
@@ -85,7 +106,6 @@ export default function useDashboard() {
     dashboard,
     loading,
     error,
-    refreshDashboard:
-      fetchDashboard,
+    refreshDashboard: fetchDashboard,
   };
 }

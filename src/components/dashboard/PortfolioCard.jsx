@@ -6,28 +6,31 @@ import {
 } from "lucide-react";
 
 import { useState } from "react";
-import useDashboard from "../../hooks/useDashboard";
 
-export default function PortfolioCard() {
-  const { dashboard, loading } = useDashboard();
-
+export default function PortfolioCard({
+  dashboard,
+  loading,
+}) {
   const [hidden, setHidden] = useState(false);
 
   const wallet = dashboard?.wallet || {};
 
   const availableBalance = Number(
-    wallet.availableBalance || 0
+    wallet.availableBalance ?? 0
   );
 
   const lockedBalance = Number(
-    wallet.lockedBalance || 0
+    wallet.lockedBalance ?? 0
   );
 
   const formatMoney = (value) =>
-    Number(value || 0).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    Number(value || 0).toLocaleString(
+      "en-US",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    );
 
   return (
     <section
@@ -58,7 +61,9 @@ export default function PortfolioCard() {
       />
 
       <div className="relative">
+
         {/* Header */}
+
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div
@@ -75,7 +80,10 @@ export default function PortfolioCard() {
                 text-[#6EA2FF]
               "
             >
-              <Wallet size={17} strokeWidth={1.8} />
+              <Wallet
+                size={17}
+                strokeWidth={1.8}
+              />
             </div>
 
             <div>
@@ -106,7 +114,9 @@ export default function PortfolioCard() {
 
           <button
             type="button"
-            onClick={() => setHidden((value) => !value)}
+            onClick={() =>
+              setHidden((value) => !value)
+            }
             className="
               flex
               h-9
@@ -123,7 +133,9 @@ export default function PortfolioCard() {
               active:scale-95
             "
             aria-label={
-              hidden ? "Show balance" : "Hide balance"
+              hidden
+                ? "Show balance"
+                : "Hide balance"
             }
           >
             {hidden ? (
@@ -135,6 +147,7 @@ export default function PortfolioCard() {
         </div>
 
         {/* Balance */}
+
         <div className="mt-7">
           <p
             className="
@@ -162,7 +175,9 @@ export default function PortfolioCard() {
                 ? "••••••"
                 : hidden
                 ? "••••••"
-                : `$${formatMoney(availableBalance)}`}
+                : `$${formatMoney(
+                    availableBalance
+                  )}`}
             </span>
 
             {!hidden && !loading && (
@@ -180,6 +195,7 @@ export default function PortfolioCard() {
         </div>
 
         {/* Bottom stats */}
+
         <div
           className="
             mt-6
@@ -192,6 +208,7 @@ export default function PortfolioCard() {
           "
         >
           {/* Available */}
+
           <div>
             <p
               className="
@@ -216,11 +233,14 @@ export default function PortfolioCard() {
                 ? "••••"
                 : loading
                 ? "—"
-                : `$${formatMoney(availableBalance)}`}
+                : `$${formatMoney(
+                    availableBalance
+                  )}`}
             </p>
           </div>
 
           {/* Locked */}
+
           <div className="border-l border-white/[0.06] pl-4">
             <p
               className="
@@ -230,7 +250,9 @@ export default function PortfolioCard() {
                 text-[#606975]
               "
             >
-              {lockedBalance > 0 ? "In Trade" : "Locked"}
+              {lockedBalance > 0
+                ? "In Trade"
+                : "Locked"}
             </p>
 
             <div className="mt-1 flex items-center gap-1.5">
@@ -252,7 +274,9 @@ export default function PortfolioCard() {
                   ? "••••"
                   : loading
                   ? "—"
-                  : `$${formatMoney(lockedBalance)}`}
+                  : `$${formatMoney(
+                      lockedBalance
+                    )}`}
               </p>
             </div>
           </div>
