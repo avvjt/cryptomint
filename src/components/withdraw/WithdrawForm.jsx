@@ -198,7 +198,7 @@ export default function WithdrawForm() {
       </div>
 
       {/* Summary */}
-      <div className="space-y-2 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+      <div className="space-y-2 rounded-xl border border-white/10 bg-white/3 p-4">
         <div className="flex justify-between text-sm">
           <span className="text-gray-400">
             Withdrawal Amount

@@ -104,7 +104,7 @@ export default function BuySellPanel() {
 
       {/* Package */}
       {selectedPackage && (
-        <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4">
+        <div className="mt-4 rounded-xl border border-white/10 bg-white/3 p-4">
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-400">
               Current Package

@@ -347,14 +347,14 @@ export default function FloatingTradeActions() {
           bottom-3
           left-0
           right-0
-          z-[80]
+          z-80
           pointer-events-none
           px-3
           sm:bottom-5
           sm:px-5
           xl:left-1/2
           xl:right-auto
-          xl:w-[560px]
+          xl:w-140
           xl:-translate-x-1/2
         "
       >
@@ -397,7 +397,7 @@ export default function FloatingTradeActions() {
                   items-center
                   justify-center
                   rounded-full
-                  bg-[#1D66FF]/10
+                  bg-brand/10
                   text-[#4D8DFF]
                 "
               >
@@ -454,7 +454,7 @@ export default function FloatingTradeActions() {
                   gap-1
                   text-[11px]
                   font-medium
-                  text-[#00C076]
+                  text-success
                 "
               >
                 <TrendingUp size={11} />
@@ -482,8 +482,8 @@ export default function FloatingTradeActions() {
               disabled={isProcessing}
               className="
                 hidden
-                h-[48px]
-                w-[46px]
+                h-12
+                w-11.5
                 shrink-0
                 flex-col
                 items-center
@@ -516,7 +516,7 @@ export default function FloatingTradeActions() {
                 walletBalance < 50
               }
               className="
-                h-[48px]
+                h-12
                 flex-1
                 rounded-full
                 bg-[#08B77A]
@@ -549,7 +549,7 @@ export default function FloatingTradeActions() {
               }
               className="
                 relative
-                h-[48px]
+                h-12
                 flex-1
                 overflow-hidden
                 rounded-full
@@ -597,7 +597,7 @@ export default function FloatingTradeActions() {
           className="
             fixed
             inset-0
-            z-[100]
+            z-100
             flex
             items-center
             justify-center
@@ -721,7 +721,7 @@ export default function FloatingTradeActions() {
                         mt-1
                         text-xl
                         font-bold
-                        text-[#00C076]
+                        text-success
                       "
                     >
                       +{formatMoney(dailyReturn)} USDT
@@ -1130,8 +1130,8 @@ function SuccessContent({
           items-center
           justify-center
           rounded-full
-          bg-[#00C076]/10
-          text-[#00C076]
+          bg-success/10
+          text-success
         "
       >
         <CheckCircle2 size={32} />
@@ -1177,7 +1177,7 @@ function ModalShell({
       className="
         relative
         w-full
-        max-w-[380px]
+        max-w-95
         rounded-[28px]
         border
         border-[#252B34]
