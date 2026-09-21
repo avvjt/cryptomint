@@ -41,56 +41,6 @@ export default function DepositVerificationCard() {
     }
   };
 
-  /*
-    Account is already active.
-  */
-
-  if (isActive) {
-    return (
-      <section
-        className="
-          rounded-2xl
-          border
-          border-[#08B77A]/20
-          bg-[#0D1014]
-          p-5
-        "
-      >
-        <div className="flex items-start gap-4">
-
-          <div
-            className="
-              flex
-              h-10
-              w-10
-              shrink-0
-              items-center
-              justify-center
-              rounded-full
-              bg-[#08B77A]/10
-              text-[#08B77A]
-            "
-          >
-            ✓
-          </div>
-
-          <div className="min-w-0">
-
-            <p className="text-sm font-semibold">
-              Account active
-            </p>
-
-            <p className="mt-1 text-xs leading-5 text-[#737B89]">
-              Your account has been verified and your
-              wallet is ready for trading.
-            </p>
-
-          </div>
-
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section
@@ -126,17 +76,23 @@ export default function DepositVerificationCard() {
 
           <div>
 
-            <p className="text-sm font-semibold">
-              Activate your account
-            </p>
+           <p className="text-sm font-semibold">
+  {isActive ? "Deposit USDT" : "Activate your account"}
+</p>
 
-            <p className="mt-1 text-xs leading-5 text-[#737B89]">
-              Deposit at least{" "}
-              <span className="text-white">
-                {WALLET_CONFIG.minimumDeposit} USDT
-              </span>{" "}
-              to activate your account.
-            </p>
+<p className="mt-1 text-xs leading-5 text-[#737B89]">
+  {isActive ? (
+    "Send USDT to your deposit address below."
+  ) : (
+    <>
+      Deposit at least{" "}
+      <span className="text-white">
+        {WALLET_CONFIG.minimumDeposit} USDT
+      </span>{" "}
+      to activate your account.
+    </>
+  )}
+</p>
 
           </div>
 

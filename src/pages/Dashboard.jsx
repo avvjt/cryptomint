@@ -7,7 +7,6 @@ import RecentActivity from "../components/dashboard/RecentActivity";
 import MarketSnapshot from "../components/dashboard/MarketSnapshot";
 import WalletBreakdown from "../components/dashboard/WalletBreakdown";
 import AutoTradeStatus from "../components/dashboard/AutoTradeStatus";
-
 import useDashboard from "../hooks/useDashboard";
 
 export default function Dashboard() {

@@ -7,6 +7,9 @@ import {
   Gift,
   ChevronRight,
   ArrowUpRight,
+  Share2,
+  MessageCircle,
+  Send,
 } from "lucide-react";
 import { useTeam } from "../hooks/useTeam";
 import { TEAM_COMMISSION_RATES } from "../config/teamConfig";
@@ -108,18 +111,74 @@ export default function Team() {
     earned: Number(referralBonus.earned || 0),
   };
 
-  const copyReferralCode = async () => {
-    try {
-      await navigator.clipboard.writeText(referralCode);
+  const referralLink = referralCode
+  ? `${window.location.origin}/signup?ref=${encodeURIComponent(referralCode)}`
+  : "";
 
+  const copyReferralLink = async () => {
+    if (!referralLink) return;
+
+    try {
+      await navigator.clipboard.writeText(referralLink);
       setCopied(true);
 
       setTimeout(() => {
         setCopied(false);
       }, 1500);
     } catch {
-      // Clipboard may be unavailable.
+      // Clipboard unavailable
     }
+  };
+
+  const shareReferralLink = async () => {
+    if (!referralLink) return;
+
+    const shareData = {
+      title: "Join CryptoMintX",
+      text: `🎁 Join CryptoMintX using my referral link and qualify for a 5% referral bonus on your first qualifying deposit.`,
+      url: referralLink,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await copyReferralLink();
+    } catch {
+      // User cancelled share or sharing unavailable.
+    }
+  };
+
+  const shareWhatsApp = () => {
+    if (!referralLink) return;
+
+    const text = encodeURIComponent(
+      `🎁 Join me on CryptoMintX!\n\nQualify for a 5% referral bonus on your first qualifying deposit.\n\n${referralLink}`
+    );
+
+    window.open(
+      `https://wa.me/?text=${text}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  };
+
+  const shareTelegram = () => {
+    if (!referralLink) return;
+
+    const text = encodeURIComponent(
+      `🎁 Join me on CryptoMintX!\n\nQualify for a 5% referral bonus on your first qualifying deposit.`
+    );
+
+    const url = encodeURIComponent(referralLink);
+
+    window.open(
+      `https://t.me/share/url?url=${url}&text=${text}`,
+      "_blank",
+      "noopener,noreferrer"
+    );
   };
 
   const handleLevelChange = async (levelName) => {
@@ -136,9 +195,9 @@ export default function Team() {
   const progressPercent =
     totalRequired > 0
       ? Math.min(
-          (totalMembers / totalRequired) * 100,
-          100
-        )
+        (totalMembers / totalRequired) * 100,
+        100
+      )
       : 100;
 
   return (
@@ -282,59 +341,141 @@ export default function Team() {
             </div>
           </section>
 
-          {/* Referral */}
-          <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-            <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
-              Referral code
-            </p>
 
-            <div className="mt-3 flex items-center gap-2">
-              <div className="min-w-0 flex-1 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-4 py-3">
-                <p className="truncate font-mono text-sm font-medium tracking-wide">
+          {/* Referral / Invite & Earn */}
+          <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
+                  Invite & Earn
+                </p>
+
+                <h2 className="mt-2 text-lg font-semibold text-white">
+                  Share your referral link
+                </h2>
+
+                <p className="mt-1 text-xs leading-5 text-gray-500">
+                  Invite friends and let them join through your personal link.
+                </p>
+              </div>
+
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#172131]">
+                <Gift size={19} className="text-[#4D8DFF]" />
+              </div>
+            </div>
+
+            {/* Bonus banner */}
+            <div className="mt-5 overflow-hidden rounded-2xl border border-[#4D8DFF]/20 bg-gradient-to-br from-[#101C2E] to-[#0B0E12]">
+              <div className="flex items-center gap-3 p-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#4D8DFF]/10">
+                  <Gift size={21} className="text-[#4D8DFF]" />
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-white">
+                      {safeReferralBonus.rate}% Referral Bonus
+                    </p>
+
+                    <span className="rounded-full bg-[#08B77A]/10 px-2 py-0.5 text-[9px] font-medium text-[#08B77A]">
+                      BONUS
+                    </span>
+                  </div>
+
+                  <p className="mt-1 text-[11px] leading-5 text-gray-500">
+                    Your referral qualifies for the bonus after their first
+                    qualifying deposit.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Referral link */}
+            <div className="mt-4">
+              <p className="mb-2 text-[11px] font-medium text-gray-500">
+                Your referral link
+              </p>
+
+              <div className="flex items-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-2">
+                <div className="min-w-0 flex-1 px-2">
+                  <p className="truncate font-mono text-xs text-gray-400">
+                    {referralLink || "Generating link..."}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={copyReferralLink}
+                  disabled={!referralLink}
+                  className="flex h-10 shrink-0 items-center gap-2 rounded-lg bg-[#285DB5] px-3 text-xs font-medium text-white transition hover:bg-[#326BC7] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {copied ? (
+                    <>
+                      <Check size={15} />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy size={15} />
+                      Copy
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {/* Share buttons */}
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <button
+                type="button"
+                onClick={shareWhatsApp}
+                disabled={!referralLink}
+                className="flex items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
+              >
+                <MessageCircle size={16} />
+                WhatsApp
+              </button>
+
+              <button
+                type="button"
+                onClick={shareTelegram}
+                disabled={!referralLink}
+                className="flex items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
+              >
+                <Send size={16} />
+                Telegram
+              </button>
+
+              <button
+                type="button"
+                onClick={shareReferralLink}
+                disabled={!referralLink}
+                className="flex items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
+              >
+                <Share2 size={16} />
+                Share
+              </button>
+            </div>
+
+            {/* Referral code */}
+            <div className="mt-4 flex items-center justify-between border-t border-[#1A1E24] pt-4">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.14em] text-gray-600">
+                  Referral code
+                </p>
+
+                <p className="mt-1 font-mono text-sm font-medium tracking-wide text-gray-300">
                   {referralCode || "—"}
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={copyReferralCode}
-                className="rounded-xl border border-[#285DB5] bg-[#285DB5] p-3 text-white transition hover:bg-[#326BC7]"
-              >
-                {copied ? (
-                  <Check size={18} />
-                ) : (
-                  <Copy size={18} />
-                )}
-              </button>
-            </div>
-
-            <div className="mt-4 flex items-center justify-between rounded-xl bg-[#0B0E12] p-3">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-[#172131] p-2">
-                  <Gift
-                    size={17}
-                    className="text-[#4D8DFF]"
-                  />
-                </div>
-
-                <div>
-                  <p className="text-sm font-medium">
-                    Referral bonus
-                  </p>
-
-                  <p className="text-xs text-gray-500">
-                    One-time bonus
-                  </p>
-                </div>
-              </div>
-
               <div className="text-right">
-                <p className="text-sm font-semibold">
-                  {safeReferralBonus.rate}%
+                <p className="text-[10px] uppercase tracking-[0.14em] text-gray-600">
+                  Earned
                 </p>
 
-                <p className="text-xs text-gray-500">
-                  Earned ${safeReferralBonus.earned.toFixed(2)}
+                <p className="mt-1 text-sm font-semibold text-white">
+                  ${safeReferralBonus.earned.toFixed(2)}
                 </p>
               </div>
             </div>
@@ -409,11 +550,10 @@ export default function Team() {
                   onClick={() =>
                     handleLevelChange(levelName)
                   }
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    activeLevel === levelName
+                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${activeLevel === levelName
                       ? "bg-[#1A2535] text-white"
                       : "text-gray-500 hover:text-gray-300"
-                  }`}
+                    }`}
                 >
                   Level {levelName}
                 </button>
@@ -636,11 +776,10 @@ function TeamMember({ member, onClick }) {
         </div>
 
         <div
-          className={`h-1.5 w-1.5 rounded-full ${
-            member.status === "ACTIVE"
+          className={`h-1.5 w-1.5 rounded-full ${member.status === "ACTIVE"
               ? "bg-[#08B77A]"
               : "bg-[#C5A55A]"
-          }`}
+            }`}
         />
 
         <ArrowUpRight
@@ -718,11 +857,10 @@ function MemberDetailSheet({ member, onClose }) {
             </div>
 
             <span
-              className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${
-                isActive
+              className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${isActive
                   ? "bg-[#10251E] text-[#08B77A]"
                   : "bg-[#211E16] text-[#C5A55A]"
-              }`}
+                }`}
             >
               {member.status}
             </span>
