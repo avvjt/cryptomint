@@ -28,7 +28,7 @@ export default function useMarketData() {
 
     fetchMarkets();
 
-    const interval = setInterval(fetchMarkets, 5000);
+    const interval = setInterval(fetchMarkets, 3000);
 
     return () => clearInterval(interval);
   }, []);
