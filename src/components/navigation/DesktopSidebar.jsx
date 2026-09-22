@@ -11,11 +11,12 @@ import {
 } from "lucide-react";
 
 import { NavLink, useNavigate } from "react-router-dom";
-
 import logo from "../../assets/logo.png";
+import { useAuth } from "../../context/AuthContext";
 
 export default function DashboardSidebar() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const items = [
     {
@@ -33,7 +34,6 @@ export default function DashboardSidebar() {
       path: "/trade",
       icon: ArrowUpDown,
     },
-    
     {
       name: "Team",
       path: "/team",
@@ -50,6 +50,27 @@ export default function DashboardSidebar() {
     localStorage.removeItem("token");
     navigate("/");
   };
+
+  const displayName =
+    user?.fullName ||
+    user?.name ||
+    user?.username ||
+    "User";
+
+  const username = user?.username
+    ? `@${user.username}`
+    : "Verified User";
+
+  const avatar =
+    user?.avatar ||
+    user?.profileImage ||
+    user?.profilePicture ||
+    null;
+
+  const initial = displayName
+    .trim()
+    .charAt(0)
+    .toUpperCase() || "U";
 
   return (
     <aside
@@ -239,15 +260,14 @@ export default function DashboardSidebar() {
                         transition-all
                         duration-200
 
-                        ${
-                          isActive
-                            ? `
+                        ${isActive
+                          ? `
                               bg-[#151B25]
                               text-white
 
                               shadow-[inset_0_0_0_1px_rgba(255,255,255,.035)]
                             `
-                            : `
+                          : `
                               text-[#7C8490]
 
                               hover:bg-[#11151B]
@@ -317,10 +337,9 @@ export default function DashboardSidebar() {
 
                             transition
 
-                            ${
-                              isActive
-                                ? "bg-[#1D66FF]/12 text-[#6D9EFF]"
-                                : "text-[#68717D] group-hover:text-[#AAB2BD]"
+                            ${isActive
+                              ? "bg-[#1D66FF]/12 text-[#6D9EFF]"
+                              : "text-[#68717D] group-hover:text-[#AAB2BD]"
                             }
                           `}
                         >
@@ -354,10 +373,9 @@ export default function DashboardSidebar() {
                           transition-all
                           duration-200
 
-                          ${
-                            isActive
-                              ? "translate-x-0 text-[#7588A7]"
-                              : "-translate-x-1 text-transparent group-hover:translate-x-0 group-hover:text-[#4D5560]"
+                          ${isActive
+                            ? "translate-x-0 text-[#7588A7]"
+                            : "-translate-x-1 text-transparent group-hover:translate-x-0 group-hover:text-[#4D5560]"
                           }
                         `}
                       />
@@ -385,146 +403,125 @@ export default function DashboardSidebar() {
             p-4
           "
         >
+          
           {/* User */}
 
-          <div
+          <button
+            type="button"
+            onClick={() => navigate("/profile")}
             className="
-              mb-3
-
-              flex
-              items-center
-              gap-3
-
-              rounded-xl
-
-              border
-              border-[#1D2229]
-
-              bg-[#0F1318]
-
-              px-3
-              py-3
-
-              transition
-
-              hover:border-[#272E38]
-            "
+    mb-3
+    flex
+    w-full
+    items-center
+    gap-3
+    rounded-xl
+    border
+    border-[#1D2229]
+    bg-[#0F1318]
+    px-3
+    py-3
+    text-left
+    transition
+    hover:border-[#272E38]
+    hover:bg-[#12171D]
+    group
+  "
           >
             {/* Avatar */}
-
             <div
               className="
-                relative
-
-                flex
-                h-10
-                w-10
-                shrink-0
-
-                items-center
-                justify-center
-
-                rounded-full
-
-                bg-gradient-to-br
-                from-[#2C75FF]
-                to-[#1745A8]
-
-                text-sm
-                font-semibold
-
-                text-white
-
-                shadow-[0_0_18px_rgba(29,102,255,.18)]
-              "
+      relative
+      flex
+      h-10
+      w-10
+      shrink-0
+      items-center
+      justify-center
+      overflow-hidden
+      rounded-full
+      bg-gradient-to-br
+      from-[#2C75FF]
+      to-[#1745A8]
+      text-sm
+      font-semibold
+      text-white
+      shadow-[0_0_18px_rgba(29,102,255,.18)]
+    "
             >
-              A
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt={displayName}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                initial
+              )}
 
               {/* Online */}
-
               <span
                 className="
-                  absolute
-                  bottom-0
-                  right-0
-
-                  h-2.5
-                  w-2.5
-
-                  rounded-full
-
-                  border-2
-                  border-[#0F1318]
-
-                  bg-[#20C77A]
-                "
+        absolute
+        bottom-0
+        right-0
+        h-2.5
+        w-2.5
+        rounded-full
+        border-2
+        border-[#0F1318]
+        bg-[#20C77A]
+      "
               />
             </div>
 
             {/* User info */}
-
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
                 <p
                   className="
-                    truncate
-
-                    text-[13px]
-                    font-semibold
-
-                    text-[#E9EDF2]
-                  "
+          truncate
+          text-[13px]
+          font-semibold
+          text-[#E9EDF2]
+        "
                 >
-                  Abhijit
+                  {displayName}
                 </p>
 
-                <ShieldCheck
-                  size={13}
-                  className="shrink-0 text-[#4E8AFF]"
-                />
+                {user?.isVerified && (
+                  <ShieldCheck
+                    size={13}
+                    className="shrink-0 text-[#4E8AFF]"
+                  />
+                )}
               </div>
 
               <p
                 className="
-                  mt-0.5
-
-                  text-[10px]
-
-                  text-[#626A75]
-                "
+        mt-0.5
+        truncate
+        text-[10px]
+        text-[#626A75]
+      "
               >
-                Verified User
+                {username}
               </p>
             </div>
 
             {/* Profile shortcut */}
-
-            <button
-              type="button"
-              onClick={() => navigate("/profile")}
+            <ChevronRight
+              size={15}
+              strokeWidth={1.8}
               className="
-                flex
-                h-7
-                w-7
-                shrink-0
-
-                items-center
-                justify-center
-
-                rounded-lg
-
-                text-[#626A75]
-
-                transition
-
-                hover:bg-[#191E25]
-                hover:text-white
-              "
-              aria-label="Open profile"
-            >
-              <ChevronRight size={15} />
-            </button>
-          </div>
+      shrink-0
+      text-[#626A75]
+      transition-transform
+      group-hover:translate-x-0.5
+      group-hover:text-white
+    "
+            />
+          </button>
 
           {/* Logout */}
 

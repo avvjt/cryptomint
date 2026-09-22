@@ -3,50 +3,49 @@ import MobileBottomNav from "../components/navigation/MobileBottomNav";
 import MobileHeader from "../components/navigation/MobileHeader";
 import DesktopSidebar from "../components/navigation/DesktopSidebar";
 import Ticker from "../components/Ticker";
+import { TradeWalletProvider } from "../context/TradeWalletContext";
 
 export default function DashboardLayout() {
   return (
-    <div className="min-h-screen bg-[#05080C] text-white">
+    <TradeWalletProvider>
+      <div className="min-h-screen bg-[#05080C] text-white">
 
-      {/* =====================================================
-          DESKTOP
-      ====================================================== */}
+        {/* =====================================================
+            DESKTOP
+        ====================================================== */}
 
-      <div className="hidden lg:block">
-        <Ticker />
-        <DesktopSidebar />
+        <div className="hidden lg:block">
+          <Ticker />
+          <DesktopSidebar />
 
-        <main
-          className="
-            min-h-screen
-            pl-[270px]
-            bg-[#05080C]
-          "
-        >
+          <main
+            className="
+              min-h-screen
+              pl-[270px]
+              bg-[#05080C]
+            "
+          >
+            <div className="min-h-screen">
+              <Outlet />
+            </div>
+          </main>
+        </div>
 
-          <div className="min-h-screen">
+        {/* =====================================================
+            MOBILE
+        ====================================================== */}
+
+        <div className="lg:hidden">
+          <MobileHeader />
+
+          <main className="pb-24">
             <Outlet />
-          </div>
-        </main>
+          </main>
+
+          <MobileBottomNav />
+        </div>
 
       </div>
-
-      {/* =====================================================
-          MOBILE
-      ====================================================== */}
-
-      <div className="lg:hidden">
-
-        <MobileHeader />
-
-        <main className="pb-24">
-          <Outlet />
-        </main>
-
-        <MobileBottomNav />
-
-      </div>
-
-    </div>
+    </TradeWalletProvider>
   );
 }
