@@ -61,11 +61,7 @@ export default function DashboardSidebar() {
     ? `@${user.username}`
     : "Verified User";
 
-  const avatar =
-    user?.avatar ||
-    user?.profileImage ||
-    user?.profilePicture ||
-    null;
+  const avatar = user?.avatarUrl || "";
 
   const initial = displayName
     .trim()

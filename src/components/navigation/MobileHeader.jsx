@@ -19,11 +19,7 @@ export default function MobileHeader() {
     user?.username ||
     "User";
 
-  const avatar =
-    user?.avatar ||
-    user?.profileImage ||
-    user?.profilePicture ||
-    null;
+  const avatar = user?.avatarUrl || "";
 
   const initial =
     displayName.trim().charAt(0).toUpperCase() || "U";
