@@ -128,24 +128,11 @@ export default function MobileHeader() {
                     initial
                   )}
 
-                  {/* Online indicator */}
-                  <span
-                    className="
-                      absolute
-                      bottom-0
-                      right-0
-                      h-2
-                      w-2
-                      rounded-full
-                      border-2
-                      border-[#0F1318]
-                      bg-[#20C77A]
-                    "
-                  />
+              
                 </div>
 
                 {/* Username */}
-                <div className="min-w-0 max-w-[110px] text-left">
+                <div className="min-w-0 max-w-[110px] text-left mr-0.5">
                   <p
                     className="
                       truncate

@@ -167,7 +167,11 @@ export default function Profile() {
       fullName: data.user.fullName,
       username: data.user.username,
       email: data.user.email,
-      avatar: data.user.avatarUrl || "",
+      avatar: user.avatarUrl
+  ? user.avatarUrl.startsWith("http")
+    ? user.avatarUrl
+    : `${import.meta.env.VITE_API_BASE_URL || "https://backendxmint.onrender.com"}${user.avatarUrl}`
+  : "",
     };
 
     setProfile(updatedProfile);
