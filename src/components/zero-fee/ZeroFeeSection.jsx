@@ -1,131 +1,573 @@
-import { useState } from "react";
-import useMarketData from "./useMarketData";
-import MarketGrid from "./MarketGrid";
+import {
+  ChevronRight,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
 
-export default function ZeroFeeSection() {
-  const [activeTab, setActiveTab] = useState("futures");
-  const coins = useMarketData();
+import {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
+import { useNavigate } from "react-router-dom";
+
+import useMarketData from "../../hooks/useMarketData";
+import CoinLogo from "../markets/CoinLogo";
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function formatPrice(value) {
+  const price = Number(value || 0);
+
+  if (!price) return "$0.00";
+
+  if (price >= 1000) {
+    return `$${price.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
+
+  if (price >= 1) {
+    return `$${price.toFixed(2)}`;
+  }
+
+  return `$${price.toFixed(4)}`;
+}
+
+function formatPercent(value) {
+  const change = Number(value || 0);
+
+  return `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+}
+
+function getBaseSymbol(symbol = "") {
+  return symbol.endsWith("USDT")
+    ? symbol.slice(0, -4)
+    : symbol;
+}
+
+/* ============================================================
+   MARKET CARD
+============================================================ */
+
+function MarketCard({
+  coin,
+  navigate,
+}) {
+  const currentPrice = Number(
+    coin.lastPrice || 0
+  );
+
+  const change = Number(
+    coin.priceChangePercent || 0
+  );
+
+  const positive = change >= 0;
+
+  const baseSymbol = getBaseSymbol(
+    coin.symbol
+  );
+
+  const previousPrice =
+    useRef(currentPrice);
+
+  const [priceDirection, setPriceDirection] =
+    useState(null);
+
+  const [priceChanged, setPriceChanged] =
+    useState(false);
+
+  useEffect(() => {
+    const previous =
+      previousPrice.current;
+
+    if (
+      previous > 0 &&
+      currentPrice !== previous
+    ) {
+      setPriceDirection(
+        currentPrice > previous
+          ? "up"
+          : "down"
+      );
+
+      setPriceChanged(true);
+
+      const timer = setTimeout(() => {
+        setPriceChanged(false);
+      }, 500);
+
+      previousPrice.current =
+        currentPrice;
+
+      return () => clearTimeout(timer);
+    }
+
+    previousPrice.current =
+      currentPrice;
+  }, [currentPrice]);
 
   return (
-    <section className="bg-[#05070A] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
+    <button
+      type="button"
+      onClick={() =>
+        navigate(
+          `/trade?symbol=${coin.symbol}`
+        )
+      }
+      className="
+        group
+        min-w-[178px]
+        shrink-0
+        rounded-[18px]
+        border
+        border-[#1A2029]
+        bg-[#0A0E13]
+        p-4
+        text-left
+        transition-all
+        duration-200
+        hover:border-[#293340]
+        hover:bg-[#0D1218]
+        active:scale-[0.98]
+        sm:min-w-0
+        sm:flex-1
+      "
+    >
 
-      <div className="mx-auto max-w-7xl">
+      {/* HEADER */}
 
-        {/* Header */}
-        <div className="max-w-2xl">
+      <div className="flex items-center justify-between">
 
-          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4D8DFF]">
-            Markets
-          </span>
+        <div className="flex min-w-0 items-center gap-2.5">
 
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
-            Trade more.
-            <br />
-            <span className="text-[#657080]">
-              Pay less.
-            </span>
-          </h2>
+          <CoinLogo
+            symbol={coin.symbol}
+          />
 
-          <p className="mt-4 text-sm leading-6 text-[#717B8A] sm:text-base">
-            Explore available markets and monitor live prices from one
-            simple interface.
-          </p>
+          <div className="min-w-0">
+
+            <p className="truncate text-[12px] font-semibold text-white">
+              {baseSymbol}
+            </p>
+
+            <p className="mt-0.5 text-[9px] text-[#59616D]">
+              /USDT
+            </p>
+
+          </div>
 
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-[#1A2029] bg-[#0A0E13]">
+        {/* CHANGE ICON */}
 
-  <Stat
-    value="3.8M+"
-    label="Fees saved"
-    suffix="USDT"
-  />
+        <div
+          className={`
+            flex
+            h-7
+            w-7
+            shrink-0
+            items-center
+            justify-center
+            rounded-lg
+            ${
+              positive
+                ? "bg-[#08B77A]/[0.08]"
+                : "bg-[#F6465D]/[0.08]"
+            }
+            transition-transform
+            duration-300
+            ${
+              priceChanged
+                ? "scale-110"
+                : "scale-100"
+            }
+          `}
+        >
 
-  <Stat
-    value="100"
-    label="Est. savings"
-    suffix="USDT"
-  />
+          {positive ? (
+            <TrendingUp
+              size={13}
+              className="text-[#08B77A]"
+            />
+          ) : (
+            <TrendingDown
+              size={13}
+              className="text-[#F6465D]"
+            />
+          )}
 
-  <Stat
-    value="500+"
-    label="Available"
-  />
+        </div>
 
-</div>
+      </div>
 
-        {/* Market table */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-[#17202D] bg-[#090D13]">
+      {/* PRICE */}
 
-          {/* Tabs */}
-          <div className="flex items-center justify-between border-b border-[#17202D] px-4 py-3 sm:px-5">
+      <div className="mt-7">
 
-            <div className="flex gap-1 rounded-lg bg-[#0D1219] p-1">
+        <p
+          className={`
+            text-[20px]
+            font-semibold
+            tracking-[-0.035em]
+            transition-all
+            duration-300
+            ${
+              priceChanged
+                ? priceDirection === "up"
+                  ? "translate-y-[-1px] text-[#08B77A]"
+                  : "translate-y-[1px] text-[#F6465D]"
+                : "translate-y-0 text-white"
+            }
+          `}
+        >
+          {formatPrice(currentPrice)}
+        </p>
 
-              {["futures", "spot"].map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`rounded-md px-4 py-2 text-xs font-medium capitalize transition ${
-                    activeTab === tab
-                      ? "bg-[#1A2535] text-white"
-                      : "text-[#606B7A] hover:text-white"
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+        <p
+          className={`
+            mt-1.5
+            text-[10px]
+            font-medium
+            ${
+              positive
+                ? "text-[#08B77A]"
+                : "text-[#F6465D]"
+            }
+          `}
+        >
+          {formatPercent(change)}
+        </p>
+
+      </div>
+
+    </button>
+  );
+}
+
+/* ============================================================
+   LOADING CARD
+============================================================ */
+
+function LoadingCard() {
+  return (
+    <div
+      className="
+        min-w-[178px]
+        shrink-0
+        animate-pulse
+        rounded-[18px]
+        border
+        border-[#1A2029]
+        bg-[#0A0E13]
+        p-4
+        sm:min-w-0
+        sm:flex-1
+      "
+    >
+
+      <div className="flex items-center gap-2.5">
+
+        <div className="h-8 w-8 rounded-full bg-[#151A20]" />
+
+        <div>
+          <div className="h-3 w-14 rounded bg-[#151A20]" />
+
+          <div className="mt-1.5 h-2 w-8 rounded bg-[#151A20]" />
+        </div>
+
+      </div>
+
+      <div className="mt-7 h-5 w-28 rounded bg-[#151A20]" />
+
+      <div className="mt-2 h-3 w-14 rounded bg-[#151A20]" />
+
+    </div>
+  );
+}
+
+/* ============================================================
+   MARKET ROW
+============================================================ */
+
+function MarketRow({
+  coins,
+  navigate,
+}) {
+  return (
+    <div
+      className="
+        -mx-4
+        flex
+        gap-3
+        overflow-x-auto
+        px-4
+        pb-1
+        scrollbar-none
+        sm:mx-0
+        sm:px-0
+      "
+    >
+
+      {coins.length > 0 ? (
+        coins.map((coin) => (
+          <MarketCard
+            key={coin.symbol}
+            coin={coin}
+            navigate={navigate}
+          />
+        ))
+      ) : (
+        <>
+          <LoadingCard />
+          <LoadingCard />
+          <LoadingCard />
+          <LoadingCard />
+        </>
+      )}
+
+    </div>
+  );
+}
+
+/* ============================================================
+   MAIN
+============================================================ */
+
+export default function ZeroFeeSection() {
+
+  const navigate = useNavigate();
+
+  const markets = useMarketData();
+
+  /* ==========================================================
+     MARKET GROUPS
+  ========================================================== */
+
+  const popularSymbols = [
+    "BTCUSDT",
+    "ETHUSDT",
+    "SOLUSDT",
+    "XRPUSDT",
+  ];
+
+  const internationalSymbols = [
+    "BNBUSDT",
+    "DOGEUSDT",
+    "ADAUSDT",
+    "AVAXUSDT",
+    "LINKUSDT",
+    "LTCUSDT",
+  ];
+
+  const getMarkets = (symbols) =>
+    symbols
+      .map((symbol) =>
+        markets.find(
+          (market) =>
+            market.symbol === symbol
+        )
+      )
+      .filter(Boolean);
+
+  const popularMarkets =
+    getMarkets(popularSymbols);
+
+  const internationalMarkets =
+    getMarkets(internationalSymbols);
+
+  return (
+    <section className="relative overflow-hidden bg-[#05070A]">
+
+      {/* ======================================================
+          BACKGROUND
+      ====================================================== */}
+
+      <div className="pointer-events-none absolute left-1/2 top-[20%] h-[400px] w-[600px] -translate-x-1/2 rounded-full bg-[#246BFF]/[0.025] blur-[120px]" />
+
+      <div className="relative mx-auto max-w-[1200px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+
+        {/* ====================================================
+            HEADER
+        ==================================================== */}
+
+        <div className="flex items-end justify-between gap-4">
+
+          <div>
+
+            <p className="text-[10px] font-medium uppercase tracking-[0.18em] text-[#596473]">
+              Markets
+            </p>
+
+            <h2 className="mt-3 text-3xl font-semibold tracking-[-0.05em] text-white sm:text-4xl lg:text-5xl">
+              Trade what moves.
+            </h2>
+
+            <p className="mt-3 max-w-[420px] text-xs leading-5 text-[#68717D] sm:text-sm">
+              Explore popular markets and follow price
+              movements in real time.
+            </p>
+
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/markets")
+            }
+            className="
+              hidden
+              shrink-0
+              items-center
+              gap-1
+              text-[11px]
+              font-medium
+              text-[#68717D]
+              transition
+              hover:text-white
+              sm:flex
+            "
+          >
+            View markets
+            <ChevronRight size={14} />
+          </button>
+
+        </div>
+
+        {/* ====================================================
+            MOBILE VIEW MARKETS BUTTON
+        ==================================================== */}
+
+        <button
+          type="button"
+          onClick={() =>
+            navigate("/markets")
+          }
+          className="
+            mt-5
+            flex
+            items-center
+            gap-1
+            text-[11px]
+            font-medium
+            text-[#68717D]
+            sm:hidden
+          "
+        >
+          View all markets
+          <ChevronRight size={13} />
+        </button>
+
+        {/* ====================================================
+            TOP MARKETS
+        ==================================================== */}
+
+        <div className="mt-8">
+
+          <div className="mb-3 flex items-center justify-between">
+
+            <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-[#4F5967]">
+              Top Markets
+            </p>
+
+            <span className="text-[9px] text-[#3F4854]">
+              Live
+            </span>
+
+          </div>
+
+          <MarketRow
+            coins={popularMarkets}
+            navigate={navigate}
+          />
+
+        </div>
+
+        {/* ====================================================
+            INTERNATIONAL FAVORITES
+        ==================================================== */}
+
+        <div className="mt-7">
+
+          <div className="mb-3">
+
+            <p className="text-[9px] font-medium uppercase tracking-[0.16em] text-[#4F5967]">
+              International Favorites
+            </p>
+
+          </div>
+
+          <MarketRow
+            coins={internationalMarkets}
+            navigate={navigate}
+          />
+
+        </div>
+
+        {/* ====================================================
+            BOTTOM CTA
+        ==================================================== */}
+
+        <div className="mt-10 border-t border-[#141A21] pt-5">
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/markets")
+            }
+            className="
+              group
+              flex
+              w-full
+              items-center
+              justify-between
+              gap-4
+              text-left
+            "
+          >
+
+            <div>
+
+              <p className="text-sm font-medium text-white">
+                Explore all markets
+              </p>
+
+              <p className="mt-1 text-[10px] text-[#596473]">
+                Discover more trading pairs
+              </p>
 
             </div>
 
-            <button className="hidden text-xs text-[#657080] transition hover:text-white sm:block">
-              View all →
-            </button>
+            <div
+              className="
+                flex
+                h-9
+                w-9
+                shrink-0
+                items-center
+                justify-center
+                rounded-full
+                border
+                border-[#1C242E]
+                text-[#68717D]
+                transition
+                group-hover:border-[#394553]
+                group-hover:text-white
+              "
+            >
+              <ChevronRight size={15} />
+            </div>
 
-          </div>
-
-          {/* Existing market component */}
-          <div className="overflow-x-auto">
-            <MarketGrid coins={coins} />
-          </div>
-
-        </div>
-
-        {/* CTA */}
-        <div className="mt-7 flex justify-center">
-
-          <a
-            href="/trade"
-            className="flex h-12 items-center justify-center rounded-xl bg-[#1D66FF] px-7 text-sm font-semibold text-white transition hover:bg-[#326BC7]"
-          >
-            Start trading
-          </a>
+          </button>
 
         </div>
 
       </div>
 
     </section>
-  );
-}
-
-function Stat({ value, label, suffix }) {
-  return (
-    <div className="min-w-0 px-3 py-4 sm:px-5 sm:py-5">
-      <p className="truncate text-[17px] font-semibold tracking-[-0.03em] text-white sm:text-xl">
-        {value}
-        {suffix && (
-          <span className="ml-1 text-[8px] font-medium tracking-normal text-[#59616D] sm:text-[9px]">
-            {suffix}
-          </span>
-        )}
-      </p>
-
-      <p className="mt-1 truncate text-[8px] uppercase tracking-[0.1em] text-[#59616D] sm:text-[9px]">
-        {label}
-      </p>
-    </div>
   );
 }

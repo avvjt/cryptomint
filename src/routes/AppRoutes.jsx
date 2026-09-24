@@ -21,9 +21,9 @@ import GuestRoute from "../layouts/GuestRoute";
 import Wallet from "../pages/Wallet";
 import History from "../pages/History";
 import Admin from "../pages/Admin";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Disclaimer from "./pages/Disclaimer";
+import Terms from "../pages/Terms";
+import Privacy from "../pages/Privacy";
+import Disclaimer from "../pages/Disclaimer";
 
 export default function AppRoutes() {
   return (
