@@ -43,6 +43,12 @@ export default function Profile() {
   const [passwordLoading, setPasswordLoading] =
     useState(false);
 
+  const [telegramLoading, setTelegramLoading] =
+    useState(false);
+
+  const [telegramMessage, setTelegramMessage] =
+    useState("");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -339,6 +345,53 @@ export default function Profile() {
       );
     }
   };
+
+  const handleConnectTelegram = async () => {
+  try {
+    setTelegramLoading(true);
+    setTelegramMessage("");
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setTelegramMessage("Please login first.");
+      return;
+    }
+
+    const response = await fetch(
+      `${import.meta.env.VITE_API_BASE_URL || "https://backendxmint.onrender.com"}/api/auth/telegram/link-token`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success || !data.token) {
+      throw new Error(data.message || "Unable to create Telegram link");
+    }
+
+    const telegramUrl =
+      `https://t.me/CryptomintxBot?start=${encodeURIComponent(data.token)}`;
+
+    window.open(
+      telegramUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
+  } catch (error) {
+    console.error("Telegram connection error:", error);
+
+    setTelegramMessage(
+      error.message || "Unable to connect Telegram. Please try again."
+    );
+  } finally {
+    setTelegramLoading(false);
+  }
+};
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -931,6 +984,49 @@ export default function Profile() {
                 );
               }}
             />
+
+            <div className="border-t border-[#1A1E24] p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium">
+                    Telegram
+                  </p>
+
+                  <p className="mt-1 text-xs text-[#737B89]">
+                    Connect your CryptoMintX account with Telegram
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleConnectTelegram}
+                  disabled={telegramLoading}
+                  className="
+        rounded-xl
+        bg-[#229ED9]
+        px-4
+        py-2.5
+        text-sm
+        font-semibold
+        text-white
+        transition
+        hover:opacity-90
+        disabled:cursor-not-allowed
+        disabled:opacity-50
+      "
+                >
+                  {telegramLoading
+                    ? "Connecting..."
+                    : "Connect Telegram"}
+                </button>
+              </div>
+
+              {telegramMessage && (
+                <p className="mt-3 text-xs text-[#AAB1BD]">
+                  {telegramMessage}
+                </p>
+              )}
+            </div>
 
           </div>
 

@@ -1,5 +1,6 @@
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -15,7 +16,6 @@ const API_URL =
 function getAvatarUrl(avatarUrl) {
   if (!avatarUrl) return "";
 
-  // Already a complete URL
   if (
     avatarUrl.startsWith("http://") ||
     avatarUrl.startsWith("https://")
@@ -23,8 +23,6 @@ function getAvatarUrl(avatarUrl) {
     return avatarUrl;
   }
 
-  // MongoDB stores something like:
-  // /uploads/profile/avatar-123.jpg
   return `${API_URL}${avatarUrl}`;
 }
 
@@ -32,16 +30,12 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  async function fetchUser() {
+  const fetchUser = useCallback(async () => {
     const token = localStorage.getItem("token");
 
     if (!token) {
       setLoading(false);
-      return;
+      return null;
     }
 
     try {
@@ -60,19 +54,86 @@ export function AuthProvider({ children }) {
           ...userData,
           avatarUrl: getAvatarUrl(userData?.avatarUrl),
         });
-      } else {
-        localStorage.removeItem("token");
-        setUser(null);
+
+        return userData;
       }
+
+      localStorage.removeItem("token");
+      setUser(null);
+      return null;
     } catch (err) {
       console.error("Fetch user error:", err);
 
       localStorage.removeItem("token");
       setUser(null);
+
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  // =====================================================
+  // TELEGRAM LOGIN
+  // =====================================================
+
+  const loginWithTelegram = useCallback(async () => {
+    if (!window.Telegram?.WebApp) {
+      throw new Error(
+        "Telegram Mini App is not available"
+      );
     }
 
-    setLoading(false);
-  }
+    const tg = window.Telegram.WebApp;
+
+    tg.ready();
+    tg.expand();
+
+    const initData = tg.initData;
+
+    if (!initData) {
+      throw new Error(
+        "Telegram authentication data is unavailable"
+      );
+    }
+
+    const res = await fetch(
+      `${API_URL}/api/auth/telegram`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          initData,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success || !data.token) {
+      throw new Error(
+        data.message || "Telegram login failed"
+      );
+    }
+
+    // Same JWT storage used by normal login
+    localStorage.setItem("token", data.token);
+
+    // Load CryptoMintX user
+    await fetchUser();
+
+    return data;
+  }, [fetchUser]);
+
+  // =====================================================
+  // LOGOUT
+  // =====================================================
 
   function logout() {
     localStorage.removeItem("token");
@@ -89,6 +150,7 @@ export function AuthProvider({ children }) {
         loading,
         logout,
         fetchUser,
+        loginWithTelegram,
       }}
     >
       {children}

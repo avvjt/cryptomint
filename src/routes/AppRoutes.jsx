@@ -24,10 +24,15 @@ import Admin from "../pages/Admin";
 import Terms from "../pages/Terms";
 import Privacy from "../pages/Privacy";
 import Disclaimer from "../pages/Disclaimer";
+import TelegramAuth from "../pages/TelegramAuth";
 
 export default function AppRoutes() {
   return (
     <Routes>
+      <Route
+        path="/telegram-auth"
+        element={<TelegramAuth />}
+      />
       <Route element={<GuestRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />
