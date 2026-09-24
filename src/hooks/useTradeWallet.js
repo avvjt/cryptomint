@@ -33,6 +33,24 @@ export default function useTradeWallet() {
 
   /*
    * ============================================================
+   * COUNTDOWN CLOCK
+   * ============================================================
+   */
+
+  const [now, setNow] = useState(Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(interval);
+    };
+  }, []);
+
+  /*
+   * ============================================================
    * FETCH WALLET
    * ============================================================
    */
@@ -41,7 +59,6 @@ export default function useTradeWallet() {
     try {
       const headers = getAuthHeaders();
 
-      // User is not logged in
       if (!headers) {
         setWallet(null);
         return null;
@@ -70,7 +87,8 @@ export default function useTradeWallet() {
         );
       }
 
-      const walletData = data?.wallet || null;
+      const walletData =
+        data?.wallet || null;
 
       setWallet(walletData);
 
@@ -115,7 +133,8 @@ export default function useTradeWallet() {
           }
         );
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (!response.ok) {
           if (response.status === 401) {
@@ -129,11 +148,10 @@ export default function useTradeWallet() {
           );
         }
 
-        const trades = Array.isArray(
-          data?.trades
-        )
-          ? data.trades
-          : [];
+        const trades =
+          Array.isArray(data?.trades)
+            ? data.trades
+            : [];
 
         setTradeHistory(trades);
 
@@ -156,234 +174,39 @@ export default function useTradeWallet() {
    * ============================================================
    */
 
-  const refresh = useCallback(async () => {
-    const token = localStorage.getItem("token");
+  const refresh = useCallback(
+    async () => {
+      const token =
+        localStorage.getItem("token");
 
-    // Not logged in
-    if (!token) {
-      setWallet(null);
-      setTradeHistory([]);
-      setLoading(false);
-      return;
-    }
+      if (!token) {
+        setWallet(null);
+        setTradeHistory([]);
+        setLoading(false);
+        return;
+      }
 
-    setLoading(true);
-    setError("");
+      setLoading(true);
+      setError("");
 
-    try {
-      await Promise.all([
-        fetchWallet(),
-        fetchTradeHistory(),
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  }, [
-    fetchWallet,
-    fetchTradeHistory,
-  ]);
+      try {
+        await Promise.all([
+          fetchWallet(),
+          fetchTradeHistory(),
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [
+      fetchWallet,
+      fetchTradeHistory,
+    ]
+  );
 
   useEffect(() => {
     refresh();
   }, [refresh]);
-
-  /*
-   * ============================================================
-   * MANUAL TRADE
-   * ============================================================
-   */
-
-  const executeTrade = useCallback(
-    async ({ symbol } = {}) => {
-      if (processing) {
-        return {
-          success: false,
-          message:
-            "A trade is already being processed.",
-        };
-      }
-
-      const headers = getAuthHeaders();
-
-      if (!headers) {
-        return {
-          success: false,
-          message: "Please login first.",
-        };
-      }
-
-      setProcessing(true);
-      setError("");
-
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/trade/manual`,
-          {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
-              symbol: symbol || null,
-            }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          const message =
-            data?.message ||
-            "Unable to complete trade.";
-
-          setError(message);
-
-          return {
-            success: false,
-            message,
-          };
-        }
-
-        setLastTrade(
-          data?.trade || null
-        );
-
-        await Promise.all([
-          fetchWallet(),
-          fetchTradeHistory(),
-        ]);
-
-        return {
-          success: true,
-          message:
-            data?.message ||
-            "Trade completed.",
-          trade: data?.trade,
-          earning: data?.earning,
-        };
-      } catch (err) {
-        console.error(
-          "Execute trade error:",
-          err
-        );
-
-        const message =
-          err?.message ||
-          "Unable to complete trade.";
-
-        setError(message);
-
-        return {
-          success: false,
-          message,
-        };
-      } finally {
-        setProcessing(false);
-      }
-    },
-    [
-      processing,
-      fetchWallet,
-      fetchTradeHistory,
-    ]
-  );
-
-  /*
-   * ============================================================
-   * AUTO TRADE
-   * ============================================================
-   */
-
-  const startAutoTrade = useCallback(
-    async ({ symbol } = {}) => {
-      if (processing) {
-        return {
-          success: false,
-          message:
-            "A trade is already being processed.",
-        };
-      }
-
-      const headers = getAuthHeaders();
-
-      if (!headers) {
-        return {
-          success: false,
-          message: "Please login first.",
-        };
-      }
-
-      setProcessing(true);
-      setError("");
-
-      try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/trade/auto`,
-          {
-            method: "POST",
-            headers,
-            body: JSON.stringify({
-              symbol: symbol || null,
-            }),
-          }
-        );
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          const message =
-            data?.message ||
-            "Unable to start Auto Trade.";
-
-          setError(message);
-
-          return {
-            success: false,
-            message,
-          };
-        }
-
-        setLastTrade(
-          data?.trade || null
-        );
-
-        await Promise.all([
-          fetchWallet(),
-          fetchTradeHistory(),
-        ]);
-
-        return {
-          success: true,
-          message:
-            data?.message ||
-            "Auto Trade completed.",
-          trade: data?.trade,
-          earning: data?.earning,
-        };
-      } catch (err) {
-        console.error(
-          "Auto Trade error:",
-          err
-        );
-
-        const message =
-          err?.message ||
-          "Unable to start Auto Trade.";
-
-        setError(message);
-
-        return {
-          success: false,
-          message,
-        };
-      } finally {
-        setProcessing(false);
-      }
-    },
-    [
-      processing,
-      fetchWallet,
-      fetchTradeHistory,
-    ]
-  );
 
   /*
    * ============================================================
@@ -395,67 +218,484 @@ export default function useTradeWallet() {
     wallet?.availableBalance ?? 0
   );
 
-  const availableBalance = balance;
+  const availableBalance =
+    balance;
 
   const lockedBalance = Number(
     wallet?.lockedBalance ?? 0
   );
 
-  const totalBalance =
-    availableBalance + lockedBalance;
+  const totalBalance = Number(
+    wallet?.totalBalance ??
+      availableBalance +
+        lockedBalance
+  );
 
   /*
    * ============================================================
-   * DAILY TRADE STATUS
+   * BACKEND AUTO TRADE STATE
    * ============================================================
    */
 
-  const today = useMemo(() => {
-    return new Date()
-      .toISOString()
-      .slice(0, 10);
-  }, []);
+  const processingUntil =
+    wallet?.processingUntil
+      ? new Date(
+          wallet.processingUntil
+        ).getTime()
+      : null;
 
-  const todayTrade =
-    tradeHistory.find(
-      (trade) =>
-        trade.date === today &&
-        trade.status === "COMPLETED"
+  const cooldownUntil =
+    wallet?.cooldownUntil
+      ? new Date(
+          wallet.cooldownUntil
+        ).getTime()
+      : null;
+
+  /*
+   * ============================================================
+   * 5 MINUTE PROCESSING COUNTDOWN
+   * ============================================================
+   */
+
+  const processingRemaining =
+    processingUntil &&
+    processingUntil > now
+      ? processingUntil - now
+      : 0;
+
+  /*
+   * ============================================================
+   * 24 HOUR COOLDOWN COUNTDOWN
+   * ============================================================
+   */
+
+  const cooldownRemaining =
+    cooldownUntil &&
+    cooldownUntil > now
+      ? cooldownUntil - now
+      : 0;
+
+  const isLocked =
+    processingRemaining > 0;
+
+  const isCooldown =
+    cooldownRemaining > 0;
+
+  const lockRemaining =
+    processingRemaining;
+
+  /*
+   * ============================================================
+   * FORMAT DURATION
+   * ============================================================
+   */
+
+  const formatDuration =
+    useCallback(
+      (milliseconds) => {
+        const totalSeconds =
+          Math.ceil(
+            Math.max(
+              0,
+              milliseconds || 0
+            ) / 1000
+          );
+
+        const hours =
+          Math.floor(
+            totalSeconds / 3600
+          );
+
+        const minutes =
+          Math.floor(
+            (totalSeconds % 3600) / 60
+          );
+
+        const seconds =
+          totalSeconds % 60;
+
+        return `${String(
+          hours
+        ).padStart(
+          2,
+          "0"
+        )}:${String(
+          minutes
+        ).padStart(
+          2,
+          "0"
+        )}:${String(
+          seconds
+        ).padStart(
+          2,
+          "0"
+        )}`;
+      },
+      []
     );
 
+  /*
+   * ============================================================
+   * AUTO TRADE STATUS
+   *
+   * Backend is authoritative.
+   * ============================================================
+   */
+
+  const backendCanAutoTrade =
+    wallet?.autoTrade
+      ?.canAutoTrade === true;
+
   const canAutoTrade =
-    !todayTrade && !processing;
+    backendCanAutoTrade &&
+    !isLocked &&
+    !isCooldown &&
+    !processing;
 
-  const lockedUntil = null;
-  const isLocked = false;
-  const lockRemaining = 0;
+  const autoTradeStatus =
+    isLocked
+      ? "PROCESSING"
+      : isCooldown
+      ? "COOLDOWN"
+      : balance <= 0
+      ? "NO_BALANCE"
+      : "AVAILABLE";
 
-  const formatDuration = useCallback(
-    (milliseconds) => {
-      const totalSeconds = Math.ceil(
-        Math.max(
-          0,
-          milliseconds
-        ) / 1000
+  /*
+   * ============================================================
+   * POLL WHILE PROCESSING
+   *
+   * Backend finalizer checks expired trades.
+   * Refresh every 5 seconds so UI gets the result.
+   * ============================================================
+   */
+
+  useEffect(() => {
+    if (!processingUntil) {
+      return;
+    }
+
+    const interval =
+      window.setInterval(() => {
+        fetchWallet();
+        fetchTradeHistory();
+      }, 5000);
+
+    return () => {
+      window.clearInterval(
+        interval
       );
+    };
+  }, [
+    processingUntil,
+    fetchWallet,
+    fetchTradeHistory,
+  ]);
 
-      const minutes = Math.floor(
-        totalSeconds / 60
-      );
+  /*
+   * ============================================================
+   * REFRESH WHEN PROCESSING TIMER ENDS
+   * ============================================================
+   */
 
-      const seconds =
-        totalSeconds % 60;
+  useEffect(() => {
+    if (
+      processingUntil &&
+      processingRemaining <= 0
+    ) {
+      fetchWallet();
+      fetchTradeHistory();
+    }
+  }, [
+    processingUntil,
+    processingRemaining,
+    fetchWallet,
+    fetchTradeHistory,
+  ]);
 
-      return `${String(minutes).padStart(
-        2,
-        "0"
-      )}:${String(seconds).padStart(
-        2,
-        "0"
-      )}`;
-    },
-    []
-  );
+  /*
+   * ============================================================
+   * REFRESH WHEN COOLDOWN ENDS
+   * ============================================================
+   */
+
+  useEffect(() => {
+    if (
+      cooldownUntil &&
+      cooldownRemaining <= 0
+    ) {
+      fetchWallet();
+      fetchTradeHistory();
+    }
+  }, [
+    cooldownUntil,
+    cooldownRemaining,
+    fetchWallet,
+    fetchTradeHistory,
+  ]);
+
+  /*
+   * ============================================================
+   * MANUAL TRADE
+   *
+   * Kept here for backend compatibility.
+   * Trade.jsx will no longer call it.
+   * ============================================================
+   */
+
+  const executeTrade =
+    useCallback(
+      async ({ symbol } = {}) => {
+        if (processing) {
+          return {
+            success: false,
+            message:
+              "A trade is already being processed.",
+          };
+        }
+
+        const headers =
+          getAuthHeaders();
+
+        if (!headers) {
+          return {
+            success: false,
+            message:
+              "Please login first.",
+          };
+        }
+
+        setProcessing(true);
+        setError("");
+
+        try {
+          const response =
+            await fetch(
+              `${API_BASE_URL}/api/trade/manual`,
+              {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                  symbol:
+                    symbol || null,
+                }),
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            const message =
+              data?.message ||
+              "Unable to complete trade.";
+
+            setError(message);
+
+            return {
+              success: false,
+              message,
+            };
+          }
+
+          setLastTrade(
+            data?.trade || null
+          );
+
+          await Promise.all([
+            fetchWallet(),
+            fetchTradeHistory(),
+          ]);
+
+          return {
+            success: true,
+            message:
+              data?.message ||
+              "Trade completed.",
+            trade: data?.trade,
+            earning: data?.earning,
+          };
+        } catch (err) {
+          console.error(
+            "Execute trade error:",
+            err
+          );
+
+          const message =
+            err?.message ||
+            "Unable to complete trade.";
+
+          setError(message);
+
+          return {
+            success: false,
+            message,
+          };
+        } finally {
+          setProcessing(false);
+        }
+      },
+      [
+        processing,
+        fetchWallet,
+        fetchTradeHistory,
+      ]
+    );
+
+  /*
+   * ============================================================
+   * AUTO TRADE
+   * ============================================================
+   */
+
+  const startAutoTrade =
+    useCallback(
+      async ({ symbol } = {}) => {
+        if (processing) {
+          return {
+            success: false,
+            message:
+              "A trade is already being processed.",
+          };
+        }
+
+        if (isLocked) {
+          return {
+            success: false,
+            message:
+              "Auto Trade is currently processing.",
+          };
+        }
+
+        if (isCooldown) {
+          return {
+            success: false,
+            message:
+              `Auto Trade is unavailable for ${formatDuration(
+                cooldownRemaining
+              )}.`,
+          };
+        }
+
+        if (balance <= 0) {
+          return {
+            success: false,
+            message:
+              "Insufficient available balance.",
+          };
+        }
+
+        const headers =
+          getAuthHeaders();
+
+        if (!headers) {
+          return {
+            success: false,
+            message:
+              "Please login first.",
+          };
+        }
+
+        setProcessing(true);
+        setError("");
+
+        try {
+          const response =
+            await fetch(
+              `${API_BASE_URL}/api/trade/auto`,
+              {
+                method: "POST",
+                headers,
+                body: JSON.stringify({
+                  symbol:
+                    symbol || null,
+                }),
+              }
+            );
+
+          const data =
+            await response.json();
+
+          if (!response.ok) {
+            const message =
+              data?.message ||
+              "Unable to start Auto Trade.";
+
+            setError(message);
+
+            /*
+             * Refresh in case backend state
+             * changed before the error response.
+             */
+            await fetchWallet();
+
+            return {
+              success: false,
+              message,
+            };
+          }
+
+          setLastTrade(
+            data?.trade || null
+          );
+
+          /*
+           * IMPORTANT:
+           *
+           * Auto Trade is now PROCESSING.
+           * Refresh wallet so frontend gets
+           * processingUntil immediately.
+           */
+          await Promise.all([
+            fetchWallet(),
+            fetchTradeHistory(),
+          ]);
+
+          return {
+            success: true,
+            message:
+              data?.message ||
+              "Auto Trade started.",
+            trade: data?.trade,
+            earning: data?.earning,
+            processingUntil:
+              data?.processingUntil ||
+              null,
+            cooldownUntil:
+              data?.cooldownUntil ||
+              null,
+          };
+        } catch (err) {
+          console.error(
+            "Auto Trade error:",
+            err
+          );
+
+          const message =
+            err?.message ||
+            "Unable to start Auto Trade.";
+
+          setError(message);
+
+          return {
+            success: false,
+            message,
+          };
+        } finally {
+          setProcessing(false);
+        }
+      },
+      [
+        processing,
+        isLocked,
+        isCooldown,
+        cooldownRemaining,
+        balance,
+        formatDuration,
+        fetchWallet,
+        fetchTradeHistory,
+      ]
+    );
 
   /*
    * ============================================================
@@ -475,21 +715,76 @@ export default function useTradeWallet() {
     processing,
     error,
 
-    lockedUntil,
-    isLocked,
-    lockRemaining,
-    formatDuration,
+    /*
+     * Processing / 5 minute lock
+     */
+    lockedUntil:
+      wallet?.processingUntil ||
+      null,
 
+    processingUntil:
+      wallet?.processingUntil ||
+      null,
+
+    isLocked,
+
+    lockRemaining,
+
+    processingRemaining,
+
+    processingTime:
+      formatDuration(
+        processingRemaining
+      ),
+
+    /*
+     * 24 hour cooldown
+     */
+    cooldownUntil:
+      wallet?.cooldownUntil ||
+      null,
+
+    isCooldown,
+
+    cooldownRemaining,
+
+    cooldownTimeRemaining:
+      cooldownRemaining,
+
+    cooldownTime:
+      formatDuration(
+        cooldownRemaining
+      ),
+
+    /*
+     * Auto Trade
+     */
+    canAutoTrade,
+
+    autoTradeStatus,
+
+    /*
+     * History
+     */
     tradeHistory,
     lastTrade,
 
-    canAutoTrade,
-
+    /*
+     * Actions
+     */
     executeTrade,
     startAutoTrade,
 
+    /*
+     * Refresh
+     */
     refresh,
     fetchWallet,
     fetchTradeHistory,
+
+    /*
+     * Utility
+     */
+    formatDuration,
   };
 }

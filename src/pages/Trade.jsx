@@ -66,12 +66,14 @@ function TradeContent() {
     useState(false);
 
   const {
-    balance,
-    canAutoTrade,
-    lockedUntil,
-    executeTrade,
-    startAutoTrade,
-  } = useTradeWalletContext();
+  balance,
+  canAutoTrade,
+  lockedUntil,
+  cooldownUntil,
+  isLocked,
+  isCooldown,
+  startAutoTrade,
+} = useTradeWalletContext();
 
 
   const symbol =
@@ -86,57 +88,15 @@ function TradeContent() {
 
 
 
-const handleTrade = async () => {
+const handleTrade = () => {
   if (!isActive) {
     setShowActivationModal(true);
     return;
   }
 
-  if (Number(balance) <= 0) {
-    alert(
-      "Your wallet balance is currently unavailable."
-    );
-    return;
-  }
-
-  setModal("trade");
-  setProcessing(true);
-
-  try {
-    /*
-     * 5-second visual loading.
-     */
-    await new Promise((resolve) => {
-      window.setTimeout(resolve, 5000);
-    });
-
-    /*
-     * REAL backend trade.
-     */
-    const result = await executeTrade({
-      symbol,
-    });
-
-    if (!result?.success) {
-      setModal(null);
-
-      alert(
-        result?.message ||
-          "Unable to complete trade."
-      );
-
-      return;
-    }
-
-    /*
-     * Brief success state.
-     */
-    window.setTimeout(() => {
-      setModal(null);
-    }, 1500);
-  } finally {
-    setProcessing(false);
-  }
+  alert(
+    "🔒 Trade option is locked.\n\nPlease use Auto Trade once every 24 hours to receive your daily earning."
+  );
 };
 
 
@@ -146,48 +106,65 @@ const handleTrade = async () => {
     return;
   }
 
-  if (!canAutoTrade) {
+  // Currently processing
+  if (isLocked) {
     alert(
-      "Today's trade has already been completed."
+      "Your wallet is currently being processed. Please wait until the timer ends."
     );
     return;
   }
 
-  if (
-    lockedUntil &&
-    Number(lockedUntil) > Date.now()
-  ) {
+  // 24-hour cooldown
+  if (isCooldown) {
     alert(
-      "Your wallet is currently being processed."
+      "Auto Trade has already been used. Please wait until the 24-hour timer ends."
     );
+    return;
+  }
+
+  // Backend says Auto Trade isn't available
+  if (!canAutoTrade) {
+    if (Number(balance) <= 0) {
+      alert(
+        "Your wallet does not have an available balance."
+      );
+    } else {
+      alert(
+        "Auto Trade is currently unavailable. Please try again later."
+      );
+    }
+
     return;
   }
 
   if (Number(balance) <= 0) {
     alert(
-      "Your wallet balance is unavailable."
+      "Your wallet does not have an available balance."
     );
     return;
   }
 
   /*
-   * Show the existing 5-second
-   * Auto Trade initialization UI.
+   * Show the existing 5-second initialization UI.
    */
   setModal("auto");
   setProcessing(true);
 
   try {
     /*
-     * Keep the 5-second visual experience.
+     * Keep the existing visual loading experience.
      */
     await new Promise((resolve) => {
       window.setTimeout(resolve, 5000);
     });
 
     /*
-     * After the loading animation,
-     * perform the REAL backend request.
+     * Start REAL backend Auto Trade.
+     *
+     * Backend will:
+     * - lock the available wallet balance
+     * - create PROCESSING trade
+     * - set 5-minute processingUntil
      */
     const result = await startAutoTrade({
       symbol,
@@ -205,11 +182,19 @@ const handleTrade = async () => {
     }
 
     /*
-     * Keep success modal visible briefly.
+     * Show success briefly.
      */
     window.setTimeout(() => {
       setModal(null);
     }, 1500);
+  } catch (error) {
+    setModal(null);
+
+    alert(
+      error?.response?.data?.message ||
+        error?.message ||
+        "Unable to start Auto Trade."
+    );
   } finally {
     setProcessing(false);
   }
@@ -326,28 +311,14 @@ const handleTrade = async () => {
             >
 
               <TradeActions
-                balance={balance}
-
-                canAutoTrade={
-                  canAutoTrade
-                }
-
-                lockedUntil={
-                  lockedUntil
-                }
-
-                processing={
-                  processing
-                }
-
-                onTrade={
-                  handleTrade
-                }
-
-                onAutoTrade={
-                  handleAutoTrade
-                }
-              />
+  balance={balance}
+  canAutoTrade={canAutoTrade}
+  lockedUntil={lockedUntil}
+  cooldownUntil={cooldownUntil}
+  processing={processing}
+  onTrade={handleTrade}
+  onAutoTrade={handleAutoTrade}
+/>
 
             </div>
 
@@ -560,28 +531,14 @@ const handleTrade = async () => {
           >
 
             <TradeActions
-              balance={balance}
-
-              canAutoTrade={
-                canAutoTrade
-              }
-
-              lockedUntil={
-                lockedUntil
-              }
-
-              processing={
-                processing
-              }
-
-              onTrade={
-                handleTrade
-              }
-
-              onAutoTrade={
-                handleAutoTrade
-              }
-            />
+  balance={balance}
+  canAutoTrade={canAutoTrade}
+  lockedUntil={lockedUntil}
+  cooldownUntil={cooldownUntil}
+  processing={processing}
+  onTrade={handleTrade}
+  onAutoTrade={handleAutoTrade}
+/>
 
           </div>
 

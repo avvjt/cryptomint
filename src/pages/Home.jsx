@@ -1,7 +1,6 @@
 import HomeHero from "../components/HomeHero";
 import ZeroFeeSection from "../components/zero-fee/ZeroFeeSection";
 import Features from "../components/Features";
-import Security from "../components/Security";
 import HowItWorks from "../components/HowItWorks";
 import Faq from "../components/Faq";
 import HomeCTA from "../components/HomeCTA";

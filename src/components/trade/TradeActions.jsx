@@ -1,518 +1,489 @@
-import {
-  ArrowUpRight,
-  Bot,
-  Wallet,
-  Clock3,
-  Sparkles,
-  ShieldCheck,
-} from "lucide-react";
+import React, { useEffect, useState } from "react";
 
 export default function TradeActions({
   balance = 0,
-  canAutoTrade = true,
+  canAutoTrade = false,
   lockedUntil = null,
+  cooldownUntil = null,
   processing = false,
+
   onTrade,
   onAutoTrade,
-  packageName = null,
-  dailyReturn = null,
+
+  packageName,
+  dailyReturn,
 }) {
-  const isLocked =
-    lockedUntil &&
-    Number(lockedUntil) > Date.now();
+  const [now, setNow] = useState(Date.now());
 
-  const availableBalance = isLocked
-    ? 0
-    : Number(balance || 0);
+  // --------------------------------------------------
+  // Live countdown
+  // --------------------------------------------------
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
 
-  const formattedBalance =
-    availableBalance.toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    return () => window.clearInterval(interval);
+  }, []);
 
+  // --------------------------------------------------
+  // Processing state
+  // --------------------------------------------------
+  const processingTime = lockedUntil
+    ? new Date(lockedUntil).getTime() - now
+    : 0;
+
+  const isProcessing = processingTime > 0;
+
+  // --------------------------------------------------
+  // 24h cooldown
+  // --------------------------------------------------
+  const cooldownTime = cooldownUntil
+    ? new Date(cooldownUntil).getTime() - now
+    : 0;
+
+  const isCooldown = cooldownTime > 0;
+
+  // --------------------------------------------------
+  // Format countdown
+  // --------------------------------------------------
+  const formatTime = (milliseconds) => {
+    if (!milliseconds || milliseconds <= 0) {
+      return "00:00:00";
+    }
+
+    const totalSeconds = Math.ceil(
+      milliseconds / 1000
+    );
+
+    const hours = Math.floor(
+      totalSeconds / 3600
+    );
+
+    const minutes = Math.floor(
+      (totalSeconds % 3600) / 60
+    );
+
+    const seconds =
+      totalSeconds % 60;
+
+    return [
+      String(hours).padStart(2, "0"),
+      String(minutes).padStart(2, "0"),
+      String(seconds).padStart(2, "0"),
+    ].join(":");
+  };
+
+  const processingLabel =
+    formatTime(processingTime);
+
+  const cooldownLabel =
+    formatTime(cooldownTime);
+
+  // --------------------------------------------------
+  // Balance
+  // --------------------------------------------------
+  const numericBalance =
+    Number(balance || 0);
+
+  // --------------------------------------------------
+  // Auto Trade button state
+  // --------------------------------------------------
   const autoTradeDisabled =
-    !canAutoTrade ||
     processing ||
-    isLocked ||
-    availableBalance <= 0;
+    isProcessing ||
+    isCooldown ||
+    !canAutoTrade ||
+    numericBalance <= 0;
+
+  let autoTradeLabel = "Auto Trade";
+
+  if (processing) {
+    autoTradeLabel = "Initializing...";
+  } else if (isProcessing) {
+    autoTradeLabel =
+      `Processing ${processingLabel}`;
+  } else if (isCooldown) {
+    autoTradeLabel =
+      `Used · ${cooldownLabel}`;
+  } else if (numericBalance <= 0) {
+    autoTradeLabel = "No Balance";
+  } else if (!canAutoTrade) {
+    autoTradeLabel = "Used Today";
+  }
+
+  // --------------------------------------------------
+  // Trade button
+  //
+  // IMPORTANT:
+  // It stays clickable so we can explain why it
+  // is locked. It is NOT disabled.
+  // --------------------------------------------------
+  const handleLockedTrade = () => {
+    if (typeof onTrade === "function") {
+      onTrade();
+    }
+  };
 
   return (
-    <section
-      className="
-        w-full
+    <div className="w-full">
 
-        rounded-[18px]
-
-        border
-        border-[#20262E]
-
-        bg-[#0D1117]
-
-        p-2.5
-
-        shadow-[0_12px_40px_rgba(0,0,0,0.35)]
-      "
-    >
-
-      {/* =====================================================
+      {/* =================================================
           WALLET
-      ===================================================== */}
-
+      ================================================= */}
       <div
         className="
-          relative
-          overflow-hidden
-
-          rounded-[15px]
-
+          mb-3
+          rounded-xl
           border
-          border-[#20262E]
-
-          bg-gradient-to-br
-          from-[#171C23]
-          via-[#141920]
-          to-[#10151B]
-
-          px-3.5
-          py-3
+          border-[#1A1E24]
+          bg-[#0F1216]
+          p-4
         "
       >
-
-        {/* subtle glow */}
-
         <div
           className="
-            pointer-events-none
-
-            absolute
-            -right-8
-            -top-10
-
-            h-24
-            w-24
-
-            rounded-full
-
-            bg-[#1D66FF]/10
-
-            blur-2xl
-          "
-        />
-
-        <div
-          className="
-            relative
-
             flex
             items-center
             justify-between
-
             gap-3
           "
         >
-
-          {/* Left */}
-
-          <div
-            className="
-              flex
-              min-w-0
-              items-center
-              gap-2.5
-            "
-          >
+          <div>
+            <p
+              className="
+                text-[11px]
+                uppercase
+                tracking-[0.12em]
+                text-[#68717D]
+              "
+            >
+              Available Balance
+            </p>
 
             <div
               className="
+                mt-1
                 flex
-                h-9
-                w-9
-                shrink-0
-
-                items-center
-                justify-center
-
-                rounded-xl
-
-                border
-                border-[#315EA8]/30
-
-                bg-[#1D66FF]/10
+                items-baseline
+                gap-1.5
               "
             >
-              <Wallet
-                size={17}
-                className="text-[#6EA2FF]"
-              />
-            </div>
-
-            <div className="min-w-0">
-
-              <div className="flex items-center gap-2">
-
-                <p
-                  className="
-                    text-[9px]
-                    font-semibold
-                    uppercase
-                    tracking-[0.13em]
-                    text-[#69727E]
-                  "
-                >
-                  Wallet Balance
-                </p>
-
-                <ShieldCheck
-                  size={11}
-                  className="text-[#00C076]"
-                />
-
-              </div>
-
-              <p
+              <span
                 className="
-                  mt-0.5
-                  truncate
-
-                  text-[15px]
+                  text-2xl
                   font-semibold
                   tracking-tight
                   text-white
                 "
               >
-                {formattedBalance}
+                {numericBalance.toFixed(2)}
+              </span>
 
-                <span
-                  className="
-                    ml-1
-
-                    text-[10px]
-                    font-medium
-                    text-[#69727E]
-                  "
-                >
-                  USDT
-                </span>
-              </p>
-
+              <span
+                className="
+                  text-sm
+                  text-[#68717D]
+                "
+              >
+                USDT
+              </span>
             </div>
-
           </div>
 
-
-          {/* Right status */}
-
-          {isLocked ? (
-
+          {/* Processing indicator */}
+          {isProcessing && (
             <div
               className="
-                flex
-                shrink-0
-                items-center
-                gap-1.5
-
-                rounded-full
-
+                rounded-lg
                 border
-                border-[#F6465D]/20
-
-                bg-[#F6465D]/10
-
-                px-2.5
-                py-1.5
-
-                text-[9px]
-                font-semibold
-                text-[#FF7182]
+                border-[#2A3038]
+                bg-[#14181D]
+                px-3
+                py-2
+                text-right
               "
             >
-              <Clock3 size={11} />
-
-              Processing
-            </div>
-
-          ) : packageName ? (
-
-            <div className="text-right">
-
               <p
                 className="
-                  text-[9px]
+                  text-[10px]
                   uppercase
                   tracking-wider
                   text-[#68717D]
                 "
               >
-                {packageName}
+                Processing
               </p>
 
-              {dailyReturn !== null && (
+              <p
+                className="
+                  mt-0.5
+                  text-sm
+                  font-medium
+                  tabular-nums
+                  text-white
+                "
+              >
+                {processingLabel}
+              </p>
+            </div>
+          )}
+
+          {/* Cooldown indicator */}
+          {!isProcessing &&
+            isCooldown && (
+              <div
+                className="
+                  rounded-lg
+                  border
+                  border-[#2A3038]
+                  bg-[#14181D]
+                  px-3
+                  py-2
+                  text-right
+                "
+              >
+                <p
+                  className="
+                    text-[10px]
+                    uppercase
+                    tracking-wider
+                    text-[#68717D]
+                  "
+                >
+                  Next Auto Trade
+                </p>
+
                 <p
                   className="
                     mt-0.5
-
-                    text-[11px]
-                    font-semibold
-                    text-[#00C076]
+                    text-sm
+                    font-medium
+                    tabular-nums
+                    text-white
                   "
                 >
-                  {(Number(dailyReturn) * 100).toFixed(2)}%
-                  <span className="ml-1 text-[#68717D]">
-                    daily
-                  </span>
+                  {cooldownLabel}
                 </p>
-              )}
-
-            </div>
-
-          ) : (
-
-            <div
-              className="
-                flex
-                items-center
-                gap-1
-
-                text-[9px]
-                text-[#68717D]
-              "
-            >
-              <Sparkles size={11} />
-
-              Ready
-            </div>
-
-          )}
-
+              </div>
+            )}
         </div>
-
       </div>
 
-
-      {/* =====================================================
-          ACTION BUTTONS
-      ===================================================== */}
-
+      {/* =================================================
+          ACTIONS
+      ================================================= */}
       <div
         className="
-          mt-2.5
-
           grid
           grid-cols-2
-
           gap-2
         "
       >
 
-        {/* ===================================================
-            TRADE
-        =================================================== */}
-
+        {/* =================================================
+            TRADE — ALWAYS LOCKED
+        ================================================= */}
         <button
           type="button"
-          onClick={onTrade}
-          disabled={availableBalance <= 0 || processing}
+          onClick={handleLockedTrade}
           className="
-            group
             relative
-            overflow-hidden
-
             flex
-            h-[52px]
-
+            min-h-[52px]
             items-center
             justify-center
             gap-2
-
-            rounded-[15px]
-
-            bg-gradient-to-b
-            from-[#18CD91]
-            to-[#00AD76]
-
-            text-[14px]
+            rounded-xl
+            border
+            border-[#292E35]
+            bg-[#111419]
+            px-4
+            text-sm
             font-semibold
-            text-white
-
-            shadow-[0_6px_20px_rgba(0,192,118,0.18)]
-
+            text-[#777F89]
             transition-all
             duration-200
-
-            hover:-translate-y-[1px]
-            hover:shadow-[0_10px_28px_rgba(0,192,118,0.28)]
-
-            active:scale-[0.985]
-
-            disabled:cursor-not-allowed
-            disabled:opacity-35
-            disabled:hover:translate-y-0
+            hover:border-[#353C45]
+            hover:bg-[#15191E]
+            hover:text-[#A0A7B0]
+            active:scale-[0.98]
           "
         >
-
-          {/* shine */}
-
-          <span
-            className="
-              pointer-events-none
-
-              absolute
-              inset-x-0
-              top-0
-
-              h-1/2
-
-              bg-gradient-to-b
-              from-white/[0.12]
-              to-transparent
-            "
-          />
-
-          <span
-            className="
-              relative
-
-              flex
-              h-7
-              w-7
-
-              items-center
-              justify-center
-
-              rounded-lg
-
-              bg-white/10
-            "
+          {/* Lock icon */}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
           >
-            <ArrowUpRight
-              size={17}
-              strokeWidth={2.4}
-              className="
-                transition-transform
-                duration-200
-
-                group-hover:-translate-y-0.5
-                group-hover:translate-x-0.5
-              "
+            <rect
+              x="3"
+              y="11"
+              width="18"
+              height="10"
+              rx="2"
             />
-          </span>
 
-          <span className="relative">
+            <path
+              d="M7 11V7a5 5 0 0 1 10 0v4"
+            />
+          </svg>
+
+          <span>
             Trade
           </span>
-
         </button>
 
-
-        {/* ===================================================
+        {/* =================================================
             AUTO TRADE
-        =================================================== */}
-
+        ================================================= */}
         <button
           type="button"
-          onClick={onAutoTrade}
           disabled={autoTradeDisabled}
-          className="
-            group
+          onClick={onAutoTrade}
+          className={`
             relative
-            overflow-hidden
-
             flex
-            h-[52px]
-
+            min-h-[52px]
             items-center
             justify-center
             gap-2
-
-            rounded-[15px]
-
-            bg-gradient-to-b
-            from-[#FF6075]
-            to-[#E63E56]
-
-            text-[14px]
+            rounded-xl
+            border
+            px-4
+            text-sm
             font-semibold
-            text-white
-
-            shadow-[0_6px_20px_rgba(246,70,93,0.18)]
-
             transition-all
             duration-200
 
-            hover:-translate-y-[1px]
-            hover:shadow-[0_10px_28px_rgba(246,70,93,0.28)]
-
-            active:scale-[0.985]
-
-            disabled:cursor-not-allowed
-            disabled:opacity-35
-            disabled:hover:translate-y-0
-          "
+            ${
+              autoTradeDisabled
+                ? `
+                  cursor-not-allowed
+                  border-[#252A31]
+                  bg-[#111419]
+                  text-[#656D77]
+                `
+                : `
+                  border-white
+                  bg-white
+                  text-black
+                  hover:bg-[#E7E9EB]
+                  active:scale-[0.98]
+                `
+            }
+          `}
         >
-
-          {/* shine */}
-
-          <span
-            className="
-              pointer-events-none
-
-              absolute
-              inset-x-0
-              top-0
-
-              h-1/2
-
-              bg-gradient-to-b
-              from-white/[0.12]
-              to-transparent
-            "
-          />
-
-          <span
-            className="
-              relative
-
-              flex
-              h-7
-              w-7
-
-              items-center
-              justify-center
-
-              rounded-lg
-
-              bg-white/10
-            "
-          >
-
-            <Bot
-              size={17}
-              strokeWidth={2.2}
+          {/* Auto Trade icon */}
+          {isProcessing ? (
+            <span
               className="
-                transition-transform
-                duration-200
-
-                group-hover:scale-110
+                h-4
+                w-4
+                animate-spin
+                rounded-full
+                border-2
+                border-[#555D67]
+                border-t-white
               "
             />
+          ) : isCooldown ? (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              />
 
+              <path d="M12 7v5l3 2" />
+            </svg>
+          ) : (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 12a9 9 0 0 1 15.5-6.2" />
+              <path d="M21 12a9 9 0 0 1-15.5 6.2" />
+              <path d="M18 3v4h-4" />
+              <path d="M6 21v-4h4" />
+            </svg>
+          )}
+
+          <span>
+            {autoTradeLabel}
           </span>
-
-          <span className="relative">
-
-            {processing
-              ? "Initializing..."
-              : canAutoTrade
-                ? "Auto Trade"
-                : "Used Today"}
-
-          </span>
-
         </button>
 
       </div>
 
-    </section>
+      {/* =================================================
+          AUTO TRADE INFORMATION
+      ================================================= */}
+      <div
+        className="
+          mt-3
+          text-center
+        "
+      >
+        {isProcessing ? (
+          <p
+            className="
+              text-[11px]
+              leading-5
+              text-[#68717D]
+            "
+          >
+            Your wallet is temporarily locked.
+            <br />
+            Auto Trade will finish automatically.
+          </p>
+        ) : isCooldown ? (
+          <p
+            className="
+              text-[11px]
+              leading-5
+              text-[#68717D]
+            "
+          >
+            Auto Trade has been used for today.
+            <br />
+            You can use it again when the timer ends.
+          </p>
+        ) : (
+          <p
+            className="
+              text-[11px]
+              leading-5
+              text-[#68717D]
+            "
+          >
+            Use Auto Trade once every 24 hours
+            <br />
+            to receive your daily earning.
+          </p>
+        )}
+      </div>
+
+    </div>
   );
 }
