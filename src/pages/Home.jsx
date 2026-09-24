@@ -1,25 +1,43 @@
-import Events from "../components/events/Events";
 import HomeHero from "../components/HomeHero";
+import ZeroFeeSection from "../components/zero-fee/ZeroFeeSection";
+import Features from "../components/Features";
 import Security from "../components/Security";
-import AssetSecurity from "../components/security/AssetSecurity";
-import AppDownload from "../components/app-download/AppDownload";
+import HowItWorks from "../components/HowItWorks";
+import Faq from "../components/Faq";
+import HomeCTA from "../components/HomeCTA";
 import FooterDesign from "../components/FooterDesign";
-import ZeroFeeSection from "../components/zero-fee/ZeroFeeSection"
-import DownloadCard from "../components/DownloadCard";
+import Events from "../components/events/Events";
 
-function Home() {
-    return (
-        <>
-            <AppDownload />
-            <Events />
-            <FooterDesign />
-            <ZeroFeeSection />
-            <HomeHero />
-            <Security />
-            <AssetSecurity />
-            <DownloadCard/>
-        </>
-    );
+export default function Home() {
+  return (
+    <main className="min-h-screen overflow-x-hidden bg-[#05070A] text-white">
+
+      {/* Hero */}
+      <HomeHero />
+
+      {/* Live markets / zero fee */}
+      <ZeroFeeSection />
+
+      {/* Platform features */}
+      <Features />
+
+      {/* Security */}
+      <Security />
+
+      <Events />
+
+      {/* Simple onboarding */}
+      <HowItWorks />
+
+      {/* FAQ */}
+      <Faq />
+
+      {/* Final CTA */}
+      <HomeCTA />
+
+      {/* Footer */}
+      <FooterDesign />
+
+    </main>
+  );
 }
-
-export default Home;

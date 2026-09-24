@@ -21,20 +21,26 @@ import GuestRoute from "../layouts/GuestRoute";
 import Wallet from "../pages/Wallet";
 import History from "../pages/History";
 import Admin from "../pages/Admin";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Disclaimer from "./pages/Disclaimer";
 
 export default function AppRoutes() {
   return (
     <Routes>
-      <Route element={<GuestRoute />}> 
-      <Route element={<MainLayout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/academy" element={<Academy />} />
-        <Route path="/help" element={<Help />} />
-      </Route>
+      <Route element={<GuestRoute />}>
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/academy" element={<Academy />} />
+          <Route path="/help" element={<Help />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/disclaimer" element={<Disclaimer />} />
+        </Route>
       </Route>
 
       <Route element={<ProtectedRoute />}>

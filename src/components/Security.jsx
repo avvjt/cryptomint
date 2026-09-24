@@ -1,84 +1,125 @@
-import React, { useState } from 'react';
+import { Check, Copy, ShieldCheck, Wallet, Zap } from "lucide-react";
+import { useState } from "react";
 
-const Security = () => {
-  const guardianAddress = "0x469AFE803C54A36674C55231489Cf4b61da8c1bC";
+const guardianAddress =
+  "0x469AFE803C54A36674C55231489Cf4b61da8c1bC";
+
+export default function Security() {
   const [copied, setCopied] = useState(false);
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(guardianAddress);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyAddress = async () => {
+    try {
+      await navigator.clipboard.writeText(guardianAddress);
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 1800);
+    } catch {
+      // Clipboard unavailable
+    }
   };
 
   return (
-    <div className="bg-black min-h-screen text-white font-sans">
-      <div className="max-w-6xl mx-auto px-6 py-16 md:py-24">
-        
-        {/* Main heading - exactly as screenshot */}
-        <h1 className="text-4xl md:text-5xl font-bold text-center tracking-tight mb-16">
-          3KeyMeasuresForAssetSecurity
-        </h1>
+    <section className="bg-[#07090D] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
 
-        {/* Three measures grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-          
-          {/* Card 1: Guardian Fund */}
-          <div className="bg-[#0F0F0F] rounded-2xl p-6 border border-gray-800">
-            <h2 className="text-2xl font-bold mb-3">$100M Guardian Fund</h2>
-            <div className="bg-black rounded-lg p-3 font-mono text-sm break-all border border-gray-800">
-              <span className="text-gray-400">WalletAddress</span>
-              <span className="text-cyan-400 ml-1">{guardianAddress}</span>
-            </div>
-            <p className="text-gray-400 text-sm mt-4">
-              Full and instant coverage for platform issues
-            </p>
-          </div>
+      <div className="mx-auto max-w-7xl">
 
-          {/* Card 2: Reserves */}
-          <div className="bg-[#0F0F0F] rounded-2xl p-6 border border-gray-800">
-            <h2 className="text-2xl font-bold mb-3">ReservesBacked1:1andBeyond</h2>
-            <p className="text-gray-400 text-sm mt-2">
-              Verified inrealtimeandaccessibleatalltimes
-            </p>
-            <div className="mt-6 w-full bg-gray-800 rounded-full h-1.5">
-              <div className="bg-green-500 h-1.5 rounded-full w-[102%]"></div>
-            </div>
-          </div>
+        <div className="max-w-2xl">
 
-          {/* Card 3: Futures Insurance Fund */}
-          <div className="bg-[#0F0F0F] rounded-2xl p-6 border border-gray-800">
-            <h2 className="text-2xl font-bold mb-3">FuturesInsuranceFund</h2>
-            <p className="text-gray-400 text-sm">
-              Protectionagainstmarketextremes
-            </p>
-          </div>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4D8DFF]">
+            Security
+          </span>
+
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
+            Security comes first.
+          </h2>
+
+          <p className="mt-4 text-sm leading-6 text-[#687384] sm:text-base">
+            Designed with multiple layers of protection around your
+            account and digital assets.
+          </p>
+
         </div>
 
-        {/* Badges and CTA - exactly as screenshot */}
-        <div className="flex flex-col items-center space-y-8">
-          <div className="flex gap-6">
-            <div className="bg-[#0F0F0F] px-8 py-2 rounded-full border border-gray-700">
-              <span className="text-white font-bold tracking-wider">CERTIK</span>
-            </div>
-            <div className="bg-[#0F0F0F] px-8 py-2 rounded-full border border-gray-700">
-              <span className="text-white font-bold tracking-wider">ELLIPTIC</span>
-            </div>
-          </div>
+        <div className="mt-10 grid gap-3 lg:grid-cols-3">
 
-          <button className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-black font-bold py-3 px-8 rounded-full text-lg transition">
-            GetStartedwithMEXC
-          </button>
+          {/* Guardian */}
+          <SecurityCard
+            icon={ShieldCheck}
+            title="Guardian protection"
+            description="A dedicated security layer designed to protect platform assets."
+          >
+            <button
+              type="button"
+              onClick={copyAddress}
+              className="mt-5 w-full rounded-xl border border-[#17202D] bg-[#070A0E] p-3 text-left transition hover:border-[#263B5C]"
+            >
+              <div className="flex items-center justify-between gap-3">
+
+                <span className="text-[10px] uppercase tracking-wider text-[#566171]">
+                  Guardian wallet
+                </span>
+
+                {copied ? (
+                  <Check size={14} className="text-[#08B77A]" />
+                ) : (
+                  <Copy size={14} className="text-[#566171]" />
+                )}
+
+              </div>
+
+              <p className="mt-2 break-all font-mono text-[10px] text-[#7D8796]">
+                {guardianAddress}
+              </p>
+            </button>
+          </SecurityCard>
+
+          {/* Assets */}
+          <SecurityCard
+            icon={Wallet}
+            title="Asset visibility"
+            description="Keep track of balances, deposits and withdrawals from your account."
+          />
+
+          {/* Infrastructure */}
+          <SecurityCard
+            icon={Zap}
+            title="Transaction monitoring"
+            description="Blockchain activity can be monitored through transaction records."
+          />
+
         </div>
 
-        {/* Copy notification (toast) */}
-        {copied && (
-          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded-lg text-sm z-50">
-            ✅ Address copied!
-          </div>
-        )}
       </div>
+
+    </section>
+  );
+}
+
+function SecurityCard({
+  icon: Icon,
+  title,
+  description,
+  children,
+}) {
+  return (
+    <div className="rounded-2xl border border-[#17202D] bg-[#090D13] p-5 sm:p-6">
+
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#12203A] text-[#4D8DFF]">
+        <Icon size={20} />
+      </div>
+
+      <h3 className="mt-6 text-lg font-semibold text-white">
+        {title}
+      </h3>
+
+      <p className="mt-2 text-sm leading-6 text-[#687384]">
+        {description}
+      </p>
+
+      {children}
+
     </div>
   );
-};
-
-export default Security;
+}

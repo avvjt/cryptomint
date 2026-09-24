@@ -1,181 +1,131 @@
 import { useState } from "react";
-
 import useMarketData from "./useMarketData";
 import MarketGrid from "./MarketGrid";
 
 export default function ZeroFeeSection() {
-  const [activeTab, setActiveTab] =
-    useState("futures");
-
-   const coins = useMarketData();
-
+  const [activeTab, setActiveTab] = useState("futures");
+  const coins = useMarketData();
 
   return (
-    <section className="bg-black py-24">
+    <section className="bg-[#05070A] px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-28">
 
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="mx-auto max-w-7xl">
 
-        <h2
-          className="
-          text-center
-          text-6xl
-          font-bold
-          text-white
-          drop-shadow-[0_0_20px_rgba(255,255,255,.8)]
-          "
-        >
-          500+ Pairs with 0 Fees
-        </h2>
+        {/* Header */}
+        <div className="max-w-2xl">
 
-        <div
-          className="
-          mt-16
-          grid
-          lg:grid-cols-[280px_1fr]
-          gap-10
-          "
-        >
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[#4D8DFF]">
+            Markets
+          </span>
 
-          {/* LEFT */}
+          <h2 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-5xl">
+            Trade more.
+            <br />
+            <span className="text-[#657080]">
+              Pay less.
+            </span>
+          </h2>
 
-          <div className="space-y-20">
+          <p className="mt-4 text-sm leading-6 text-[#717B8A] sm:text-base">
+            Explore available markets and monitor live prices from one
+            simple interface.
+          </p>
 
-            <div>
-              <p className="text-zinc-400">
-                Fees Saved by Users
-              </p>
+        </div>
 
-              <h3
-                className="
-                text-5xl
-                text-white
-                mt-3
-                "
-              >
-                3.8M+ USDT
-              </h3>
+        {/* Stats */}
+        <div className="grid grid-cols-3 overflow-hidden rounded-2xl border border-[#1A2029] bg-[#0A0E13]">
+
+  <Stat
+    value="3.8M+"
+    label="Fees saved"
+    suffix="USDT"
+  />
+
+  <Stat
+    value="100"
+    label="Est. savings"
+    suffix="USDT"
+  />
+
+  <Stat
+    value="500+"
+    label="Available"
+  />
+
+</div>
+
+        {/* Market table */}
+        <div className="mt-8 overflow-hidden rounded-2xl border border-[#17202D] bg-[#090D13]">
+
+          {/* Tabs */}
+          <div className="flex items-center justify-between border-b border-[#17202D] px-4 py-3 sm:px-5">
+
+            <div className="flex gap-1 rounded-lg bg-[#0D1219] p-1">
+
+              {["futures", "spot"].map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  onClick={() => setActiveTab(tab)}
+                  className={`rounded-md px-4 py-2 text-xs font-medium capitalize transition ${
+                    activeTab === tab
+                      ? "bg-[#1A2535] text-white"
+                      : "text-[#606B7A] hover:text-white"
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+
             </div>
 
-            <div>
-              <p className="text-zinc-400">
-                Est. Savings
-              </p>
-
-              <h3
-                className="
-                text-5xl
-                text-white
-                mt-3
-                "
-              >
-                100 USDT
-              </h3>
-            </div>
-
-            <div>
-              <p className="text-zinc-400">
-                Pairs with 0 Fees
-              </p>
-
-              <h3
-                className="
-                text-5xl
-                text-white
-                mt-3
-                "
-              >
-                90+
-              </h3>
-            </div>
+            <button className="hidden text-xs text-[#657080] transition hover:text-white sm:block">
+              View all →
+            </button>
 
           </div>
 
-          {/* RIGHT */}
-
-          <div
-            className="
-            rounded-[32px]
-            border
-            border-[#12203a]
-            bg-[#030813]
-            overflow-hidden
-            "
-          >
-            <div
-              className="
-              flex
-              items-center
-              justify-between
-              px-8
-              py-6
-              border-b
-              border-[#12203a]
-              "
-            >
-              <div className="flex gap-6">
-
-                <button
-                  onClick={() =>
-                    setActiveTab(
-                      "futures"
-                    )
-                  }
-                  className={`${
-                    activeTab ===
-                    "futures"
-                      ? "text-white"
-                      : "text-zinc-500"
-                  }`}
-                >
-                  Futures
-                </button>
-
-                <button
-                  onClick={() =>
-                    setActiveTab(
-                      "spot"
-                    )
-                  }
-                  className={`${
-                    activeTab ===
-                    "spot"
-                      ? "text-white"
-                      : "text-zinc-500"
-                  }`}
-                >
-                  Spot
-                </button>
-
-              </div>
-
-              <button className="text-zinc-500">
-                More →
-              </button>
-            </div>
-
+          {/* Existing market component */}
+          <div className="overflow-x-auto">
             <MarketGrid coins={coins} />
           </div>
 
         </div>
 
-        <div className="mt-12 flex justify-center">
+        {/* CTA */}
+        <div className="mt-7 flex justify-center">
 
-          <button
-            className="
-            rounded-full
-            bg-[#1D66FF]
-            px-10
-            py-4
-            text-white
-            "
+          <a
+            href="/trade"
+            className="flex h-12 items-center justify-center rounded-xl bg-[#1D66FF] px-7 text-sm font-semibold text-white transition hover:bg-[#326BC7]"
           >
-            Trade with 0 Fees
-          </button>
+            Start trading
+          </a>
 
         </div>
 
       </div>
 
     </section>
+  );
+}
+
+function Stat({ value, label, suffix }) {
+  return (
+    <div className="min-w-0 px-3 py-4 sm:px-5 sm:py-5">
+      <p className="truncate text-[17px] font-semibold tracking-[-0.03em] text-white sm:text-xl">
+        {value}
+        {suffix && (
+          <span className="ml-1 text-[8px] font-medium tracking-normal text-[#59616D] sm:text-[9px]">
+            {suffix}
+          </span>
+        )}
+      </p>
+
+      <p className="mt-1 truncate text-[8px] uppercase tracking-[0.1em] text-[#59616D] sm:text-[9px]">
+        {label}
+      </p>
+    </div>
   );
 }

@@ -138,27 +138,23 @@ export default function HelpCenter() {
               </button>
 
               <div
-                className={`
-                  overflow-hidden
-                  transition-all
-                  duration-300
-                  ${
-                    active === index
-                      ? "max-h-40 opacity-100"
-                      : "max-h-0 opacity-0"
-                  }
-                `}
-              >
-                <p
-                  className="
-                  pl-9
-                  pb-4
-                  text-zinc-400
-                  "
-                >
-                  {item.answer}
-                </p>
-              </div>
+  className={`grid transition-all duration-300 ${
+    active === index
+      ? "grid-rows-[1fr] opacity-100"
+      : "grid-rows-[0fr] opacity-0"
+  }`}
+>
+  <div className="overflow-hidden">
+    <p className="pb-5 pl-9 pr-2 text-sm leading-6 text-zinc-400">
+      {item.answer}
+    </p>
+  </div>
+</div>
+<button
+  type="button"
+  onClick={() => toggleFAQ(index)}
+  className="flex w-full items-start justify-between gap-4 py-5 text-left"
+></button>
 
             </div>
           ))}
