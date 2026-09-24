@@ -118,17 +118,12 @@ export default function HomeHero() {
 
             {/* Video */}
             <video
-              className="
-                block
-                h-auto
-                w-full
-                object-cover
-              "
+              className="block h-auto w-full object-cover"
               autoPlay
               loop
               muted
               playsInline
-              preload="auto"
+              preload="metadata"
             >
               <source
                 src="/tradeflow.webm"
