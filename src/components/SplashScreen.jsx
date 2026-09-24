@@ -1,4 +1,4 @@
-import logo from "../assets/logo.png";
+import logotext from "../assets/logotext.png";
 
 export default function SplashScreen() {
   return (
@@ -91,7 +91,7 @@ export default function SplashScreen() {
           {/* Logo */}
 
           <img
-            src={logo}
+            src={logotext}
             alt="CryptoMintX"
             className="
             relative

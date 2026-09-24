@@ -12,30 +12,13 @@ export default function Home() {
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#05070A] text-white">
 
-      {/* Hero */}
       <HomeHero />
-
-      {/* Live markets / zero fee */}
       <ZeroFeeSection />
-
-      {/* Platform features */}
       <Features />
-
-      {/* Security */}
-      <Security />
-
       <Events />
-
-      {/* Simple onboarding */}
       <HowItWorks />
-
-      {/* FAQ */}
       <Faq />
-
-      {/* Final CTA */}
       <HomeCTA />
-
-      {/* Footer */}
       <FooterDesign />
 
     </main>
