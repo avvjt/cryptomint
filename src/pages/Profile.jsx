@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { useAccountStatusContext } from "../context/AccountStatusContext";
 import { useNavigate } from "react-router-dom";
 
-const PROFILE_STORAGE_KEY = "cryptomintx_profile";
-
 const DEFAULT_PROFILE = {
   fullName: "CryptoMintX User",
   username: "user",
@@ -16,7 +14,8 @@ export default function Profile() {
 
   const { isActive } = useAccountStatusContext();
 
-  const [profile, setProfile] = useState(DEFAULT_PROFILE);
+  const [profile, setProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(true);
 
   const [editing, setEditing] = useState(false);
 
@@ -87,6 +86,8 @@ export default function Profile() {
         setForm(nextProfile);
       } catch (error) {
         console.error("Unable to load profile:", error);
+      } finally {
+        setProfileLoading(false);
       }
     };
 
@@ -115,79 +116,79 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-  const fullName = form.fullName.trim();
-  const username = form.username.trim();
+    const fullName = form.fullName.trim();
+    const username = form.username.trim();
 
-  if (!fullName) {
-    setMessage("Full name is required.");
-    return;
-  }
-
-  if (!username) {
-    setMessage("Username is required.");
-    return;
-  }
-
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    navigate("/login", { replace: true });
-    return;
-  }
-
-  try {
-    setMessage("");
-
-    const res = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/profile`,
-      {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          fullName,
-          username,
-        }),
-      }
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setMessage(
-        data.message || "Unable to update profile."
-      );
+    if (!fullName) {
+      setMessage("Full name is required.");
       return;
     }
 
-    const updatedProfile = {
-      ...profile,
-      fullName: data.user.fullName,
-      username: data.user.username,
-      email: data.user.email,
-      avatar: user.avatarUrl
-  ? user.avatarUrl.startsWith("http")
-    ? user.avatarUrl
-    : `${import.meta.env.VITE_API_BASE_URL || "https://backendxmint.onrender.com"}${user.avatarUrl}`
-  : "",
-    };
+    if (!username) {
+      setMessage("Username is required.");
+      return;
+    }
 
-    setProfile(updatedProfile);
-    setForm(updatedProfile);
+    const token = localStorage.getItem("token");
 
-    setMessage("Profile updated successfully.");
-    setEditing(false);
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
 
-  } catch (error) {
-  console.error("Update profile error:", error);
+    try {
+      setMessage("");
 
-  setMessage(
-    error.message || "Unable to connect to the server."
-  );
-}
-};
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/profile`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            fullName,
+            username,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(
+          data.message || "Unable to update profile."
+        );
+        return;
+      }
+
+      const updatedProfile = {
+        ...profile,
+        fullName: data.user.fullName,
+        username: data.user.username,
+        email: data.user.email,
+        avatar: user.avatarUrl
+          ? user.avatarUrl.startsWith("http")
+            ? user.avatarUrl
+            : `${import.meta.env.VITE_API_BASE_URL || "https://backendxmint.onrender.com"}${user.avatarUrl}`
+          : "",
+      };
+
+      setProfile(updatedProfile);
+      setForm(updatedProfile);
+
+      setMessage("Profile updated successfully.");
+      setEditing(false);
+
+    } catch (error) {
+      console.error("Update profile error:", error);
+
+      setMessage(
+        error.message || "Unable to connect to the server."
+      );
+    }
+  };
 
   const handleAvatarClick = () => {
     setAvatarError("");
@@ -196,148 +197,148 @@ export default function Profile() {
   };
 
   const handleAvatarChange = async (event) => {
-  const file = event.target.files?.[0];
+    const file = event.target.files?.[0];
 
-  if (!file) {
-    return;
-  }
-
-  setAvatarError("");
-
-  const allowedTypes = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-  ];
-
-  if (!allowedTypes.includes(file.type)) {
-    setAvatarError(
-      "Please choose a JPG, PNG, or WebP image."
-    );
-
-    event.target.value = "";
-    return;
-  }
-
-  const maxSize = 5 * 1024 * 1024;
-
-  if (file.size > maxSize) {
-    setAvatarError(
-      "Profile picture must be smaller than 5 MB."
-    );
-
-    event.target.value = "";
-    return;
-  }
-
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    navigate("/login", { replace: true });
-    return;
-  }
-
-  try {
-    const formData = new FormData();
-
-    formData.append("avatar", file);
-
-    const res = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/profile/avatar`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      }
-    );
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      setAvatarError(
-        data.message ||
-        "Unable to upload profile picture."
-      );
+    if (!file) {
       return;
     }
 
-    const avatar =
-  `${import.meta.env.VITE_API_BASE_URL}${data.avatarUrl}`;
-
-    const updatedProfile = {
-      ...profile,
-      avatar,
-    };
-
-    setProfile(updatedProfile);
-    setForm(updatedProfile);
-
-  } catch (error) {
-    console.error(
-      "Avatar upload error:",
-      error
-    );
-
-    setAvatarError(
-      "Unable to connect to the server."
-    );
-  } finally {
-    event.target.value = "";
-  }
-};
-
-  const handleRemoveAvatar = async () => {
-  const token = localStorage.getItem("token");
-
-  if (!token) {
-    navigate("/login", { replace: true });
-    return;
-  }
-
-  try {
     setAvatarError("");
 
-    const res = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/api/profile/avatar`,
-      {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
 
-    const data = await res.json();
-
-    if (!res.ok) {
+    if (!allowedTypes.includes(file.type)) {
       setAvatarError(
-        data.message ||
-        "Unable to remove profile picture."
+        "Please choose a JPG, PNG, or WebP image."
       );
+
+      event.target.value = "";
       return;
     }
 
-    const updatedProfile = {
-      ...profile,
-      avatar: "",
-    };
+    const maxSize = 5 * 1024 * 1024;
 
-    setProfile(updatedProfile);
-    setForm(updatedProfile);
+    if (file.size > maxSize) {
+      setAvatarError(
+        "Profile picture must be smaller than 5 MB."
+      );
 
-  } catch (error) {
-    console.error(
-      "Remove avatar error:",
-      error
-    );
+      event.target.value = "";
+      return;
+    }
 
-    setAvatarError(
-      "Unable to connect to the server."
-    );
-  }
-};
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+
+      formData.append("avatar", file);
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/profile/avatar`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAvatarError(
+          data.message ||
+          "Unable to upload profile picture."
+        );
+        return;
+      }
+
+      const avatar =
+        `${import.meta.env.VITE_API_BASE_URL}${data.avatarUrl}`;
+
+      const updatedProfile = {
+        ...profile,
+        avatar,
+      };
+
+      setProfile(updatedProfile);
+      setForm(updatedProfile);
+
+    } catch (error) {
+      console.error(
+        "Avatar upload error:",
+        error
+      );
+
+      setAvatarError(
+        "Unable to connect to the server."
+      );
+    } finally {
+      event.target.value = "";
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    try {
+      setAvatarError("");
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/profile/avatar`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setAvatarError(
+          data.message ||
+          "Unable to remove profile picture."
+        );
+        return;
+      }
+
+      const updatedProfile = {
+        ...profile,
+        avatar: "",
+      };
+
+      setProfile(updatedProfile);
+      setForm(updatedProfile);
+
+    } catch (error) {
+      console.error(
+        "Remove avatar error:",
+        error
+      );
+
+      setAvatarError(
+        "Unable to connect to the server."
+      );
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -431,6 +432,57 @@ export default function Profile() {
       setPasswordLoading(false);
     }
   };
+
+  if (profileLoading || !profile) {
+    return (
+      <main className="min-h-screen bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[900px]">
+
+          {/* Loading header */}
+          <div className="mb-5">
+            <div className="h-6 w-24 animate-pulse rounded bg-[#1A1E24]" />
+            <div className="mt-2 h-4 w-48 animate-pulse rounded bg-[#1A1E24]" />
+          </div>
+
+          {/* Loading profile card */}
+          <section className="rounded-2xl border border-[#1A1E24] bg-[#0D1014] p-5">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+
+              {/* Avatar skeleton */}
+              <div className="h-24 w-24 shrink-0 animate-pulse rounded-full bg-[#1A1E24]" />
+
+              {/* Name skeleton */}
+              <div className="min-w-0 flex-1">
+                <div className="h-5 w-40 animate-pulse rounded bg-[#1A1E24]" />
+
+                <div className="mt-2 h-4 w-28 animate-pulse rounded bg-[#1A1E24]" />
+
+                <div className="mt-4 h-6 w-28 animate-pulse rounded-full bg-[#1A1E24]" />
+              </div>
+
+              {/* Edit button skeleton */}
+              <div className="h-10 w-28 animate-pulse rounded-xl bg-[#1A1E24]" />
+
+            </div>
+
+            <div className="mt-5 border-t border-[#1A1E24] pt-5">
+              <div className="h-9 w-28 animate-pulse rounded-lg bg-[#1A1E24]" />
+
+              <div className="mt-2 h-3 w-52 animate-pulse rounded bg-[#1A1E24]" />
+            </div>
+          </section>
+
+          {/* Other loading cards */}
+          <div className="mt-5 h-48 animate-pulse rounded-2xl border border-[#1A1E24] bg-[#0D1014]" />
+
+          <div className="mt-5 h-40 animate-pulse rounded-2xl border border-[#1A1E24] bg-[#0D1014]" />
+
+          <div className="mt-5 h-48 animate-pulse rounded-2xl border border-[#1A1E24] bg-[#0D1014]" />
+
+        </div>
+      </main>
+    );
+  }
 
   const initials = getInitials(
     profile.fullName,

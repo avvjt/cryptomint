@@ -476,6 +476,7 @@ export default function Signup() {
 ============================================================ */
 
 function PromoSection() {
+
   return (
     <section
       className="
@@ -579,28 +580,43 @@ function PromoSection() {
 
       <div
         className="
-          mt-5
-          flex
-          items-center
-          justify-center
-          gap-1
-        "
+    mt-5
+    flex
+    flex-row
+    items-center
+    justify-center
+    gap-1
+    whitespace-nowrap
+  "
       >
-        {[0, 1, 2, 3, 4].map(
-          (item) => (
-            <span
-              key={item}
-              className="
-                h-8
-                w-8
-                rounded-full
-                border
-                border-[#60656D]
-                bg-[#272D37]
-              "
+        {[
+          { name: "BTC", logo: "/icons/btc.png" },
+          { name: "ETH", logo: "/icons/eth.png" },
+          { name: "USDT", logo: "/icons/usdt.png" },
+          { name: "BNB", logo: "/icons/bnb.png" },
+          { name: "SOL", logo: "/icons/sol.png" },
+        ].map((coin) => (
+          <span
+            key={coin.name}
+            className="
+        flex
+        h-8
+        w-8
+        shrink-0
+        overflow-hidden
+        rounded-full
+        border
+        border-[#60656D]
+        bg-[#272D37]
+      "
+          >
+            <img
+              src={coin.logo}
+              alt={coin.name}
+              className="h-full w-full object-cover"
             />
-          )
-        )}
+          </span>
+        ))}
       </div>
 
       <div

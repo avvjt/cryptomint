@@ -29,8 +29,8 @@ export default function Team() {
 
   if (loading && !team) {
     return (
-      <main className="min-h-screen bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-[1700px]">
+      <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
+  <div className="mx-auto w-full min-w-0 max-w-[1700px]">
           <div className="mb-6">
             <div className="h-7 w-24 animate-pulse rounded bg-[#1A1E24]" />
             <div className="mt-2 h-4 w-48 animate-pulse rounded bg-[#1A1E24]" />
@@ -112,8 +112,8 @@ export default function Team() {
   };
 
   const referralLink = referralCode
-  ? `${window.location.origin}/signup?ref=${encodeURIComponent(referralCode)}`
-  : "";
+    ? `${window.location.origin}/signup?ref=${encodeURIComponent(referralCode)}`
+    : "";
 
   const copyReferralLink = async () => {
     if (!referralLink) return;
@@ -201,441 +201,442 @@ export default function Team() {
       : 100;
 
   return (
-    <main className="min-h-screen bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[1700px]">
+  <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#090B0E] px-4 pb-28 pt-5 text-white sm:px-6 lg:px-8">
+    <div className="mx-auto w-full min-w-0 max-w-[1700px]">
 
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            Team
-          </h1>
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          Team
+        </h1>
 
-          <p className="mt-1 text-sm text-gray-500">
-            Referral network and team income
-          </p>
-        </div>
+        <p className="mt-1 text-sm text-gray-500">
+          Referral network and team income
+        </p>
+      </div>
 
-        {/* Top cards */}
-        <div className="grid gap-4 lg:grid-cols-3">
+      {/* Top cards */}
+      <div className="grid min-w-0 gap-4 lg:grid-cols-3">
 
-          {/* Level */}
-          <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Current level
-                </p>
-
-                <div className="mt-2 flex items-baseline gap-2">
-                  <span className="text-4xl font-semibold">
-                    {level}
-                  </span>
-
-                  <span className="text-sm text-gray-500">
-                    / 6
-                  </span>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
-                <TrendingUp
-                  size={20}
-                  className="text-[#4D8DFF]"
-                />
-              </div>
-            </div>
-
-            {progress?.nextLevel ? (
-              <>
-                <div className="mt-5 flex items-center justify-between text-xs">
-                  <span className="text-gray-500">
-                    Progress to Level {progress.nextLevel}
-                  </span>
-
-                  <span className="font-medium text-gray-300">
-                    {safeStats.total}/{progress.requiredTotal}
-                  </span>
-                </div>
-
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#1A1E24]">
-                  <div
-                    className="h-full rounded-full bg-[#4D8DFF] transition-all duration-500"
-                    style={{
-                      width: `${progressPercent}%`,
-                    }}
-                  />
-                </div>
-
-                <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-                  <div className="rounded-lg bg-[#0B0E12] p-2">
-                    <p className="text-gray-500">
-                      Level A
-                    </p>
-
-                    <p className="mt-1 font-medium">
-                      {safeStats.levelA} / {progress.requiredA}
-                    </p>
-                  </div>
-
-                  <div className="rounded-lg bg-[#0B0E12] p-2">
-                    <p className="text-gray-500">
-                      Level B + C
-                    </p>
-
-                    <p className="mt-1 font-medium">
-                      {safeStats.levelB + safeStats.levelC} /{" "}
-                      {progress.requiredBC}
-                    </p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="mt-5 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
-                <p className="text-sm font-medium">
-                  Maximum level reached
-                </p>
-
-                <p className="mt-1 text-xs text-gray-500">
-                  You are currently at the highest team level.
-                </p>
-              </div>
-            )}
-          </section>
-
-          {/* Team stats */}
-          <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Team members
-                </p>
-
-                <p className="mt-2 text-4xl font-semibold">
-                  {safeStats.total}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
-                <Users
-                  size={20}
-                  className="text-[#4D8DFF]"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6 grid grid-cols-3 gap-2">
-              <TeamStat
-                label="Level A"
-                value={safeStats.levelA}
-              />
-
-              <TeamStat
-                label="Level B"
-                value={safeStats.levelB}
-              />
-
-              <TeamStat
-                label="Level C"
-                value={safeStats.levelC}
-              />
-            </div>
-          </section>
-
-
-          {/* Referral / Invite & Earn */}
-          <section className="rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
-                  Invite & Earn
-                </p>
-
-                <h2 className="mt-2 text-lg font-semibold text-white">
-                  Share your referral link
-                </h2>
-
-                <p className="mt-1 text-xs leading-5 text-gray-500">
-                  Invite friends and let them join through your personal link.
-                </p>
-              </div>
-
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#172131]">
-                <Gift size={19} className="text-[#4D8DFF]" />
-              </div>
-            </div>
-
-            {/* Bonus banner */}
-            <div className="mt-5 overflow-hidden rounded-2xl border border-[#4D8DFF]/20 bg-gradient-to-br from-[#101C2E] to-[#0B0E12]">
-              <div className="flex items-center gap-3 p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#4D8DFF]/10">
-                  <Gift size={21} className="text-[#4D8DFF]" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-white">
-                      {safeReferralBonus.rate}% Referral Bonus
-                    </p>
-
-                    <span className="rounded-full bg-[#08B77A]/10 px-2 py-0.5 text-[9px] font-medium text-[#08B77A]">
-                      BONUS
-                    </span>
-                  </div>
-
-                  <p className="mt-1 text-[11px] leading-5 text-gray-500">
-                    Your referral qualifies for the bonus after their first
-                    qualifying deposit.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Referral link */}
-            <div className="mt-4">
-              <p className="mb-2 text-[11px] font-medium text-gray-500">
-                Your referral link
-              </p>
-
-              <div className="flex items-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-2">
-                <div className="min-w-0 flex-1 px-2">
-                  <p className="truncate font-mono text-xs text-gray-400">
-                    {referralLink || "Generating link..."}
-                  </p>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={copyReferralLink}
-                  disabled={!referralLink}
-                  className="flex h-10 shrink-0 items-center gap-2 rounded-lg bg-[#285DB5] px-3 text-xs font-medium text-white transition hover:bg-[#326BC7] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  {copied ? (
-                    <>
-                      <Check size={15} />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={15} />
-                      Copy
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Share buttons */}
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={shareWhatsApp}
-                disabled={!referralLink}
-                className="flex items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
-              >
-                <MessageCircle size={16} />
-                WhatsApp
-              </button>
-
-              <button
-                type="button"
-                onClick={shareTelegram}
-                disabled={!referralLink}
-                className="flex items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
-              >
-                <Send size={16} />
-                Telegram
-              </button>
-
-              <button
-                type="button"
-                onClick={shareReferralLink}
-                disabled={!referralLink}
-                className="flex items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
-              >
-                <Share2 size={16} />
-                Share
-              </button>
-            </div>
-
-            {/* Referral code */}
-            <div className="mt-4 flex items-center justify-between border-t border-[#1A1E24] pt-4">
-              <div>
-                <p className="text-[10px] uppercase tracking-[0.14em] text-gray-600">
-                  Referral code
-                </p>
-
-                <p className="mt-1 font-mono text-sm font-medium tracking-wide text-gray-300">
-                  {referralCode || "—"}
-                </p>
-              </div>
-
-              <div className="text-right">
-                <p className="text-[10px] uppercase tracking-[0.14em] text-gray-600">
-                  Earned
-                </p>
-
-                <p className="mt-1 text-sm font-semibold text-white">
-                  ${safeReferralBonus.earned.toFixed(2)}
-                </p>
-              </div>
-            </div>
-          </section>
-        </div>
-
-        {/* Income */}
-        <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-          <div className="flex items-center justify-between">
+        {/* Level */}
+        <section className="min-w-0 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
+          <div className="flex items-start justify-between">
             <div>
               <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
-                Today's team income
+                Current level
               </p>
 
-              <p className="mt-2 text-3xl font-semibold">
-                ${safeIncome.today.toFixed(2)}
-              </p>
+              <div className="mt-2 flex items-baseline gap-2">
+                <span className="text-4xl font-semibold">
+                  {level}
+                </span>
+
+                <span className="text-sm text-gray-500">
+                  / 6
+                </span>
+              </div>
             </div>
 
-            <div className="text-right">
-              <p className="text-xs text-gray-500">
-                Commission rates
-              </p>
-
-              <p className="mt-1 text-sm font-medium">
-                A {commissionRates.levelA}% · B{" "}
-                {commissionRates.levelB}% · C{" "}
-                {commissionRates.levelC}%
-              </p>
+            <div className="rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
+              <TrendingUp
+                size={20}
+                className="text-[#4D8DFF]"
+              />
             </div>
           </div>
 
-          <div className="mt-5 grid grid-cols-3 gap-3">
-            <IncomeItem
+          {progress?.nextLevel ? (
+            <>
+              <div className="mt-5 flex items-center justify-between text-xs">
+                <span className="text-gray-500">
+                  Progress to Level {progress.nextLevel}
+                </span>
+
+                <span className="font-medium text-gray-300">
+                  {safeStats.total}/{progress.requiredTotal}
+                </span>
+              </div>
+
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#1A1E24]">
+                <div
+                  className="h-full rounded-full bg-[#4D8DFF] transition-all duration-500"
+                  style={{
+                    width: `${progressPercent}%`,
+                  }}
+                />
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-lg bg-[#0B0E12] p-2">
+                  <p className="text-gray-500">
+                    Level A
+                  </p>
+
+                  <p className="mt-1 font-medium">
+                    {safeStats.levelA} / {progress.requiredA}
+                  </p>
+                </div>
+
+                <div className="rounded-lg bg-[#0B0E12] p-2">
+                  <p className="text-gray-500">
+                    Level B + C
+                  </p>
+
+                  <p className="mt-1 font-medium">
+                    {safeStats.levelB + safeStats.levelC} /{" "}
+                    {progress.requiredBC}
+                  </p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="mt-5 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
+              <p className="text-sm font-medium">
+                Maximum level reached
+              </p>
+
+              <p className="mt-1 text-xs text-gray-500">
+                You are currently at the highest team level.
+              </p>
+            </div>
+          )}
+        </section>
+
+        {/* Team stats */}
+        <section className="min-w-0 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
+                Team members
+              </p>
+
+              <p className="mt-2 text-4xl font-semibold">
+                {safeStats.total}
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-3">
+              <Users
+                size={20}
+                className="text-[#4D8DFF]"
+              />
+            </div>
+          </div>
+
+          <div className="mt-6 grid min-w-0 grid-cols-3 gap-2">
+            <TeamStat
               label="Level A"
-              value={safeIncome.levelA}
-              rate={commissionRates.levelA}
+              value={safeStats.levelA}
             />
 
-            <IncomeItem
+            <TeamStat
               label="Level B"
-              value={safeIncome.levelB}
-              rate={commissionRates.levelB}
+              value={safeStats.levelB}
             />
 
-            <IncomeItem
+            <TeamStat
               label="Level C"
-              value={safeIncome.levelC}
-              rate={commissionRates.levelC}
+              value={safeStats.levelC}
             />
           </div>
         </section>
 
-        {/* Team members */}
-        <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318]">
-          <div className="border-b border-[#1A1E24] p-5">
-            <div>
-              <h2 className="text-base font-semibold">
-                Team members
+        {/* Referral / Invite & Earn */}
+        <section className="min-w-0 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
+                Invite & Earn
+              </p>
+
+              <h2 className="mt-2 text-lg font-semibold text-white">
+                Share your referral link
               </h2>
 
-              <p className="mt-1 text-xs text-gray-500">
-                Members in your referral network
+              <p className="mt-1 text-xs leading-5 text-gray-500">
+                Invite friends and let them join through your personal link.
               </p>
             </div>
 
-            <div className="mt-4 grid grid-cols-3 rounded-xl bg-[#0B0E12] p-1">
-              {["A", "B", "C"].map((levelName) => (
-                <button
-                  key={levelName}
-                  type="button"
-                  onClick={() =>
-                    handleLevelChange(levelName)
-                  }
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${activeLevel === levelName
-                      ? "bg-[#1A2535] text-white"
-                      : "text-gray-500 hover:text-gray-300"
-                    }`}
-                >
-                  Level {levelName}
-                </button>
-              ))}
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#172131]">
+              <Gift
+                size={19}
+                className="text-[#4D8DFF]"
+              />
             </div>
           </div>
 
-          <div className="divide-y divide-[#1A1E24]">
-            {members.length === 0 ? (
-              <div className="px-5 py-12 text-center">
-                <Users
-                  size={28}
-                  className="mx-auto text-gray-600"
+          {/* Bonus banner */}
+          <div className="mt-5 overflow-hidden rounded-2xl border border-[#4D8DFF]/20 bg-gradient-to-br from-[#101C2E] to-[#0B0E12]">
+            <div className="flex items-center gap-3 p-4">
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#4D8DFF]/10">
+                <Gift
+                  size={21}
+                  className="text-[#4D8DFF]"
                 />
+              </div>
 
-                <p className="mt-3 text-sm font-medium text-gray-300">
-                  No Level {activeLevel} members
-                </p>
+              <div className="min-w-0 flex-1">
+                <div className="flex min-w-0 items-center gap-2">
+                  <p className="min-w-0 truncate text-sm font-semibold text-white">
+                    {safeReferralBonus.rate}% Referral Bonus
+                  </p>
 
-                <p className="mt-1 text-xs text-gray-600">
-                  Members will appear here when they join your network.
+                  <span className="shrink-0 rounded-full bg-[#08B77A]/10 px-2 py-0.5 text-[9px] font-medium text-[#08B77A]">
+                    BONUS
+                  </span>
+                </div>
+
+                <p className="mt-1 text-[11px] leading-5 text-gray-500">
+                  Your referral qualifies for the bonus after their first
+                  qualifying deposit.
                 </p>
               </div>
-            ) : (
-              members.map((member) => (
-                <TeamMember
-                  key={member.id}
-                  member={member}
-                  onClick={() =>
-                    setSelectedMember(member)
-                  }
-                />
-              ))
-            )}
+            </div>
           </div>
-        </section>
 
-        {/* Commission explanation */}
-        <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-semibold">
-                Commission structure
-              </h2>
+          {/* Referral link */}
+          <div className="mt-4 min-w-0">
+            <p className="mb-2 text-[11px] font-medium text-gray-500">
+              Your referral link
+            </p>
 
-              <p className="mt-1 text-xs text-gray-500">
-                Current rates based on your team level
+            <div className="flex min-w-0 items-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] p-2">
+              <div className="min-w-0 flex-1 px-2">
+                <p className="truncate font-mono text-xs text-gray-400">
+                  {referralLink || "Generating link..."}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={copyReferralLink}
+                disabled={!referralLink}
+                className="flex h-10 shrink-0 items-center gap-2 rounded-lg bg-[#285DB5] px-3 text-xs font-medium text-white transition hover:bg-[#326BC7] disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {copied ? (
+                  <>
+                    <Check size={15} />
+                    Copied
+                  </>
+                ) : (
+                  <>
+                    <Copy size={15} />
+                    Copy
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Share buttons */}
+          <div className="mt-3 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3">
+            <button
+              type="button"
+              onClick={shareWhatsApp}
+              disabled={!referralLink}
+              className="flex min-w-0 items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
+            >
+              <MessageCircle size={16} />
+              WhatsApp
+            </button>
+
+            <button
+              type="button"
+              onClick={shareTelegram}
+              disabled={!referralLink}
+              className="flex min-w-0 items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
+            >
+              <Send size={16} />
+              Telegram
+            </button>
+
+            <button
+              type="button"
+              onClick={shareReferralLink}
+              disabled={!referralLink}
+              className="flex min-w-0 items-center justify-center gap-2 rounded-xl border border-[#1A1E24] bg-[#0B0E12] px-3 py-3 text-xs font-medium text-gray-300 transition hover:border-[#2A3038] hover:bg-[#14181E] hover:text-white disabled:opacity-40"
+            >
+              <Share2 size={16} />
+              Share
+            </button>
+          </div>
+
+          {/* Referral code */}
+          <div className="mt-4 flex min-w-0 items-center justify-between border-t border-[#1A1E24] pt-4">
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-gray-600">
+                Referral code
+              </p>
+
+              <p className="mt-1 truncate font-mono text-sm font-medium tracking-wide text-gray-300">
+                {referralCode || "—"}
               </p>
             </div>
 
-            <ChevronRight
-              size={18}
-              className="text-gray-600"
-            />
+            <div className="shrink-0 text-right">
+              <p className="text-[10px] uppercase tracking-[0.14em] text-gray-600">
+                Earned
+              </p>
+
+              <p className="mt-1 text-sm font-semibold text-white">
+                ${safeReferralBonus.earned.toFixed(2)}
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      {/* Income */}
+      <section className="mt-4 min-w-0 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
+        <div className="flex min-w-0 items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs uppercase tracking-[0.16em] text-gray-500">
+              Today's team income
+            </p>
+
+            <p className="mt-2 text-3xl font-semibold">
+              ${safeIncome.today.toFixed(2)}
+            </p>
           </div>
 
-          <div className="mt-5 overflow-x-auto">
-            <table className="w-full min-w-[420px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-[#1A1E24] text-xs text-gray-500">
-                  <th className="pb-3 font-medium">
-                    Your level
-                  </th>
+          <div className="shrink-0 text-right">
+            <p className="text-xs text-gray-500">
+              Commission rates
+            </p>
 
-                  <th className="pb-3 font-medium">
-                    Level A
-                  </th>
+            <p className="mt-1 text-sm font-medium">
+              A {commissionRates.levelA}% · B{" "}
+              {commissionRates.levelB}% · C{" "}
+              {commissionRates.levelC}%
+            </p>
+          </div>
+        </div>
 
-                  <th className="pb-3 font-medium">
-                    Level B
-                  </th>
+        <div className="mt-5 grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-3">
+          <IncomeItem
+            label="Level A"
+            value={safeIncome.levelA}
+            rate={commissionRates.levelA}
+          />
 
-                  <th className="pb-3 font-medium">
-                    Level C
-                  </th>
-                </tr>
-              </thead>
+          <IncomeItem
+            label="Level B"
+            value={safeIncome.levelB}
+            rate={commissionRates.levelB}
+          />
 
-              <tbody>
-                {Object.entries(
-                  TEAM_COMMISSION_RATES
-                ).map(([levelNumber, rates]) => (
+          <IncomeItem
+            label="Level C"
+            value={safeIncome.levelC}
+            rate={commissionRates.levelC}
+          />
+        </div>
+      </section>
+
+      {/* Team members */}
+      <section className="mt-4 min-w-0 rounded-2xl border border-[#1A1E24] bg-[#101318]">
+        <div className="border-b border-[#1A1E24] p-5">
+          <div>
+            <h2 className="text-base font-semibold">
+              Team members
+            </h2>
+
+            <p className="mt-1 text-xs text-gray-500">
+              Members in your referral network
+            </p>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 rounded-xl bg-[#0B0E12] p-1">
+            {["A", "B", "C"].map((levelName) => (
+              <button
+                key={levelName}
+                type="button"
+                onClick={() => handleLevelChange(levelName)}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                  activeLevel === levelName
+                    ? "bg-[#1A2535] text-white"
+                    : "text-gray-500 hover:text-gray-300"
+                }`}
+              >
+                Level {levelName}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="divide-y divide-[#1A1E24]">
+          {members.length === 0 ? (
+            <div className="px-5 py-12 text-center">
+              <Users
+                size={28}
+                className="mx-auto text-gray-600"
+              />
+
+              <p className="mt-3 text-sm font-medium text-gray-300">
+                No Level {activeLevel} members
+              </p>
+
+              <p className="mt-1 text-xs text-gray-600">
+                Members will appear here when they join your network.
+              </p>
+            </div>
+          ) : (
+            members.map((member) => (
+              <TeamMember
+                key={member.id}
+                member={member}
+                onClick={() => setSelectedMember(member)}
+              />
+            ))
+          )}
+        </div>
+      </section>
+
+      {/* Commission explanation */}
+      <section className="mt-4 min-w-0 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
+        <div className="flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-base font-semibold">
+              Commission structure
+            </h2>
+
+            <p className="mt-1 text-xs text-gray-500">
+              Current rates based on your team level
+            </p>
+          </div>
+
+          <ChevronRight
+            size={18}
+            className="shrink-0 text-gray-600"
+          />
+        </div>
+
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[420px] text-left text-sm">
+            <thead>
+              <tr className="border-b border-[#1A1E24] text-xs text-gray-500">
+                <th className="pb-3 font-medium">
+                  Your level
+                </th>
+
+                <th className="pb-3 font-medium">
+                  Level A
+                </th>
+
+                <th className="pb-3 font-medium">
+                  Level B
+                </th>
+
+                <th className="pb-3 font-medium">
+                  Level C
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {Object.entries(TEAM_COMMISSION_RATES).map(
+                ([levelNumber, rates]) => (
                   <tr
                     key={levelNumber}
                     className="border-b border-[#1A1E24] last:border-0"
@@ -656,45 +657,46 @@ export default function Team() {
                       {rates.C}%
                     </td>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                )
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-        {/* Hierarchy explanation */}
-        <section className="mt-4 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
-          <h2 className="text-base font-semibold">
-            How the team hierarchy works
-          </h2>
+      {/* Hierarchy explanation */}
+      <section className="mt-4 min-w-0 rounded-2xl border border-[#1A1E24] bg-[#101318] p-5">
+        <h2 className="text-base font-semibold">
+          How the team hierarchy works
+        </h2>
 
-          <div className="mt-4 space-y-3">
-            <HierarchyRow
-              level="A"
-              text="People you directly refer"
-            />
+        <div className="mt-4 space-y-3">
+          <HierarchyRow
+            level="A"
+            text="People you directly refer"
+          />
 
-            <HierarchyRow
-              level="B"
-              text="People referred by your Level A members"
-            />
+          <HierarchyRow
+            level="B"
+            text="People referred by your Level A members"
+          />
 
-            <HierarchyRow
-              level="C"
-              text="People referred by your Level B members"
-            />
-          </div>
-        </section>
-      </div>
+          <HierarchyRow
+            level="C"
+            text="People referred by your Level B members"
+          />
+        </div>
+      </section>
+    </div>
 
-      {selectedMember && (
-        <MemberDetailSheet
-          member={selectedMember}
-          onClose={() => setSelectedMember(null)}
-        />
-      )}
-    </main>
-  );
+    {selectedMember && (
+      <MemberDetailSheet
+        member={selectedMember}
+        onClose={() => setSelectedMember(null)}
+      />
+    )}
+  </main>
+);
 }
 
 /* ---------------- Components ---------------- */
@@ -749,8 +751,21 @@ function TeamMember({ member, onClick }) {
       className="group flex w-full items-center justify-between gap-4 border-b border-[#1A1E24] px-5 py-4 text-left transition last:border-0 hover:bg-[#11161D] active:bg-[#141A22] sm:px-6"
     >
       <div className="flex min-w-0 items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#1A1E24] bg-[#172131] text-sm font-semibold text-[#4D8DFF]">
-          {initial}
+        <div className="h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[#1A1E24] bg-[#172131]">
+          {member.avatarUrl ? (
+            <img
+              src={member.avatarUrl}
+              alt={member.name || "User"}
+              className="h-full w-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+              }}
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-[#4D8DFF]">
+              {initial}
+            </div>
+          )}
         </div>
 
         <div className="min-w-0">
@@ -777,8 +792,8 @@ function TeamMember({ member, onClick }) {
 
         <div
           className={`h-1.5 w-1.5 rounded-full ${member.status === "ACTIVE"
-              ? "bg-[#08B77A]"
-              : "bg-[#C5A55A]"
+            ? "bg-[#08B77A]"
+            : "bg-[#C5A55A]"
             }`}
         />
 
@@ -858,8 +873,8 @@ function MemberDetailSheet({ member, onClose }) {
 
             <span
               className={`rounded-md px-2.5 py-1 text-[10px] font-medium ${isActive
-                  ? "bg-[#10251E] text-[#08B77A]"
-                  : "bg-[#211E16] text-[#C5A55A]"
+                ? "bg-[#10251E] text-[#08B77A]"
+                : "bg-[#211E16] text-[#C5A55A]"
                 }`}
             >
               {member.status}

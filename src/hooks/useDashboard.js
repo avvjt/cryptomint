@@ -35,7 +35,7 @@ export default function useDashboard() {
 
       if (!token) {
         throw new Error(
-          "Authentication token not found."
+          "Authentication token not found, pls LOGIN again."
         );
       }
 

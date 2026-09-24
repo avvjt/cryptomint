@@ -151,8 +151,9 @@ export function useTeam() {
   // INITIAL LOAD
   // ================================
   useEffect(() => {
-    fetchTeam();
-  }, [fetchTeam]);
+  fetchTeam();
+  fetchMembers("A");
+}, [fetchTeam, fetchMembers]);
 
   // ================================
   // RETURN

@@ -76,23 +76,23 @@ export default function DepositVerificationCard() {
 
           <div>
 
-           <p className="text-sm font-semibold">
-  {isActive ? "Deposit USDT" : "Activate your account"}
-</p>
+            <p className="text-sm font-semibold">
+              {isActive ? "Deposit USDT" : "Activate your account"}
+            </p>
 
-<p className="mt-1 text-xs leading-5 text-[#737B89]">
-  {isActive ? (
-    "Send USDT to your deposit address below."
-  ) : (
-    <>
-      Deposit at least{" "}
-      <span className="text-white">
-        {WALLET_CONFIG.minimumDeposit} USDT
-      </span>{" "}
-      to activate your account.
-    </>
-  )}
-</p>
+            <p className="mt-1 text-xs leading-5 text-[#737B89]">
+              {isActive ? (
+                "Send USDT to your deposit address below."
+              ) : (
+                <>
+                  Deposit at least{" "}
+                  <span className="text-white">
+                    {WALLET_CONFIG.minimumDeposit} USDT
+                  </span>{" "}
+                  to activate your account.
+                </>
+              )}
+            </p>
 
           </div>
 
