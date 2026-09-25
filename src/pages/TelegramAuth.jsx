@@ -30,12 +30,10 @@ export default function TelegramAuth() {
           "/markets",
           "/trade",
           "/team",
-          "/assets",
-          "/profile",
           "/wallet",
+          "/profile",
           "/history",
         ];
-
         const destination = allowedRoutes.includes(redirectTo)
           ? redirectTo
           : "/dashboard";
@@ -52,7 +50,7 @@ export default function TelegramAuth() {
         if (!cancelled) {
           setError(
             err?.message ||
-              "Telegram authentication failed. Please try again."
+            "Telegram authentication failed. Please try again."
           );
         }
       }
