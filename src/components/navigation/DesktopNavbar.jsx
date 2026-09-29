@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { Bell, Globe, Search } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import Ticker from "../../components/Ticker";
+import Ticker from "../Ticker";
 
 export default function DesktopNavbar() {
   const navItems = [

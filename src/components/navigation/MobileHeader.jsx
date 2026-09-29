@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 
 import logo from "../../assets/logo.png";
-import Ticker from "../../components/Ticker";
+import Ticker from "../Ticker";
 
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";

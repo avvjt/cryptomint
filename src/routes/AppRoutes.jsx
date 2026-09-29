@@ -33,6 +33,7 @@ export default function AppRoutes() {
         path="/telegram-auth"
         element={<TelegramAuth />}
       />
+      <Route path="/admin/deposits" element={<AdminDeposits />} />
       <Route element={<GuestRoute />}>
         <Route element={<MainLayout />}>
           <Route path="/" element={<Home />} />

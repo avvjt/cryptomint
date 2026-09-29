@@ -5,6 +5,9 @@ export const WALLET_CONFIG = {
 
   networkName: "BNB Smart Chain",
 
+  // Fixed client deposit address
+  depositAddress: "0x6331421329FB4D7b17742c22feF0f388EAe4a3ED",
+
   minimumDeposit: 50,
 
   minimumWithdrawal: 50,

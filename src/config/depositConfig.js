@@ -3,17 +3,9 @@ export const DEPOSIT_CONFIG = {
   network: "BEP20",
   networkName: "BNB Smart Chain",
 
-  /*
-   * Frontend development only.
-   *
-   * IMPORTANT:
-   * This is NOT a real deposit address.
-   *
-   * Replace it with the address returned by
-   * your backend before accepting real deposits.
-   */
-  demoAddress:
-    "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
+  // Fixed client deposit address
+  depositAddress:
+    "0x6331421329FB4D7b17742c22feF0f388EAe4a3ED",
 
   api: {
     depositAddress:
