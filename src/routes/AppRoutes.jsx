@@ -25,6 +25,7 @@ import Terms from "../pages/Terms";
 import Privacy from "../pages/Privacy";
 import Disclaimer from "../pages/Disclaimer";
 import TelegramAuth from "../pages/TelegramAuth";
+import AdminDeposits from "../pages/admin/AdminDeposits";
 
 export default function AppRoutes() {
   return (
